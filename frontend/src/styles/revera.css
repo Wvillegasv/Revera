@@ -1,0 +1,108 @@
+/* =========================
+   ESTILOS GLOBALES
+========================= */
+
+body{
+  margin:0;
+  padding:0;
+  font-family: Arial, Helvetica, sans-serif;
+  background:#f3f3f3;
+  color:#00001B;
+}
+
+/* Reset básico */
+
+*{
+  box-sizing:border-box;
+}
+
+img{
+  max-width:100%;
+  height:auto;
+  display:block;
+}
+
+/* =========================
+   CONTENEDOR PRINCIPAL
+========================= */
+
+.home{
+  width:100%;
+  max-width:1400px;
+  margin:0 auto;
+  padding:16px 20px 40px;
+}
+
+/* =========================
+   GRID DE SERVICIOS
+========================= */
+
+.services{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:24px;
+  margin-top:40px;
+  padding:0 clamp(0px, 4vw, 90px);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+/* MONITORES GRANDES */
+
+@media (min-width:1600px){
+
+  .home{
+    max-width:1500px;
+  }
+
+}
+
+/* LAPTOP / TABLET HORIZONTAL */
+
+@media (max-width:1100px){
+
+  .services{
+    grid-template-columns:repeat(2, 1fr);
+    padding:0 10px;
+  }
+
+}
+
+/* TABLET */
+
+@media (max-width:900px){
+
+  .home{
+    padding:14px 16px 32px;
+  }
+
+  .services{
+    grid-template-columns:1fr;
+    margin-top:20px;
+    padding:0;
+  }
+
+}
+
+/* TELEFONO */
+
+@media (max-width:640px){
+
+  .home{
+    padding:12px 12px 28px;
+  }
+
+}
+
+/* TELEFONOS MUY PEQUEÑOS */
+
+@media (max-width:420px){
+
+  .home{
+    padding:10px;
+  }
+
+}

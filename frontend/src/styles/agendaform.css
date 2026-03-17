@@ -1,0 +1,206 @@
+.agenda-form{
+  width:60%;
+  padding:42px 48px 42px 64px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.agenda-form label{
+  font-weight:600;
+  font-size:14px;
+  color:#111;
+  margin-bottom:2px;
+}
+
+.input-group{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:10px 12px;
+  background:#FFFFFF;
+}
+
+.input-group svg{
+  color:#555;
+  flex-shrink:0;
+}
+
+.input-group input,
+.input-group select{
+  border:none;
+  outline:none;
+  width:100%;
+  font-size:14px;
+  background:transparent;
+  color:#333;
+}
+
+.agenda-form textarea{
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  font-size:14px;
+  background:#FFFFFF;
+  color:#333;
+  min-height:120px;
+  resize:none;
+  outline:none;
+}
+
+.row{
+  display:flex;
+  gap:20px;
+}
+
+.field{
+  flex:1;
+}
+
+.telefono-row{
+  display:flex;
+  gap:12px;
+  align-items:stretch;
+}
+
+.country-code-group{
+  min-width:180px;
+}
+
+.country-code-group select{
+  width:100%;
+  height:100%;
+  border:1px solid #ddd;
+  border-radius:10px;
+  padding:10px 12px;
+  background:#FFFFFF;
+  font-size:14px;
+  color:#333;
+  outline:none;
+}
+
+.phone-input-group{
+  flex:1;
+}
+
+.help-message{
+  background:#eef2ff;
+  border-left:4px solid #6b5fb5;
+  padding:8px;
+  margin-top:6px;
+  font-size:13px;
+  border-radius:4px;
+  color:#333;
+}
+
+.error{
+  color:#e53935;
+  font-size:13px;
+  margin-top:4px;
+}
+
+.mensaje-exito{
+  background:#e8f5e9;
+  border-left:5px solid #4caf50;
+  color:#2e7d32;
+  padding:12px;
+  margin-top:15px;
+  margin-bottom:10px;
+  border-radius:6px;
+  font-size:14px;
+}
+
+.mensaje-error{
+  background:#fdecea;
+  border-left:5px solid #e53935;
+  color:#b71c1c;
+  padding:12px;
+  margin-top:15px;
+  margin-bottom:10px;
+  border-radius:6px;
+  font-size:14px;
+}
+
+.agenda-form button{
+  margin-top:10px;
+  background:linear-gradient(90deg,#7b6bbf,#2d1b69);
+  color:#FFFFFF;
+  border:none;
+  padding:14px;
+  border-radius:12px;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:600;
+  transition:transform 0.2s ease, opacity 0.2s ease;
+}
+
+.agenda-form button:hover{
+  transform:translateY(-1px);
+}
+
+.agenda-form button:disabled{
+  opacity:0.7;
+  cursor:not-allowed;
+  transform:none;
+}
+
+/* LAPTOP / TABLET */
+
+@media (max-width:1100px){
+  .agenda-form{
+    padding:36px 32px 36px 42px;
+  }
+
+  .country-code-group{
+    min-width:160px;
+  }
+}
+
+/* TABLET */
+
+@media (max-width:900px){
+  .agenda-form{
+    width:100%;
+    padding:28px 22px;
+  }
+
+  .row{
+    flex-direction:column;
+  }
+
+  .telefono-row{
+    flex-direction:column;
+  }
+
+  .country-code-group{
+    min-width:100%;
+  }
+}
+
+/* TELEFONO */
+
+@media (max-width:640px){
+  .agenda-form{
+    padding:22px 18px;
+    gap:10px;
+  }
+
+  .agenda-form label{
+    font-size:13px;
+  }
+
+  .input-group{
+    padding:10px;
+  }
+
+  .agenda-form textarea{
+    min-height:110px;
+  }
+
+  .agenda-form button{
+    font-size:15px;
+    padding:13px;
+  }
+}

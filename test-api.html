@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prueba API REVERA</title>
+</head>
+
+<body>
+
+<h2>Prueba insertar cita</h2>
+
+<button onclick="enviarCita()">Enviar cita</button>
+
+<script>
+
+function enviarCita(){
+
+const cita = {
+
+  ac_nombre: "Jose vargas",
+  ac_identificacion: "101010102",
+  ac_correo: "jose@test.com",
+  ac_codigo_pais: 506,
+  ac_telefono: "88889999",
+  ac_motivo_cita: "Registro de marca",
+  ac_fecha_cita: "2026-03-10",
+  ac_hora_cita: "10:00 AM"
+
+}
+
+fetch("http://localhost:3000/api/citas",{
+
+  method:"POST",
+
+  headers:{
+    "Content-Type":"application/json"
+  },
+
+  body: JSON.stringify(cita)
+
+})
+.then(res => res.json())
+.then(data => {
+
+  console.log(data)
+
+  alert("Respuesta API: " + JSON.stringify(data))
+
+})
+.catch(error => console.error(error))
+
+}
+
+</script>
+
+</body>
+</html>

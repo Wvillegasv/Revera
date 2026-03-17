@@ -1,0 +1,142 @@
+.navbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  padding:14px 34px;
+  border-radius:30px;
+  background:linear-gradient(90deg,#E6E7E8 0%, #bdb6d9 42%, #6F60AA 100%);
+  box-shadow:0 10px 24px rgba(0,0,0,0.12);
+  margin-bottom:18px;
+}
+
+.logo-revera{
+  display:flex;
+  align-items:center;
+  min-width:230px;
+}
+
+.logo-revera-svg{
+  width:230px;
+  height:34px;
+  display:block;
+}
+
+.logo-revera-group{
+  fill:#120742;
+}
+
+.logo-letter{
+  font-family:"Montserrat", "Poppins", Arial, sans-serif;
+  font-size:30px;
+  font-weight:600;
+  letter-spacing:0;
+  fill:#120742;
+}
+
+.menu{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.menu-pill{
+  border:none;
+  background:#FFFFFF;
+  color:#6F60AA;
+  padding:12px 28px;
+  border-radius:999px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.12);
+  transition:transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.menu-pill:hover{
+  transform:translateY(-1px);
+  box-shadow:0 8px 18px rgba(0,0,0,0.14);
+}
+
+.menu-link{
+  border:none;
+  background:transparent;
+  color:#00001B;
+  padding:10px 14px;
+  font-size:16px;
+  font-weight:500;
+  cursor:pointer;
+  transition:opacity 0.2s ease;
+}
+
+.menu-link:hover{
+  opacity:0.75;
+}
+
+@media (max-width:640px){
+  .navbar{
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+    padding:16px 18px;
+    border-radius:24px;
+  }
+
+  .logo-revera{
+    justify-content:center;
+    min-width:auto;
+  }
+
+  .logo-revera-svg{
+    width:205px;
+    height:32px;
+  }
+
+  .logo-letter{
+    font-size:28px;
+  }
+
+  .menu{
+    justify-content:center;
+    gap:8px;
+  }
+
+  .menu-pill{
+    padding:10px 22px;
+    font-size:15px;
+  }
+
+  .menu-link{
+    font-size:15px;
+    padding:8px 10px;
+  }
+}
+
+.logo-revera{
+
+ display:flex;
+ align-items:center;
+
+}
+
+.logo-revera-svg{
+
+ width:240px;
+ height:40px;
+
+}
+
+.logo-revera-text{
+
+ fill:#120742;
+
+ font-family:"Montserrat","Poppins",sans-serif;
+
+ font-weight:600;
+
+ font-size:38px;
+
+ letter-spacing:8px;
+
+}

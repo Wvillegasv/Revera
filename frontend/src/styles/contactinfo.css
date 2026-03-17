@@ -1,0 +1,44 @@
+.contact-info{
+  width:40%;
+  padding:42px 34px;
+  color:#FFFFFF;
+  background:linear-gradient(180deg,#6F60AA 0%, #4f4287 45%, #120742 100%);
+}
+
+.contact-info h2{
+  margin:0 0 28px;
+  font-size:30px;
+  line-height:1.2;
+}
+
+.contact-item{
+  display:flex;
+  gap:15px;
+  align-items:flex-start;
+  margin-bottom:24px;
+}
+
+.contact-item strong{
+  display:block;
+  margin-bottom:5px;
+  font-size:15px;
+}
+
+.contact-item p{
+  margin:0;
+  color:rgba(255,255,255,0.90);
+  font-size:14px;
+  line-height:1.65;
+}
+
+.contact-item svg{
+  color:#FFFFFF;
+  margin-top:3px;
+  flex-shrink:0;
+}
+
+@media (max-width:900px){
+  .contact-info{
+    width:100%;
+  }
+}
