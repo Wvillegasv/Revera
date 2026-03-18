@@ -1,16 +1,13 @@
-import "../styles/servicecard.css"
+import "../styles/servicecard.css";
 
-function ServiceCard({ titulo, descripcion, icono, onClick }) {
+function ServiceCard({ icon, title, description }) {
   return (
-    <article className="service-card" onClick={onClick}>
-      <div className="service-icon">
-        {icono}
-      </div>
-
-      <h3>{titulo}</h3>
-      <p>{descripcion}</p>
+    <article className="service-card">
+      <div className="service-card-icon">{icon}</div>
+      <h3>{title}</h3>
+      <p>{description}</p>
     </article>
-  )
+  );
 }
 
-export default ServiceCard
+export default ServiceCard;

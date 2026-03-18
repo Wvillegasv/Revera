@@ -1,88 +1,81 @@
-import { useRef, useState } from "react"
-import "../styles/revera.css"
-import "../styles/hero.css"
-import "../styles/agenda.css"
-
-import Navbar from "../components/Navbar"
-import ContactInfo from "../components/ContactInfo"
-import AgendaForm from "../components/AgendaForm"
-import ServiceCard from "../components/ServiceCard"
-
-import { Search, FileText, CalendarDays } from "lucide-react"
-
-import rFondo from "../assets/r-fondo.jpg"
-import tresPuntos from "../assets/tres-puntos.jpg"
-import logoR from "../assets/logo-r.jpg"
-
-
+import Navbar from "../components/Navbar";
+import ServiceCard from "../components/ServiceCard";
+import AgendaForm from "../components/AgendaForm";
+import ContactInfo from "../components/ContactInfo";
+import { Search, FileText, CalendarDays } from "lucide-react";
+import "../styles/revera.css";
+import "../styles/hero.css";
+import "../styles/agenda.css";
 
 function Home() {
-  const [mostrarAgenda, setMostrarAgenda] = useState(false)
-  const agendaRef = useRef(null)
-
-  const abrirAgenda = () => {
-    setMostrarAgenda(true)
-
-    setTimeout(() => {
-      agendaRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      })
-    }, 100)
-  }
+  const servicios = [
+    {
+      id: 1,
+      icon: <Search size={34} strokeWidth={2.2} />,
+      title: "Estudio de Registrabilidad",
+      description: "Verificamos si tu marca puede ser registrada legalmente",
+    },
+    {
+      id: 2,
+      icon: <FileText size={34} strokeWidth={2.2} />,
+      title: "Registro de Marca",
+      description: "Iniciamos el proceso completo de registro de tu marca",
+    },
+    {
+      id: 3,
+      icon: <CalendarDays size={34} strokeWidth={2.2} />,
+      title: "Asesoría Personalizada",
+      description: "Agenda una cita con nuestros expertos",
+    },
+  ];
 
   return (
-    <div className="home">
-      <Navbar onContactoClick={abrirAgenda} />
+    <div id="home-top" className="home-page">
+      <Navbar />
 
-      <section className="hero">
-        <img src={rFondo} alt="" className="hero-r-bg" />
-        <img src={logoR} alt="" className="hero-logo-top" />
-        <img src={tresPuntos} alt="" className="hero-dots" />
+      <main className="hero-section">
+        <div className="hero-background-shape">
+          <div className="hero-logo-circle">R</div>
 
-        <div className="hero-text">
+          <div className="hero-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+
+        <section className="hero-content">
           <h1>¿Necesitas ayuda con tu marca?</h1>
           <h2>¡Nosotros te ayudamos!</h2>
           <p>Selecciona el servicio que necesitas</p>
+        </section>
+
+        <section className="services-section">
+          {servicios.map((service) => (
+            <ServiceCard
+              key={service.id}
+              icon={service.icon}
+              title={service.title}
+              description={service.description}
+            />
+          ))}
+        </section>
+      </main>
+
+      <section id="contacto" className="agenda-section">
+        <div className="agenda-header">
+          <h2>Agenda una Cita</h2>
+          <p>Completa el formulario y nos pondremos en contacto contigo</p>
+        </div>
+
+        <div className="agenda-wrapper">
+          <ContactInfo />
+          <AgendaForm />
         </div>
       </section>
-
-      <section className="services">
-        <ServiceCard
-          titulo="Estudio de Registrabilidad"
-          descripcion="Verificamos si tu marca puede ser registrada legalmente"
-          icono={<Search size={28} />}
-        />
-
-        <ServiceCard
-          titulo="Registro de Marca"
-          descripcion="Iniciamos el proceso completo de registro de tu marca"
-          icono={<FileText size={28} />}
-        />
-
-        <ServiceCard
-          titulo="Asesoría Personalizada"
-          descripcion="Agenda una cita con nuestros expertos"
-          icono={<CalendarDays size={28} />}
-          onClick={abrirAgenda}
-        />
-      </section>
-
-      {mostrarAgenda && (
-        <section ref={agendaRef} className="agenda-section">
-          <div className="agenda-header">
-            <h1>Agenda una Cita</h1>
-            <p>Completa el formulario y nos pondremos en contacto contigo</p>
-          </div>
-
-          <div className="agenda-layout">
-            <ContactInfo />
-            <AgendaForm />
-          </div>
-        </section>
-      )}
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;

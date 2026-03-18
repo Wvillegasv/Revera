@@ -1,142 +1,129 @@
-.navbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:20px;
-  padding:14px 34px;
-  border-radius:30px;
-  background:linear-gradient(90deg,#E6E7E8 0%, #bdb6d9 42%, #6F60AA 100%);
-  box-shadow:0 10px 24px rgba(0,0,0,0.12);
-  margin-bottom:18px;
+/* NAVBAR CONTENEDOR */
+.navbar {
+  width: 100%;
+  max-width: 1215px;
+  margin: 6px auto 0;
+  min-height: 60px;
+  border-radius: 20px;
+  background: linear-gradient(90deg, #e5e5ea 0%, #8d7bc2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 20px;
+  gap: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
 
-.logo-revera{
-  display:flex;
-  align-items:center;
-  min-width:230px;
+/* LOGO */
+.navbar-logo {
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: 10px;
+  color: #1a154c;
+  white-space: nowrap;
+
+  /* ajuste fino vertical */
+  position: relative;
+  top: -2px;
 }
 
-.logo-revera-svg{
-  width:230px;
-  height:34px;
-  display:block;
+/* MENÚ */
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-.logo-revera-group{
-  fill:#120742;
+/* BOTÓN CHAT (PILL) */
+.navbar-pill {
+  background: #ffffff;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6e61b1;
+  text-decoration: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s ease;
 }
 
-.logo-letter{
-  font-family:"Montserrat", "Poppins", Arial, sans-serif;
-  font-size:30px;
-  font-weight:600;
-  letter-spacing:0;
-  fill:#120742;
+/* LINKS */
+.navbar-link {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #100b35;
+  text-decoration: none;
+  transition: all 0.2s ease;
 }
 
-.menu{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  flex-wrap:wrap;
+/* BOTÓN CONTACTO (IMPORTANTE) */
+.navbar-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
 }
 
-.menu-pill{
-  border:none;
-  background:#FFFFFF;
-  color:#6F60AA;
-  padding:12px 28px;
-  border-radius:999px;
-  font-size:16px;
-  font-weight:700;
-  cursor:pointer;
-  box-shadow:0 4px 12px rgba(0,0,0,0.12);
-  transition:transform 0.2s ease, box-shadow 0.2s ease;
+/* ESTADOS */
+.navbar-pill:hover,
+.navbar-link:hover {
+  transform: translateY(-1px);
 }
 
-.menu-pill:hover{
-  transform:translateY(-1px);
-  box-shadow:0 8px 18px rgba(0,0,0,0.14);
+.active-link {
+  background: rgba(255, 255, 255, 0.35);
 }
 
-.menu-link{
-  border:none;
-  background:transparent;
-  color:#00001B;
-  padding:10px 14px;
-  font-size:16px;
-  font-weight:500;
-  cursor:pointer;
-  transition:opacity 0.2s ease;
-}
+/* ===== RESPONSIVE ===== */
 
-.menu-link:hover{
-  opacity:0.75;
-}
-
-@media (max-width:640px){
-  .navbar{
-    flex-direction:column;
-    align-items:center;
-    gap:14px;
-    padding:16px 18px;
-    border-radius:24px;
+/* Tablet */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 12px;
+    border-radius: 18px;
   }
 
-  .logo-revera{
-    justify-content:center;
-    min-width:auto;
+  .navbar-logo {
+    font-size: 22px;
+    letter-spacing: 6px;
+    top: 0;
   }
 
-  .logo-revera-svg{
-    width:205px;
-    height:32px;
+  .navbar-menu {
+    justify-content: center;
+    gap: 8px;
   }
 
-  .logo-letter{
-    font-size:28px;
-  }
-
-  .menu{
-    justify-content:center;
-    gap:8px;
-  }
-
-  .menu-pill{
-    padding:10px 22px;
-    font-size:15px;
-  }
-
-  .menu-link{
-    font-size:15px;
-    padding:8px 10px;
+  .navbar-pill,
+  .navbar-link {
+    font-size: 13px;
+    padding: 6px 12px;
   }
 }
 
-.logo-revera{
+/* Teléfono */
+@media (max-width: 480px) {
+  .navbar-logo {
+    font-size: 20px;
+    letter-spacing: 4px;
+  }
 
- display:flex;
- align-items:center;
+  .navbar-menu {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
 
-}
-
-.logo-revera-svg{
-
- width:240px;
- height:40px;
-
-}
-
-.logo-revera-text{
-
- fill:#120742;
-
- font-family:"Montserrat","Poppins",sans-serif;
-
- font-weight:600;
-
- font-size:38px;
-
- letter-spacing:8px;
-
+  .navbar-pill,
+  .navbar-link {
+    width: 100%;
+    text-align: center;
+  }
 }

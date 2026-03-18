@@ -1,44 +1,61 @@
-import { Link } from "react-router-dom"
-import "../styles/navbar.css"
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import "../styles/navbar.css";
 
-function Navbar({ onContactoClick }) {
+function Navbar() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const irAContacto = () => {
+    if (location.pathname === "/") {
+      const seccion = document.getElementById("contacto");
+      if (seccion) {
+        seccion.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    } else {
+      navigate("/");
+
+      setTimeout(() => {
+        const seccion = document.getElementById("contacto");
+        if (seccion) {
+          seccion.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 200);
+    }
+  };
+
   return (
-    <nav className="navbar">
-      <div className="logo-revera" aria-label="REVERA">
-        <svg
-          viewBox="0 0 360 48"
-          className="logo-revera-svg"
-          xmlns="http://www.w3.org/2000/svg"
-          role="img"
+    <header className="navbar">
+      <div className="navbar-logo">REVERA</div>
+
+      <nav className="navbar-menu">
+        <Link
+          to="/chatbot-registrabilidad"
+          className={`navbar-pill ${
+            location.pathname === "/chatbot-registrabilidad" ? "active" : ""
+          }`}
         >
-          <g className="logo-revera-group">
-            <text x="0" y="33" className="logo-letter">R</text>
-            <text x="55" y="33" className="logo-letter">E</text>
-            <text x="107" y="33" className="logo-letter">V</text>
-            <text x="165" y="33" className="logo-letter">E</text>
-            <text x="217" y="33" className="logo-letter">R</text>
-            <text x="272" y="33" className="logo-letter">A</text>
-          </g>
-        </svg>
-      </div>
-
-      <div className="menu">
-        <button className="menu-pill">
           Chat
-        </button>
+        </Link>
 
-        <button className="menu-link" onClick={onContactoClick}>
+        <button
+          type="button"
+          className="navbar-link navbar-button"
+          onClick={irAContacto}
+        >
           Contacto
         </button>
 
-        <Link to="/blog">
-          <button className="menu-link">
-            Blog
-          </button>
+        <Link
+          to="/blog"
+          className={`navbar-link ${
+            location.pathname === "/blog" ? "active-link" : ""
+          }`}
+        >
+          Blog
         </Link>
-      </div>
-    </nav>
-  )
+      </nav>
+    </header>
+  );
 }
 
-export default Navbar
+export default Navbar;

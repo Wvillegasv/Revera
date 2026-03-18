@@ -1,37 +1,43 @@
-import "../styles/contactinfo.css"
-import { Mail, Phone, Clock } from "lucide-react"
+import { Mail, Phone, Clock3 } from "lucide-react";
+import "../styles/contactinfo.css";
 
 function ContactInfo() {
   return (
-    <div className="contact-info">
-      <h2>Información de Contacto</h2>
+    <aside className="contact-info-card">
+      <h3>Información de Contacto</h3>
 
-      <div className="contact-item">
-        <Mail size={22} />
+      <div className="contact-info-item">
+        <div className="contact-info-icon">
+          <Mail size={24} strokeWidth={2.2} />
+        </div>
         <div>
-          <strong>Email</strong>
+          <h4>Email</h4>
           <p>contacto@revera.com</p>
         </div>
       </div>
 
-      <div className="contact-item">
-        <Phone size={22} />
+      <div className="contact-info-item">
+        <div className="contact-info-icon">
+          <Phone size={24} strokeWidth={2.2} />
+        </div>
         <div>
-          <strong>Teléfono</strong>
+          <h4>Teléfono</h4>
           <p>+52 55 1234 5678</p>
         </div>
       </div>
 
-      <div className="contact-item">
-        <Clock size={22} />
+      <div className="contact-info-item">
+        <div className="contact-info-icon">
+          <Clock3 size={24} strokeWidth={2.2} />
+        </div>
         <div>
-          <strong>Horario</strong>
+          <h4>Horario</h4>
           <p>Lun - Vie: 9:00 - 18:00</p>
           <p>Sáb: 10:00 - 14:00</p>
         </div>
       </div>
-    </div>
-  )
+    </aside>
+  );
 }
 
-export default ContactInfo
+export default ContactInfo;

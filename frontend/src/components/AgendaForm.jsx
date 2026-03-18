@@ -1,17 +1,17 @@
-import { useForm } from "react-hook-form"
-import { useEffect, useState } from "react"
-import { User, Mail, Phone, Calendar, Clock } from "lucide-react"
-import api from "../services/api"
-import "../styles/agendaform.css"
+import { useForm } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { User, Mail, Phone, Calendar, Clock, MessageSquare } from "lucide-react";
+import api from "../services/api";
+import "../styles/agendaform.css";
 
-const HORARIOS_BASE = ["09:00", "10:00", "11:00", "14:00", "15:00"]
+const HORARIOS_BASE = ["09:00", "10:00", "11:00", "14:00", "15:00"];
 
 function obtenerFechaHoyLocal() {
-  const hoy = new Date()
-  const year = hoy.getFullYear()
-  const month = String(hoy.getMonth() + 1).padStart(2, "0")
-  const day = String(hoy.getDate()).padStart(2, "0")
-  return `${year}-${month}-${day}`
+  const hoy = new Date();
+  const year = hoy.getFullYear();
+  const month = String(hoy.getMonth() + 1).padStart(2, "0");
+  const day = String(hoy.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function AgendaForm() {
@@ -21,76 +21,76 @@ function AgendaForm() {
     reset,
     watch,
     setValue,
-    formState: { errors }
+    formState: { errors },
   } = useForm({
     defaultValues: {
       ac_codigo_pais: "506",
-      ac_hora_cita: ""
-    }
-  })
+      ac_hora_cita: "",
+    },
+  });
 
-  const [campoActivo, setCampoActivo] = useState("")
-  const [mensajeExito, setMensajeExito] = useState("")
-  const [mensajeError, setMensajeError] = useState("")
-  const [horariosOcupados, setHorariosOcupados] = useState([])
-  const [cargandoHorarios, setCargandoHorarios] = useState(false)
+  const [campoActivo, setCampoActivo] = useState("");
+  const [mensajeExito, setMensajeExito] = useState("");
+  const [mensajeError, setMensajeError] = useState("");
+  const [horariosOcupados, setHorariosOcupados] = useState([]);
+  const [cargandoHorarios, setCargandoHorarios] = useState(false);
 
-  const fechaSeleccionada = watch("ac_fecha_cita")
+  const fechaSeleccionada = watch("ac_fecha_cita");
 
-  const activar = (campo) => setCampoActivo(campo)
-  const limpiar = () => setCampoActivo("")
+  const activar = (campo) => setCampoActivo(campo);
+  const limpiar = () => setCampoActivo("");
 
   useEffect(() => {
     const cargarHorarios = async () => {
       if (!fechaSeleccionada) {
-        setHorariosOcupados([])
-        setValue("ac_hora_cita", "")
-        return
+        setHorariosOcupados([]);
+        setValue("ac_hora_cita", "");
+        return;
       }
 
-      const hoy = obtenerFechaHoyLocal()
+      const hoy = obtenerFechaHoyLocal();
 
       if (fechaSeleccionada < hoy) {
-        setHorariosOcupados([])
-        setValue("ac_hora_cita", "")
-        return
+        setHorariosOcupados([]);
+        setValue("ac_hora_cita", "");
+        return;
       }
 
       try {
-        setCargandoHorarios(true)
-        setMensajeError("")
+        setCargandoHorarios(true);
+        setMensajeError("");
 
         const response = await api.get("/citas/horarios-disponibles", {
-          params: { fecha: fechaSeleccionada }
-        })
+          params: { fecha: fechaSeleccionada },
+        });
 
-        const ocupados = response.data.horariosOcupados || []
-        setHorariosOcupados(ocupados)
-        setValue("ac_hora_cita", "")
+        const ocupados = response.data.horariosOcupados || [];
+        setHorariosOcupados(ocupados);
+        setValue("ac_hora_cita", "");
       } catch (error) {
-        console.error("Error consultando horarios:", error)
-        setHorariosOcupados([])
+        console.error("Error consultando horarios:", error);
+        setHorariosOcupados([]);
       } finally {
-        setCargandoHorarios(false)
+        setCargandoHorarios(false);
       }
-    }
+    };
 
-    cargarHorarios()
-  }, [fechaSeleccionada, setValue])
+    cargarHorarios();
+  }, [fechaSeleccionada, setValue]);
 
   const onSubmit = async (data) => {
-    const hoy = obtenerFechaHoyLocal()
+    const hoy = obtenerFechaHoyLocal();
 
     if (data.ac_fecha_cita < hoy) {
-      setMensajeError("No se puede agendar una cita en una fecha pasada.")
-      setMensajeExito("")
-      return
+      setMensajeError("No se puede agendar una cita en una fecha pasada.");
+      setMensajeExito("");
+      return;
     }
 
     if (horariosOcupados.includes(data.ac_hora_cita)) {
-      setMensajeError("La hora seleccionada ya no está disponible. Selecciona otra.")
-      setMensajeExito("")
-      return
+      setMensajeError("La hora seleccionada ya no está disponible. Selecciona otra.");
+      setMensajeExito("");
+      return;
     }
 
     const cita = {
@@ -104,277 +104,329 @@ function AgendaForm() {
       ac_hora_cita: data.ac_hora_cita,
       nombre_marca: "",
       descripcion_producto_servicio: data.ac_motivo_cita,
-      adjunto_imagenes: false
-    }
+      adjunto_imagenes: false,
+    };
 
-    setMensajeExito("")
-    setMensajeError("")
+    setMensajeExito("");
+    setMensajeError("");
 
     try {
-      const response = await api.post("/citas", cita)
+      const response = await api.post("/citas", cita);
 
       if (response.data.ok) {
         if (response.data.correoEnviado === false) {
-          setMensajeExito("Cita registrada correctamente. Sin embargo, hubo un problema al enviar la notificación por correo.")
+          setMensajeExito(
+            "Cita registrada correctamente. Sin embargo, hubo un problema al enviar la notificación por correo."
+          );
+
+          setTimeout(() => {
+            setMensajeExito("");
+            document.getElementById("home-top")?.scrollIntoView({
+              behavior: "smooth",
+            });
+          }, 5000);
         } else {
-          setMensajeExito("Gracias por contactarnos, nos pondremos en contacto pronto.")
+          setMensajeExito("Gracias por contactarnos, nos pondremos en contacto pronto.");
+
+          setTimeout(() => {
+            setMensajeExito("");
+            document.getElementById("home-top")?.scrollIntoView({
+              behavior: "smooth",
+            });
+          }, 3000);
         }
 
         reset({
+          ac_nombre: "",
+          ac_correo: "",
           ac_codigo_pais: "506",
-          ac_hora_cita: ""
-        })
+          ac_telefono: "",
+          ac_fecha_cita: "",
+          ac_hora_cita: "",
+          ac_motivo_cita: "",
+        });
 
-        setCampoActivo("")
-        setHorariosOcupados([])
+        setCampoActivo("");
+        setHorariosOcupados([]);
+      } else {
+        setMensajeError("No fue posible registrar la cita. Inténtalo nuevamente.");
 
         setTimeout(() => {
-          setMensajeExito("")
-        }, 5000)
-      } else {
-        setMensajeError("No fue posible registrar la cita. Inténtalo nuevamente.")
+          setMensajeError("");
+        }, 5000);
       }
     } catch (error) {
-      console.error("Error registrando la cita:", error)
+      console.error("Error registrando la cita:", error);
 
       const mensajeBackend =
         error.response?.data?.mensaje ||
-        "No fue posible registrar la cita. Inténtalo nuevamente."
+        error.response?.data?.message ||
+        "No fue posible registrar la cita. Inténtalo nuevamente.";
 
-      setMensajeError(mensajeBackend)
+      setMensajeError(mensajeBackend);
 
       setTimeout(() => {
-        setMensajeError("")
-      }, 5000)
+        setMensajeError("");
+      }, 5000);
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="agenda-form">
-      <label>Nombre Completo</label>
-      <div className="input-group">
-        <User size={18} />
-        <input
-          placeholder="Tu nombre"
-          {...register("ac_nombre", {
-            required: "El nombre es obligatorio",
-            minLength: {
-              value: 10,
-              message: "El nombre debe tener al menos 10 caracteres"
-            }
-          })}
-          onMouseEnter={() => activar("nombre")}
-          onFocus={() => activar("nombre")}
-          onMouseLeave={limpiar}
-        />
-      </div>
+    <div className="agenda-form-shell">
+      <div className="agenda-form-decoration"></div>
 
-      {campoActivo === "nombre" && (
-        <p className="help-message">
-          ¡Hola! Para agendar una consultoría, ¿cuál es tu nombre completo?
-        </p>
-      )}
-      {errors.ac_nombre && <p className="error">{errors.ac_nombre.message}</p>}
+      <form onSubmit={handleSubmit(onSubmit)} className="agenda-form-card">
+        <div className="agenda-form-group">
+          <label htmlFor="ac_nombre">
+            <User size={18} />
+            <span>Nombre Completo</span>
+          </label>
 
-      <label>Correo Electrónico</label>
-      <div className="input-group">
-        <Mail size={18} />
-        <input
-          placeholder="tu@email.com"
-          {...register("ac_correo", {
-            required: "El correo es obligatorio",
-            pattern: {
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Correo electrónico inválido"
-            }
-          })}
-          onMouseEnter={() => activar("correo")}
-          onFocus={() => activar("correo")}
-          onMouseLeave={limpiar}
-        />
-      </div>
-
-      {campoActivo === "correo" && (
-        <p className="help-message">
-          Gracias. ¿Cuál es tu correo electrónico para contactarte?
-        </p>
-      )}
-      {errors.ac_correo && <p className="error">{errors.ac_correo.message}</p>}
-
-      <label>Teléfono</label>
-      <div className="telefono-row">
-        <div className="country-code-group">
-          <select
-            {...register("ac_codigo_pais", {
-              required: "Debe seleccionar un código de país"
-            })}
-            onMouseEnter={() => activar("telefono")}
-            onFocus={() => activar("telefono")}
-            onMouseLeave={limpiar}
-          >
-            <option value="506">Costa Rica (+506)</option>
-            <option value="1">Estados Unidos (+1)</option>
-            <option value="52">México (+52)</option>
-            <option value="34">España (+34)</option>
-            <option value="44">Reino Unido (+44)</option>
-            <option value="55">Brasil (+55)</option>
-            <option value="57">Colombia (+57)</option>
-            <option value="54">Argentina (+54)</option>
-            <option value="56">Chile (+56)</option>
-            <option value="51">Perú (+51)</option>
-            <option value="593">Ecuador (+593)</option>
-            <option value="591">Bolivia (+591)</option>
-            <option value="595">Paraguay (+595)</option>
-            <option value="598">Uruguay (+598)</option>
-            <option value="507">Panamá (+507)</option>
-            <option value="502">Guatemala (+502)</option>
-            <option value="503">El Salvador (+503)</option>
-            <option value="504">Honduras (+504)</option>
-            <option value="505">Nicaragua (+505)</option>
-          </select>
-        </div>
-
-        <div className="input-group phone-input-group">
-          <Phone size={18} />
-          <input
-            placeholder="88889999"
-            {...register("ac_telefono", {
-              required: "El teléfono es obligatorio",
-              pattern: {
-                value: /^[0-9]+$/,
-                message: "El teléfono solo debe contener números"
-              },
-              minLength: {
-                value: 8,
-                message: "El teléfono debe tener al menos 8 números"
-              }
-            })}
-            onMouseEnter={() => activar("telefono")}
-            onFocus={() => activar("telefono")}
-            onMouseLeave={limpiar}
-          />
-        </div>
-      </div>
-
-      {campoActivo === "telefono" && (
-        <p className="help-message">
-          ¿Cuál es tu teléfono para contactarte?
-        </p>
-      )}
-      {errors.ac_codigo_pais && <p className="error">{errors.ac_codigo_pais.message}</p>}
-      {errors.ac_telefono && <p className="error">{errors.ac_telefono.message}</p>}
-
-      <div className="row">
-        <div className="field">
-          <label>Fecha Preferida</label>
           <div className="input-group">
-            <Calendar size={18} />
+            <User size={18} />
             <input
-              type="date"
-              min={obtenerFechaHoyLocal()}
-              {...register("ac_fecha_cita", {
-                required: "Debe seleccionar una fecha"
+              id="ac_nombre"
+              placeholder="Tu nombre"
+              {...register("ac_nombre", {
+                required: "El nombre es obligatorio",
+                minLength: {
+                  value: 10,
+                  message: "El nombre debe tener al menos 10 caracteres",
+                },
               })}
-              onMouseEnter={() => activar("fecha")}
-              onFocus={() => activar("fecha")}
+              onMouseEnter={() => activar("nombre")}
+              onFocus={() => activar("nombre")}
               onMouseLeave={limpiar}
             />
           </div>
 
-          {campoActivo === "fecha" && (
+          {campoActivo === "nombre" && (
             <p className="help-message">
-              ¿Cuál fecha desea?
+              ¡Hola! Para agendar una consultoría, ¿cuál es tu nombre completo?
             </p>
           )}
-          {errors.ac_fecha_cita && <p className="error">{errors.ac_fecha_cita.message}</p>}
+          {errors.ac_nombre && <p className="error">{errors.ac_nombre.message}</p>}
         </div>
 
-        <div className="field">
-          <label>Hora Preferida</label>
+        <div className="agenda-form-group">
+          <label htmlFor="ac_correo">
+            <Mail size={18} />
+            <span>Correo Electrónico</span>
+          </label>
+
           <div className="input-group">
-            <Clock size={18} />
-            <select
-              {...register("ac_hora_cita", {
-                required: "Debe seleccionar una hora"
+            <Mail size={18} />
+            <input
+              id="ac_correo"
+              placeholder="tu@email.com"
+              {...register("ac_correo", {
+                required: "El correo es obligatorio",
+                pattern: {
+                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                  message: "Correo electrónico inválido",
+                },
               })}
-              onMouseEnter={() => activar("hora")}
-              onFocus={() => activar("hora")}
+              onMouseEnter={() => activar("correo")}
+              onFocus={() => activar("correo")}
               onMouseLeave={limpiar}
-              disabled={!fechaSeleccionada || cargandoHorarios}
-            >
-              <option value="">
-                {cargandoHorarios ? "Cargando horarios..." : "Seleccione una hora"}
-              </option>
-
-              {HORARIOS_BASE.map((hora) => {
-                const ocupado = horariosOcupados.includes(hora)
-
-                return (
-                  <option
-                    key={hora}
-                    value={hora}
-                    disabled={ocupado}
-                  >
-                    {ocupado ? `${hora} - No disponible` : hora}
-                  </option>
-                )
-              })}
-            </select>
+            />
           </div>
 
-          {campoActivo === "hora" && (
+          {campoActivo === "correo" && (
             <p className="help-message">
-              ¿Cuál hora desea?
+              Gracias. ¿Cuál es tu correo electrónico para contactarte?
             </p>
           )}
-          {fechaSeleccionada && !cargandoHorarios && horariosOcupados.length > 0 && (
+          {errors.ac_correo && <p className="error">{errors.ac_correo.message}</p>}
+        </div>
+
+        <div className="agenda-form-group">
+          <label>
+            <Phone size={18} />
+            <span>Teléfono</span>
+          </label>
+
+          <div className="telefono-row">
+            <div className="country-code-group">
+              <select
+                {...register("ac_codigo_pais", {
+                  required: "Debe seleccionar un código de país",
+                })}
+                onMouseEnter={() => activar("telefono")}
+                onFocus={() => activar("telefono")}
+                onMouseLeave={limpiar}
+              >
+                <option value="506">Costa Rica (+506)</option>
+                <option value="1">Estados Unidos (+1)</option>
+                <option value="52">México (+52)</option>
+                <option value="34">España (+34)</option>
+                <option value="44">Reino Unido (+44)</option>
+                <option value="55">Brasil (+55)</option>
+                <option value="57">Colombia (+57)</option>
+                <option value="54">Argentina (+54)</option>
+                <option value="56">Chile (+56)</option>
+                <option value="51">Perú (+51)</option>
+                <option value="593">Ecuador (+593)</option>
+                <option value="591">Bolivia (+591)</option>
+                <option value="595">Paraguay (+595)</option>
+                <option value="598">Uruguay (+598)</option>
+                <option value="507">Panamá (+507)</option>
+                <option value="502">Guatemala (+502)</option>
+                <option value="503">El Salvador (+503)</option>
+                <option value="504">Honduras (+504)</option>
+                <option value="505">Nicaragua (+505)</option>
+              </select>
+            </div>
+
+            <div className="input-group phone-input-group">
+              <Phone size={18} />
+              <input
+                placeholder="88889999"
+                {...register("ac_telefono", {
+                  required: "El teléfono es obligatorio",
+                  pattern: {
+                    value: /^[0-9]+$/,
+                    message: "El teléfono solo debe contener números",
+                  },
+                  minLength: {
+                    value: 8,
+                    message: "El teléfono debe tener al menos 8 números",
+                  },
+                })}
+                onMouseEnter={() => activar("telefono")}
+                onFocus={() => activar("telefono")}
+                onMouseLeave={limpiar}
+              />
+            </div>
+          </div>
+
+          {campoActivo === "telefono" && (
+            <p className="help-message">¿Cuál es tu teléfono para contactarte?</p>
+          )}
+          {errors.ac_codigo_pais && (
+            <p className="error">{errors.ac_codigo_pais.message}</p>
+          )}
+          {errors.ac_telefono && <p className="error">{errors.ac_telefono.message}</p>}
+        </div>
+
+        <div className="agenda-form-row">
+          <div className="agenda-form-group">
+            <label htmlFor="ac_fecha_cita">
+              <Calendar size={18} />
+              <span>Fecha Preferida</span>
+            </label>
+
+            <div className="input-group">
+              <Calendar size={18} />
+              <input
+                id="ac_fecha_cita"
+                type="date"
+                min={obtenerFechaHoyLocal()}
+                {...register("ac_fecha_cita", {
+                  required: "Debe seleccionar una fecha",
+                })}
+                onMouseEnter={() => activar("fecha")}
+                onFocus={() => activar("fecha")}
+                onMouseLeave={limpiar}
+              />
+            </div>
+
+            {campoActivo === "fecha" && (
+              <p className="help-message">¿Cuál fecha desea?</p>
+            )}
+            {errors.ac_fecha_cita && (
+              <p className="error">{errors.ac_fecha_cita.message}</p>
+            )}
+          </div>
+
+          <div className="agenda-form-group">
+            <label htmlFor="ac_hora_cita">
+              <Clock size={18} />
+              <span>Hora Preferida</span>
+            </label>
+
+            <div className="input-group">
+              <Clock size={18} />
+              <select
+                id="ac_hora_cita"
+                {...register("ac_hora_cita", {
+                  required: "Debe seleccionar una hora",
+                })}
+                onMouseEnter={() => activar("hora")}
+                onFocus={() => activar("hora")}
+                onMouseLeave={limpiar}
+                disabled={!fechaSeleccionada || cargandoHorarios}
+              >
+                <option value="">
+                  {cargandoHorarios ? "Cargando horarios..." : "Seleccione una hora"}
+                </option>
+
+                {HORARIOS_BASE.map((hora) => {
+                  const ocupado = horariosOcupados.includes(hora);
+
+                  return (
+                    <option key={hora} value={hora} disabled={ocupado}>
+                      {ocupado ? `${hora} - No disponible` : hora}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            {campoActivo === "hora" && (
+              <p className="help-message">¿Cuál hora desea?</p>
+            )}
+            {fechaSeleccionada && !cargandoHorarios && horariosOcupados.length > 0 && (
+              <p className="help-message">
+                Horas no disponibles: {horariosOcupados.join(", ")}
+              </p>
+            )}
+            {errors.ac_hora_cita && (
+              <p className="error">{errors.ac_hora_cita.message}</p>
+            )}
+          </div>
+        </div>
+
+        <div className="agenda-form-group">
+          <label htmlFor="ac_motivo_cita">
+            <MessageSquare size={18} />
+            <span>Motivo de la Cita</span>
+          </label>
+
+          <textarea
+            id="ac_motivo_cita"
+            placeholder="Cuéntanos brevemente el motivo de tu cita..."
+            {...register("ac_motivo_cita", {
+              required: "Debe indicar el motivo",
+              minLength: {
+                value: 20,
+                message: "El motivo debe tener al menos 20 caracteres",
+              },
+            })}
+            onMouseEnter={() => activar("motivo")}
+            onFocus={() => activar("motivo")}
+            onMouseLeave={limpiar}
+          />
+
+          {campoActivo === "motivo" && (
             <p className="help-message">
-              Horas no disponibles: {horariosOcupados.join(", ")}
+              Cuéntanos brevemente en qué podemos ayudarte con tu marca.
             </p>
           )}
-          {errors.ac_hora_cita && <p className="error">{errors.ac_hora_cita.message}</p>}
+          {errors.ac_motivo_cita && (
+            <p className="error">{errors.ac_motivo_cita.message}</p>
+          )}
         </div>
-      </div>
 
-      <label>Motivo de la Cita</label>
-      <textarea
-        placeholder="Cuéntanos brevemente el motivo de tu cita..."
-        {...register("ac_motivo_cita", {
-          required: "Debe indicar el motivo",
-          minLength: {
-            value: 20,
-            message: "El motivo debe tener al menos 20 caracteres"
-          }
-        })}
-        onMouseEnter={() => activar("motivo")}
-        onFocus={() => activar("motivo")}
-        onMouseLeave={limpiar}
-      />
+        {mensajeExito && <div className="mensaje-exito">{mensajeExito}</div>}
+        {mensajeError && <div className="mensaje-error">{mensajeError}</div>}
 
-      {campoActivo === "motivo" && (
-        <p className="help-message">
-          Cuéntanos brevemente en qué podemos ayudarte con tu marca.
-        </p>
-      )}
-      {errors.ac_motivo_cita && <p className="error">{errors.ac_motivo_cita.message}</p>}
-
-      {mensajeExito && (
-        <div className="mensaje-exito">
-          {mensajeExito}
-        </div>
-      )}
-
-      {mensajeError && (
-        <div className="mensaje-error">
-          {mensajeError}
-        </div>
-      )}
-
-      <button type="submit">
-        Agendar Cita
-      </button>
-    </form>
-  )
+        <button type="submit" className="agenda-submit-btn">
+          Agendar Cita
+        </button>
+      </form>
+    </div>
+  );
 }
 
-export default AgendaForm
+export default AgendaForm;
