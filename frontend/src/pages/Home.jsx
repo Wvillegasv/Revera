@@ -1,13 +1,15 @@
+import { useState } from "react";
 import Navbar from "../components/Navbar";
 import ServiceCard from "../components/ServiceCard";
 import AgendaForm from "../components/AgendaForm";
-import ContactInfo from "../components/ContactInfo";
-import { Search, FileText, CalendarDays } from "lucide-react";
+import { Search, FileText, CalendarDays, X } from "lucide-react";
 import "../styles/revera.css";
 import "../styles/hero.css";
 import "../styles/agenda.css";
 
 function Home() {
+  const [mostrarContacto, setMostrarContacto] = useState(false);
+
   const servicios = [
     {
       id: 1,
@@ -29,9 +31,17 @@ function Home() {
     },
   ];
 
+  const abrirContacto = () => {
+    setMostrarContacto(true);
+  };
+
+  const cerrarContacto = () => {
+    setMostrarContacto(false);
+  };
+
   return (
     <div id="home-top" className="home-page">
-      <Navbar />
+      <Navbar onContactoClick={abrirContacto} />
 
       <main className="hero-section">
         <div className="hero-background-shape">
@@ -63,17 +73,30 @@ function Home() {
         </section>
       </main>
 
-      <section id="contacto" className="agenda-section">
-        <div className="agenda-header">
-          <h2>Agenda una Cita</h2>
-          <p>Completa el formulario y nos pondremos en contacto contigo</p>
-        </div>
+      {mostrarContacto && (
+        <div className="contacto-modal-overlay" onClick={cerrarContacto}>
+          <div
+            className="contacto-modal-container"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="contacto-modal-close"
+              onClick={cerrarContacto}
+              aria-label="Cerrar formulario"
+            >
+              <X size={22} />
+            </button>
 
-        <div className="agenda-wrapper">
-          <ContactInfo />
-          <AgendaForm />
+            <div className="contacto-modal-header">
+              <h2>Agenda una Cita</h2>
+              <p>Completa el formulario y nos pondremos en contacto contigo</p>
+            </div>
+
+            <AgendaForm onSuccess={cerrarContacto} />
+          </div>
         </div>
-      </section>
+      )}
     </div>
   );
 }

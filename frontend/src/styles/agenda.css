@@ -1,81 +1,386 @@
-.agenda-section {
-  max-width: 1215px;
-  margin: 22px auto 0;
-  padding: 12px 12px 24px;
+.agenda-form-shell {
+  position: relative;
+  width: 100%;
 }
 
-.agenda-header {
-  text-align: center;
-  margin-bottom: 22px;
-  padding: 0 12px;
+.agenda-form-decoration {
+  display: none;
 }
 
-.agenda-header h2 {
-  margin: 0;
-  font-size: 48px;
-  line-height: 1.1;
-  font-weight: 800;
-  color: #05042f;
+.agenda-form-card {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 32px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
-.agenda-header p {
-  margin: 14px 0 0;
-  font-size: 18px;
-  color: #9a9aa3;
+.agenda-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.agenda-form-group label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-group svg {
+  position: absolute;
+  left: 14px;
+  color: #64748b;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.input-group input,
+.input-group select,
+.agenda-form-group textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 0.95rem;
+  color: #0f172a;
+  transition: all 0.2s ease;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.input-group input,
+.input-group select {
+  height: 52px;
+  padding: 0 14px 0 44px;
+}
+
+.agenda-form-group textarea {
+  min-height: 120px;
+  resize: vertical;
+  padding: 14px 16px;
+  line-height: 1.5;
+}
+
+.input-group input::placeholder,
+.agenda-form-group textarea::placeholder {
+  color: #94a3b8;
+}
+
+.input-group input:focus,
+.input-group select:focus,
+.agenda-form-group textarea:focus {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+}
+
+.input-group select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, #64748b 50%),
+    linear-gradient(135deg, #64748b 50%, transparent 50%);
+  background-position: calc(100% - 20px) calc(50% - 3px),
+    calc(100% - 14px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 42px;
+}
+
+.input-group select:disabled {
+  cursor: not-allowed;
+  background-color: #f8fafc;
+  color: #94a3b8;
+}
+
+.telefono-row {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.country-code-group select {
+  width: 100%;
+  height: 52px;
+  border: 1px solid #cbd5e1;
+  border-radius: 14px;
+  background: #fff;
+  padding: 0 14px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.country-code-group select:focus {
+  border-color: #0f766e;
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+}
+
+.phone-input-group input {
+  padding-left: 44px;
+}
+
+.agenda-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.help-message {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  color: #115e59;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.error {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #b91c1c;
   font-weight: 500;
 }
 
-.agenda-wrapper {
-  display: grid;
-  grid-template-columns: 360px minmax(0, 1fr);
-  align-items: stretch;
-  gap: 0;
-  border-radius: 22px;
-  overflow: hidden;
+.mensaje-exito {
+  margin-top: 8px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #ecfdf5;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 0.93rem;
+  line-height: 1.45;
 }
 
-@media (max-width: 992px) {
-  .agenda-header h2 {
-    font-size: 40px;
+.mensaje-error {
+  margin-top: 8px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  font-size: 0.93rem;
+  line-height: 1.45;
+}
+
+.agenda-submit-btn {
+  width: 100%;
+  height: 54px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #0f766e, #115e59);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 16px 30px rgba(15, 118, 110, 0.22);
+}
+
+.agenda-submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 34px rgba(15, 118, 110, 0.28);
+}
+
+.agenda-submit-btn:active {
+  transform: translateY(0);
+}
+
+.agenda-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.agenda-form-group input[type="text"],
+.agenda-form-group input[type="email"],
+.agenda-form-group input[type="date"] {
+  font-family: inherit;
+}
+
+#ac_descripcion_consulta,
+#ac_motivo_cita {
+  min-height: 130px;
+}
+
+/* Modal sobre la página principal, sin cambiar el fondo */
+.contacto-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 96px 24px 40px;
+  z-index: 9999;
+  overflow-y: auto;
+}
+
+.contacto-modal-container {
+  position: relative;
+  width: min(1140px, 96%);
+  background: #ffffff;
+  border-radius: 28px;
+  padding: 34px 30px 28px;
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.16);
+  animation: modalFadeIn 0.22s ease;
+}
+
+.contacto-modal-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding-right: 28px;
+}
+
+.contacto-modal-header h2 {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.contacto-modal-header p {
+  margin: 0;
+  font-size: 1rem;
+  color: #475569;
+}
+
+.contacto-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 42px;
+  height: 42px;
+  border: none;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #0f172a;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.contacto-modal-close:hover {
+  background: #e2e8f0;
+  transform: scale(1.03);
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .agenda-form-card {
+    padding: 24px;
+    border-radius: 20px;
   }
 
-  .agenda-header p {
-    font-size: 16px;
-  }
-
-  .agenda-wrapper {
+  .telefono-row {
     grid-template-columns: 1fr;
-    gap: 18px;
-    overflow: visible;
+  }
+
+  .agenda-form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .contacto-modal-overlay {
+    padding: 84px 16px 28px;
+  }
+
+  .contacto-modal-container {
+    width: min(100%, 900px);
+    padding: 26px 18px 20px;
+    border-radius: 22px;
+  }
+
+  .contacto-modal-header h2 {
+    font-size: 1.65rem;
   }
 }
 
-@media (max-width: 768px) {
-  .agenda-section {
-    margin-top: 18px;
-    padding: 10px 8px 18px;
+@media (max-width: 640px) {
+  .agenda-form-card {
+    padding: 20px 16px;
+    border-radius: 18px;
   }
 
-  .agenda-header {
-    margin-bottom: 16px;
+  .agenda-form-group {
+    margin-bottom: 18px;
   }
 
-  .agenda-header h2 {
-    font-size: 32px;
+  .agenda-form-group label {
+    font-size: 0.92rem;
   }
 
-  .agenda-header p {
-    font-size: 15px;
-    line-height: 1.45;
-  }
-}
-
-@media (max-width: 480px) {
-  .agenda-header h2 {
-    font-size: 28px;
+  .input-group input,
+  .input-group select,
+  .country-code-group select {
+    height: 50px;
+    font-size: 0.94rem;
   }
 
-  .agenda-header p {
-    font-size: 14px;
+  .agenda-form-group textarea {
+    min-height: 110px;
+    font-size: 0.94rem;
+  }
+
+  .agenda-submit-btn {
+    height: 52px;
+    font-size: 0.96rem;
+  }
+
+  .contacto-modal-overlay {
+    padding: 76px 10px 22px;
+  }
+
+  .contacto-modal-container {
+    width: 100%;
+    padding: 22px 12px 16px;
+    border-radius: 20px;
+  }
+
+  .contacto-modal-header {
+    margin-bottom: 18px;
+    padding-right: 12px;
+  }
+
+  .contacto-modal-header h2 {
+    font-size: 1.45rem;
+  }
+
+  .contacto-modal-header p {
+    font-size: 0.93rem;
   }
 }

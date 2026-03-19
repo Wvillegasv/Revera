@@ -17,12 +17,34 @@ const { DB_USER } = process.env
 
 const HORARIOS_PERMITIDOS = ["09:00", "10:00", "11:00", "14:00", "15:00"]
 
+const OPCIONES_CONSULTA = [
+  "Registro de marca",
+  "Estudio de registrabilidad",
+  "Uso indebido de marca",
+  "Renovación de marca",
+  "Otra consulta"
+]
+
 function obtenerFechaHoyLocal() {
   const hoy = new Date()
   const year = hoy.getFullYear()
   const month = String(hoy.getMonth() + 1).padStart(2, "0")
   const day = String(hoy.getDate()).padStart(2, "0")
   return `${year}-${month}-${day}`
+}
+
+function construirMotivoCita(body) {
+  const partes = []
+
+  if (body.ac_asunto_consulta) {
+    partes.push(`Asunto: ${String(body.ac_asunto_consulta).trim()}`)
+  }
+
+  if (body.ac_descripcion_consulta && String(body.ac_descripcion_consulta).trim()) {
+    partes.push(`Descripción: ${String(body.ac_descripcion_consulta).trim()}`)
+  }
+
+  return partes.join(" | ")
 }
 
 function validarDatosCita(body) {
@@ -40,8 +62,22 @@ function validarDatosCita(body) {
     errores.push("El teléfono es obligatorio")
   }
 
-  if (!body.ac_motivo_cita || String(body.ac_motivo_cita).trim().length < 20) {
-    errores.push("El motivo de la cita debe tener al menos 20 caracteres")
+  if (!body.ac_asunto_consulta) {
+    errores.push("Debe seleccionar el motivo principal de la consulta")
+  }
+
+  if (
+    body.ac_asunto_consulta &&
+    !OPCIONES_CONSULTA.includes(String(body.ac_asunto_consulta).trim())
+  ) {
+    errores.push("La opción seleccionada para el motivo principal no es válida")
+  }
+
+  if (
+    !body.ac_descripcion_consulta ||
+    String(body.ac_descripcion_consulta).trim().length < 20
+  ) {
+    errores.push("La descripción de la consulta debe tener al menos 20 caracteres")
   }
 
   if (!body.ac_fecha_cita) {
@@ -95,7 +131,16 @@ async function crearCita(req, res) {
       })
     }
 
-    const result = await registrarCita(pool, DB_USER, req.body)
+    const ac_motivo_cita = construirMotivoCita(req.body)
+
+    const bodyParaGuardar = {
+      ...req.body,
+      ac_identificacion: req.body.ac_identificacion || "N/A",
+      ac_otro_motivo: "",
+      ac_motivo_cita
+    }
+
+    const result = await registrarCita(pool, DB_USER, bodyParaGuardar)
 
     console.log("Cita registrada ID:", result.insertId)
 
@@ -108,11 +153,17 @@ async function crearCita(req, res) {
       const correosDestino = [
         req.body.ac_correo,
         ...correosInternos
-      ].filter(Boolean)
+      ]
+        .filter(Boolean)
+        .filter((correo, index, array) => array.indexOf(correo) === index)
 
       if (correosDestino.length > 0) {
         await enviarSolicitudRegistrabilidad({
           ...req.body,
+          ac_otro_motivo: "",
+          ac_motivo_cita,
+          descripcion_producto_servicio:
+            req.body.ac_descripcion_consulta || req.body.descripcion_producto_servicio || "",
           correosDestino
         })
 

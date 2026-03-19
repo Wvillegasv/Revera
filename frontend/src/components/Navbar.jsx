@@ -1,25 +1,17 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "../styles/navbar.css";
 
-function Navbar() {
+function Navbar({ onContactoClick }) {
   const location = useLocation();
   const navigate = useNavigate();
 
   const irAContacto = () => {
     if (location.pathname === "/") {
-      const seccion = document.getElementById("contacto");
-      if (seccion) {
-        seccion.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (onContactoClick) {
+        onContactoClick();
       }
     } else {
       navigate("/");
-
-      setTimeout(() => {
-        const seccion = document.getElementById("contacto");
-        if (seccion) {
-          seccion.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 200);
     }
   };
 

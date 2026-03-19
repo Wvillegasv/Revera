@@ -20,27 +20,31 @@ async function enviarSolicitudRegistrabilidad(data) {
     ac_nombre,
     ac_correo,
     ac_telefono,
-    nombre_marca,
     descripcion_producto_servicio,
-    adjunto_imagenes,
-    correosDestino
+    correosDestino,
+    ac_asunto_consulta,
+    ac_fecha_cita,
+    ac_hora_cita
   } = data
 
   if (!Array.isArray(correosDestino) || correosDestino.length === 0) {
     throw new Error("No se recibieron correos de destino para enviar la notificación")
   }
 
-  const asunto = `Solicitud de Estudio de Registrabilidad ${ac_nombre || ""}`
+  const asuntoBase = ac_asunto_consulta || "Consulta general"
+  const asunto = `${asuntoBase} - ${ac_nombre || ""}`
 
   const cuerpo = `
-Solicitud de Estudio de Registrabilidad
+Solicitud de consulta
 
-Nombre completo: ${ac_nombre || ""}
-Correo electrónico: ${ac_correo || ""}
+Motivo principal: ${ac_asunto_consulta || ""}
+
+Nombre: ${ac_nombre || ""}
+Correo: ${ac_correo || ""}
 Teléfono: ${ac_telefono || ""}
-Nombre de la marca: ${nombre_marca || ""}
-Descripción del producto/servicio: ${descripcion_producto_servicio || ""}
-Adjuntó imágenes: ${adjunto_imagenes ? "Sí" : "No"}
+Asunto: ${descripcion_producto_servicio || ""}
+Fecha de la cita: ${ac_fecha_cita || ""}
+Hora de la cita: ${ac_hora_cita || ""}
 `
 
   return transporter.sendMail({

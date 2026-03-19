@@ -21,8 +21,6 @@
   letter-spacing: 10px;
   color: #1a154c;
   white-space: nowrap;
-
-  /* ajuste fino vertical */
   position: relative;
   top: -2px;
 }
@@ -45,36 +43,46 @@
   color: #6e61b1;
   text-decoration: none;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-/* LINKS */
-.navbar-link {
-  padding: 6px 12px;
+/* LINKS Y BOTÓN CONTACTO */
+.navbar-link,
+.navbar-button {
+  padding: 8px 18px;
   border-radius: 999px;
   font-size: 14px;
   font-weight: 600;
   color: #100b35;
   text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-/* BOTÓN CONTACTO (IMPORTANTE) */
-.navbar-button {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
   background: transparent;
   border: none;
   cursor: pointer;
   font-family: inherit;
 }
 
-/* ESTADOS */
+/* HOVER */
 .navbar-pill:hover,
-.navbar-link:hover {
+.navbar-link:hover,
+.navbar-button:hover {
+  background: #ffffff;
   transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
 }
 
+/* ESTADO ACTIVO */
 .active-link {
-  background: rgba(255, 255, 255, 0.35);
+  background: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+/* FOCUS ACCESIBLE */
+.navbar-pill:focus-visible,
+.navbar-link:focus-visible,
+.navbar-button:focus-visible {
+  outline: 2px solid rgba(26, 21, 76, 0.35);
+  outline-offset: 2px;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -98,17 +106,23 @@
   .navbar-menu {
     justify-content: center;
     gap: 8px;
+    width: 100%;
   }
 
   .navbar-pill,
-  .navbar-link {
+  .navbar-link,
+  .navbar-button {
     font-size: 13px;
-    padding: 6px 12px;
+    padding: 7px 14px;
   }
 }
 
 /* Teléfono */
 @media (max-width: 480px) {
+  .navbar {
+    padding: 12px 10px;
+  }
+
   .navbar-logo {
     font-size: 20px;
     letter-spacing: 4px;
@@ -122,8 +136,10 @@
   }
 
   .navbar-pill,
-  .navbar-link {
+  .navbar-link,
+  .navbar-button {
     width: 100%;
     text-align: center;
+    justify-self: stretch;
   }
 }
