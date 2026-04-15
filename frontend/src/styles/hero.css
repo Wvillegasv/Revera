@@ -1,25 +1,38 @@
 .hero-section {
   position: relative;
   max-width: 1215px;
-  margin-top: 20px;
-  margin: 8px auto 0;
-  min-height: calc(100vh - 120px);
+  margin: 0 auto;
+  min-height: calc(100vh - 110px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 80px 0 24px;
+  justify-content: flex-start;
+  padding: 58px 0 30px;
   overflow: hidden;
 }
 
+/* FONDO SUAVE GENERAL DEL HERO */
+.hero-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 72% 26%, rgba(111, 96, 170, 0.10), transparent 34%),
+    radial-gradient(circle at 18% 82%, rgba(18, 7, 66, 0.05), transparent 30%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* GRAN FORMA MORADA DERECHA */
 .hero-background-shape {
   position: absolute;
-  top: 20px;
-  right: 0;
-  width: 520px;
-  height: 520px;
+  top: 56px;
+  right: 34px;
+  width: 560px;
+  height: 650px;
   pointer-events: none;
-  opacity: 0.9;
+  z-index: 0;
+  opacity: 0.68;
 }
 
 .hero-background-shape::before {
@@ -27,12 +40,12 @@
   position: absolute;
   top: 0;
   right: 0;
-  width: 400px;
-  height: 360px;
-  border: 70px solid #9a8fc6;
+  width: 514px;
+  height: 494px;
+  border: 96px solid rgba(111, 96, 170, 0.62);
   border-left: 0;
   border-bottom: 0;
-  border-radius: 0 190px 190px 0;
+  border-radius: 0 260px 260px 0;
 }
 
 .hero-background-shape::after {
@@ -40,96 +53,153 @@
   position: absolute;
   right: 0;
   bottom: 0;
-  width: 400px;
-  height: 180px;
-  background: #9a8fc6;
-  border-top-left-radius: 190px;
+  width: 514px;
+  height: 245px;
+  background: rgba(111, 96, 170, 0.62);
+  border-top-left-radius: 260px;
 }
 
+/* BLOQUE DE MARCA ENCIMA DEL TEXTO */
+.hero-brand-mark {
+  position: relative;
+  width: 110px;
+  height: 165px;
+  margin: 0 auto 18px;
+}
+
+/* CÍRCULO DEL LOGO */
 .hero-logo-circle {
   position: absolute;
-  left: 52px;
-  top: 14px;
-  width: 72px;
-  height: 72px;
-  border: 5px solid #12084b;
-  border-radius: 50%;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: 92px;
+  height: 92px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #12084b;
-  font-size: 44px;
-  font-weight: 700;
-  background: transparent;
   z-index: 2;
 }
 
+/* SVG DEL LOGO */
+.hero-logo-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+
+    /* 🔥 ajuste óptico */
+  transform: translate(-48px, -18px);
+}
+
+.hero-logo-ring {
+  stroke: var(--color-secondary);
+  stroke-width: 5; /* 🔥 más fino, más premium */
+  fill: none;
+}
+
+
+.hero-logo-stroke {
+  stroke: var(--color-secondary);
+  stroke-width: 7;
+  stroke-linecap: butt;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.hero-logo-fill {
+  fill: var(--color-secondary);
+  stroke: none;
+}
+
+/* PUNTOS DECORATIVOS */
 .hero-dots {
   position: absolute;
-  left: 78px;
-  top: 100px;
+
+  /* 🔥 POSICIÓN EXACTA */
+  left: calc(50% - 50px);   /* X */
+  top: 105px;               /* Y */
+
+  transform: translateX(-50%);
+
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  align-items: center;
+  gap: 7px;
   z-index: 2;
 }
 
+
+
 .hero-dots span {
-  width: 8px;
-  height: 8px;
   border-radius: 50%;
-  background: #9a8fc6;
+  background: var(--color-primary);
+}
+
+/* 🔥 PRIMER PUNTO MÁS GRANDE */
+
+
+.hero-dots span:nth-child(1) {
+  width: 10px;
+  height: 10px;
 }
 
 .hero-dots span:nth-child(2) {
-  opacity: 0.7;
+  width: 8px;
+  height: 8px;
 }
 
 .hero-dots span:nth-child(3) {
-  opacity: 0.5;
+  width: 6px;
+  height: 6px;
 }
 
 .hero-dots span:nth-child(4) {
-  opacity: 0.3;
+  width: 4px;
+  height: 4px;
 }
 
+/* CONTENIDO CENTRAL */
 .hero-content {
   position: relative;
   z-index: 3;
   text-align: center;
-  margin-top: 90px;
-  padding: 0 16px;
   max-width: 760px;
+  padding: 0 16px;
+  margin-top: 18px;
 }
 
 .hero-content h1 {
   margin: 0;
-  font-size: 36px;
-  line-height: 1.15;
+  font-size: 42px;
+  line-height: 1.08;
   font-weight: 800;
-  color: #02012d;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
 }
 
 .hero-content h2 {
-  margin: 12px 0 0;
-  font-size: 30px;
-  line-height: 1.15;
+  margin: 14px 0 0;
+  font-size: 34px;
+  line-height: 1.12;
   font-weight: 800;
-  color: #7467b5;
+  color: var(--color-primary);
+  letter-spacing: -0.01em;
 }
 
 .hero-content p {
-  margin: 18px 0 0;
-  font-size: 16px;
-  color: #8e8e99;
-  font-weight: 500;
+  margin: 24px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--color-text-secondary);
 }
 
+/* SERVICIOS */
 .services-section {
   position: relative;
   z-index: 4;
   width: 100%;
-  margin-top: 30px;
+  margin-top: 46px;
   display: flex;
   justify-content: center;
   gap: 24px;
@@ -137,48 +207,60 @@
   padding: 0 12px 10px;
 }
 
-/* Desktop mediano */
-@media (max-width: 1200px) {
+/* TABLET */
+@media (max-width: 992px) {
   .hero-section {
-    min-height: calc(100vh - 110px);
+    min-height: auto;
+    padding: 48px 0 28px;
   }
 
   .hero-background-shape {
-    width: 470px;
-    height: 470px;
-    top: 25px;
-    right: -10px;
-    opacity: 0.5;
+    width: 440px;
+    height: 520px;
+    top: 72px;
+    right: -6px;
+    opacity: 0.42;
   }
 
   .hero-background-shape::before {
-    width: 360px;
-    height: 320px;
-    border-width: 60px;
-    border-radius: 0 170px 170px 0;
+    width: 398px;
+    height: 382px;
+    border-width: 72px;
+    border-radius: 0 210px 210px 0;
   }
 
   .hero-background-shape::after {
-    width: 360px;
-    height: 160px;
-    border-top-left-radius: 170px;
+    width: 398px;
+    height: 190px;
+    border-top-left-radius: 210px;
+  }
+
+  .hero-brand-mark {
+    width: 98px;
+    height: 156px;
+    margin-bottom: 14px;
   }
 
   .hero-logo-circle {
-    left: 34px;
-    top: 16px;
-    width: 66px;
-    height: 66px;
-    font-size: 40px;
+    width: 84px;
+    height: 84px;
+  }
+
+  .hero-logo-ring {
+    stroke-width: 6;
+  }
+
+  .hero-logo-stroke {
+    stroke-width: 7;
   }
 
   .hero-dots {
-    left: 56px;
-    top: 92px;
+    top: 96px;
   }
 
-  .hero-content {
-    margin-top: 80px;
+  .hero-dots span {
+    width: 8px;
+    height: 8px;
   }
 
   .hero-content h1 {
@@ -188,48 +270,60 @@
   .hero-content h2 {
     font-size: 28px;
   }
+
+  .services-section {
+    margin-top: 38px;
+    gap: 18px;
+  }
 }
 
-/* Tablet */
-@media (max-width: 992px) {
+/* MOBILE */
+@media (max-width: 768px) {
   .hero-section {
-    min-height: auto;
-    justify-content: flex-start;
-    padding: 18px 0 32px;
+    padding: 34px 0 24px;
   }
 
   .hero-background-shape {
-    width: 380px;
-    height: 380px;
-    top: 70px;
-    right: -20px;
+    width: 290px;
+    height: 360px;
+    top: 96px;
+    right: -28px;
     opacity: 0.22;
   }
 
   .hero-background-shape::before {
-    width: 290px;
+    width: 255px;
     height: 250px;
-    border-width: 48px;
-    border-radius: 0 140px 140px 0;
+    border-width: 42px;
+    border-radius: 0 145px 145px 0;
   }
 
   .hero-background-shape::after {
-    width: 290px;
-    height: 130px;
-    border-top-left-radius: 140px;
+    width: 255px;
+    height: 120px;
+    border-top-left-radius: 145px;
+  }
+
+  .hero-brand-mark {
+    width: 86px;
+    height: 138px;
+    margin-bottom: 12px;
   }
 
   .hero-logo-circle {
-    left: 24px;
-    top: 18px;
-    width: 60px;
-    height: 60px;
-    font-size: 34px;
-    border-width: 4px;
+    width: 72px;
+    height: 72px;
+  }
+
+  .hero-logo-ring {
+    stroke-width: 6;
+  }
+
+  .hero-logo-stroke {
+    stroke-width: 7;
   }
 
   .hero-dots {
-    left: 42px;
     top: 84px;
     gap: 4px;
   }
@@ -240,108 +334,43 @@
   }
 
   .hero-content {
-    margin-top: 78px;
-    max-width: 680px;
-  }
-
-  .hero-content h1 {
-    font-size: 30px;
-  }
-
-  .hero-content h2 {
-    font-size: 25px;
-  }
-
-  .hero-content p {
-    font-size: 15px;
-  }
-
-  .services-section {
-    margin-top: 26px;
-    gap: 18px;
-  }
-}
-
-/* Teléfono */
-@media (max-width: 768px) {
-  .hero-section {
-    margin-top: 14px;
-    padding: 12px 0 24px;
-  }
-
-  .hero-background-shape {
-    width: 280px;
-    height: 300px;
-    top: 70px;
-    right: -35px;
-    opacity: 0.16;
-  }
-
-  .hero-background-shape::before {
-    width: 220px;
-    height: 190px;
-    border-width: 34px;
-    border-radius: 0 120px 120px 0;
-  }
-
-  .hero-background-shape::after {
-    width: 220px;
-    height: 96px;
-    border-top-left-radius: 120px;
-  }
-
-  .hero-logo-circle {
-    left: 10px;
-    top: 16px;
-    width: 52px;
-    height: 52px;
-    font-size: 30px;
-    border-width: 4px;
-  }
-
-  .hero-dots {
-    left: 26px;
-    top: 74px;
-  }
-
-  .hero-dots span {
-    width: 6px;
-    height: 6px;
-  }
-
-  .hero-content {
-    margin-top: 70px;
     padding: 0 10px;
   }
 
   .hero-content h1 {
-    font-size: 26px;
+    font-size: 28px;
   }
 
   .hero-content h2 {
-    font-size: 21px;
+    font-size: 22px;
   }
 
   .hero-content p {
     font-size: 14px;
-    margin-top: 14px;
+    margin-top: 18px;
   }
 
   .services-section {
-    margin-top: 22px;
+    margin-top: 30px;
     gap: 16px;
+    flex-direction: column;
+    align-items: center;
     padding: 0 8px 8px;
   }
 }
 
-/* Teléfono pequeño */
+/* MOBILE PEQUEÑO */
 @media (max-width: 480px) {
+  .hero-section {
+    padding-top: 28px;
+  }
+
   .hero-content h1 {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   .hero-content h2 {
-    font-size: 18px;
+    font-size: 19px;
   }
 
   .hero-content p {

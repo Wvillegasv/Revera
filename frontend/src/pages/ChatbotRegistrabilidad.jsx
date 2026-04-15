@@ -8,7 +8,7 @@ function ChatbotRegistrabilidad() {
 
       <main className="chatbot-container">
         <section className="chatbot-header">
-          <h1>Chat de Estudio de Registrabilidad</h1>
+          <h1>Estudio de Registrabilidad</h1>
           <p>
             Responde unas preguntas y te guiaremos en el análisis inicial de tu marca.
           </p>
@@ -19,7 +19,10 @@ function ChatbotRegistrabilidad() {
             <div className="chatbot-message bot">
               Hola, soy el asistente de REVERA. ¿Cuál es el nombre de la marca que deseas consultar?
             </div>
-            <div className="chatbot-message user">Mi Marca Ejemplo</div>
+
+            <div className="chatbot-message user">
+              Mi Marca Ejemplo
+            </div>
           </div>
 
           <form className="chatbot-input-area">

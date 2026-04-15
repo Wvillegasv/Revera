@@ -1,10 +1,10 @@
 .contact-info-card {
   min-height: 100%;
-  background: linear-gradient(180deg, #7668b2 0%, #14054f 100%);
-  color: #ffffff;
+  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  color: var(--color-white);
   padding: 38px 32px 42px;
   border-radius: 22px 0 0 22px;
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 14px 28px var(--color-shadow);
 }
 
 .contact-info-card h3 {
@@ -27,7 +27,7 @@
 
 .contact-info-icon {
   min-width: 24px;
-  color: #f6f2ff;
+  color: rgba(255, 255, 255, 0.94);
   margin-top: 2px;
 }
 

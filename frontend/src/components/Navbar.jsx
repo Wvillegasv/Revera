@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import reveraLogo from "../assets/revera-logo.png";
 import "../styles/navbar.css";
 
 function Navbar({ onContactoClick }) {
@@ -17,7 +18,13 @@ function Navbar({ onContactoClick }) {
 
   return (
     <header className="navbar">
-      <div className="navbar-logo">REVERA</div>
+      <div className="navbar-brand">
+        <img
+          src={reveraLogo}
+          alt="REVERA"
+          className="navbar-logo-image"
+        />
+      </div>
 
       <nav className="navbar-menu">
         <Link

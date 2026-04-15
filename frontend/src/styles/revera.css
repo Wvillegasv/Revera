@@ -1,10 +1,28 @@
 :root {
-  --revera-bg: #f6f6f8;
-  --revera-text: #07052f;
-  --revera-primary: #8f7bc5;
-  --revera-primary-dark: #6f5fb0;
-  --revera-muted: #8e8e99;
-  --revera-card: #ffffff;
+  --color-primary: #6F60AA;
+  --color-primary-hover: #5f5198;
+  --color-secondary: #120742;
+  --color-text-primary: #00001B;
+  --color-text-secondary: #939598;
+  --color-bg-light: #E6E7E8;
+  --color-white: #FFFFFF;
+
+  --color-card: #FFFFFF;
+  --color-border: #d9dbe0;
+  --color-shadow: rgba(0, 0, 0, 0.10);
+  --color-shadow-strong: rgba(0, 0, 0, 0.16);
+
+  --color-success-bg: #eef8f1;
+  --color-success-text: #1f6b43;
+  --color-error-bg: #fdecee;
+  --color-error-text: #c62839;
+
+  /* fondos auxiliares de marca */
+  --color-bg-top: #f1edf8;
+  --color-bg-mid: #e6e7e8;
+  --color-bg-bottom: #e4def4;
+  --color-bg-soft-accent: rgba(111, 96, 170, 0.10);
+  --color-bg-soft-accent-dark: rgba(18, 7, 66, 0.08);
 }
 
 /* RESET GLOBAL */
@@ -13,7 +31,7 @@
 }
 
 html {
-  scroll-behavior: smooth; /* scroll suave para Contacto */
+  scroll-behavior: smooth;
 }
 
 body,
@@ -21,40 +39,46 @@ body,
   margin: 0;
   min-height: 100%;
   font-family: Arial, Helvetica, sans-serif;
-  background: var(--revera-bg);
-  color: var(--revera-text);
+  color: var(--color-text-primary);
   overflow-x: hidden;
+background:
+  radial-gradient(circle at 14% 18%, rgba(111, 96, 170, 0.05) 0%, transparent 22%),
+  radial-gradient(circle at 84% 16%, rgba(18, 7, 66, 0.04) 0%, transparent 20%),
+  linear-gradient(
+    180deg,
+    #efeff2 0%,
+    #e6e7e8 52%,
+    #ececf0 100%
+  );
+  background-attachment: fixed;
 }
 
-/* LINKS */
 a {
   text-decoration: none;
   color: inherit;
 }
 
-/* IMÁGENES */
 img {
   max-width: 100%;
   display: block;
 }
 
-/* CONTENEDORES PRINCIPALES */
 .home-page,
 .blog-page,
 .chatbot-page {
   min-height: 100vh;
-  background: var(--revera-bg);
+  background: transparent;
   padding: 12px 16px 20px;
+  position: relative;
+  z-index: 1;
 }
 
-/* SECCIÓN AGENDA (CONTACTO) */
 .agenda-section {
   max-width: 1215px;
   margin: 30px auto 0;
   padding: 20px 12px;
 }
 
-/* CONTENEDOR AGENDA */
 .agenda-wrapper {
   display: flex;
   gap: 24px;
@@ -63,17 +87,34 @@ img {
   flex-wrap: wrap;
 }
 
-/* ===== RESPONSIVE ===== */
+/* utilitario base para futuras secciones */
+.section-container {
+  width: 100%;
+  max-width: 1215px;
+  margin: 0 auto;
+}
 
-/* Tablet */
 @media (max-width: 992px) {
   .agenda-wrapper {
     gap: 18px;
   }
 }
 
-/* Teléfono */
 @media (max-width: 768px) {
+  body,
+  #root {
+    background:
+      radial-gradient(circle at 18% 16%, rgba(111, 96, 170, 0.10) 0%, transparent 24%),
+      radial-gradient(circle at 84% 12%, rgba(18, 7, 66, 0.07) 0%, transparent 20%),
+      linear-gradient(
+        180deg,
+        #f1edf8 0%,
+        #e6e7e8 46%,
+        #e5e0f3 100%
+      );
+    background-attachment: fixed;
+  }
+
   .home-page,
   .blog-page,
   .chatbot-page {
@@ -91,7 +132,6 @@ img {
   }
 }
 
-/* Teléfono pequeño */
 @media (max-width: 480px) {
   .agenda-section {
     padding: 8px;

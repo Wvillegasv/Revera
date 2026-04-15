@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, forwardRef } from "react";
 import {
   User,
   Mail,
@@ -9,10 +9,28 @@ import {
   MessageSquare,
   MapPin,
 } from "lucide-react";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { es } from "date-fns/locale";
 import api from "../services/api";
+import "react-datepicker/dist/react-datepicker.css";
 import "../styles/agendaform.css";
 
-const HORARIOS_BASE = ["09:00", "10:00", "11:00", "14:00", "15:00"];
+registerLocale("es", es);
+
+const HORARIOS_LUNES_VIERNES = [
+  "09:00",
+  "10:00",
+  "11:00",
+  "12:00",
+  "13:00",
+  "14:00",
+  "15:00",
+  "16:00",
+  "17:00",
+  "18:00",
+];
+
+const HORARIOS_SABADO = ["10:00", "11:00", "12:00", "14:00"];
 
 const OPCIONES_CONSULTA = [
   "Registro de marca",
@@ -30,6 +48,48 @@ function obtenerFechaHoyLocal() {
   return `${year}-${month}-${day}`;
 }
 
+function formatearFechaLocal(date) {
+  if (!date) return "";
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function convertirTextoAFecha(fechaTexto) {
+  if (!fechaTexto) return null;
+  const [year, month, day] = fechaTexto.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function obtenerDiaSemanaDesdeTexto(fechaTexto) {
+  const fecha = convertirTextoAFecha(fechaTexto);
+  return fecha ? fecha.getDay() : null;
+}
+
+function esDomingoFecha(date) {
+  return date.getDay() === 0;
+}
+
+function esSabadoTexto(fechaTexto) {
+  return obtenerDiaSemanaDesdeTexto(fechaTexto) === 6;
+}
+
+const CustomDateInput = forwardRef(({ value, onClick, onFocus, onBlur }, ref) => (
+  <input
+    ref={ref}
+    type="text"
+    value={value}
+    onClick={onClick}
+    onFocus={onFocus}
+    onBlur={onBlur}
+    readOnly
+    placeholder="Seleccione una fecha"
+  />
+));
+
+CustomDateInput.displayName = "CustomDateInput";
+
 function AgendaForm({ onSuccess }) {
   const {
     register,
@@ -37,6 +97,8 @@ function AgendaForm({ onSuccess }) {
     reset,
     watch,
     setValue,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -58,15 +120,24 @@ function AgendaForm({ onSuccess }) {
   const [cargandoHorarios, setCargandoHorarios] = useState(false);
 
   const fechaSeleccionada = watch("ac_fecha_cita");
+  const fechaSeleccionadaDate = convertirTextoAFecha(fechaSeleccionada);
 
   const activar = (campo) => setCampoActivo(campo);
   const limpiar = () => setCampoActivo("");
+
+  const horariosDelDia = useMemo(() => {
+    if (!fechaSeleccionada) return HORARIOS_LUNES_VIERNES;
+    return esSabadoTexto(fechaSeleccionada)
+      ? HORARIOS_SABADO
+      : HORARIOS_LUNES_VIERNES;
+  }, [fechaSeleccionada]);
 
   useEffect(() => {
     const cargarHorarios = async () => {
       if (!fechaSeleccionada) {
         setHorariosOcupados([]);
         setValue("ac_hora_cita", "");
+        clearErrors("ac_fecha_cita");
         return;
       }
 
@@ -77,6 +148,21 @@ function AgendaForm({ onSuccess }) {
         setValue("ac_hora_cita", "");
         return;
       }
+
+      if (obtenerDiaSemanaDesdeTexto(fechaSeleccionada) === 0) {
+        setHorariosOcupados([]);
+        setValue("ac_fecha_cita", "");
+        setValue("ac_hora_cita", "");
+        setMensajeError("Los domingos no están disponibles para citas.");
+        setMensajeExito("");
+        setError("ac_fecha_cita", {
+          type: "manual",
+          message: "Los domingos no están disponibles para citas",
+        });
+        return;
+      }
+
+      clearErrors("ac_fecha_cita");
 
       try {
         setCargandoHorarios(true);
@@ -98,7 +184,7 @@ function AgendaForm({ onSuccess }) {
     };
 
     cargarHorarios();
-  }, [fechaSeleccionada, setValue]);
+  }, [fechaSeleccionada, setValue, setError, clearErrors]);
 
   const construirMotivoCita = (data) => {
     const partes = [];
@@ -128,6 +214,7 @@ function AgendaForm({ onSuccess }) {
 
     setCampoActivo("");
     setHorariosOcupados([]);
+    clearErrors();
   };
 
   const onSubmit = async (data) => {
@@ -135,6 +222,22 @@ function AgendaForm({ onSuccess }) {
 
     if (data.ac_fecha_cita < hoy) {
       setMensajeError("No se puede agendar una cita en una fecha pasada.");
+      setMensajeExito("");
+      return;
+    }
+
+    if (obtenerDiaSemanaDesdeTexto(data.ac_fecha_cita) === 0) {
+      setMensajeError("Los domingos no están disponibles para citas.");
+      setMensajeExito("");
+      setError("ac_fecha_cita", {
+        type: "manual",
+        message: "Los domingos no están disponibles para citas",
+      });
+      return;
+    }
+
+    if (!horariosDelDia.includes(data.ac_hora_cita)) {
+      setMensajeError("La hora seleccionada no está disponible para la fecha indicada.");
       setMensajeExito("");
       return;
     }
@@ -230,7 +333,7 @@ function AgendaForm({ onSuccess }) {
               </div>
               <div>
                 <h4>Correo electrónico</h4>
-                <p>info@revera.cr</p>
+                <p>contacto@revera.cr</p>
               </div>
             </div>
 
@@ -240,7 +343,7 @@ function AgendaForm({ onSuccess }) {
               </div>
               <div>
                 <h4>Teléfono</h4>
-                <p>+506 0000-0000</p>
+                <p>+52 55 1234 5678</p>
               </div>
             </div>
 
@@ -249,9 +352,9 @@ function AgendaForm({ onSuccess }) {
                 <Clock size={20} />
               </div>
               <div>
-                <h4>Horario de atención</h4>
-                <p>Lunes a Viernes</p>
-                <p>9:00 a.m. - 5:00 p.m.</p>
+                <h4>Horario</h4>
+                <p>Lun - Vie: 9:00 - 18:00</p>
+                <p>Sáb: 10:00 - 14:00 p.m.</p>
               </div>
             </div>
 
@@ -412,21 +515,41 @@ function AgendaForm({ onSuccess }) {
 
                 <div className="input-group">
                   <Calendar size={18} />
-                  <input
+                  <DatePicker
                     id="ac_fecha_cita"
-                    type="date"
-                    min={obtenerFechaHoyLocal()}
-                    {...register("ac_fecha_cita", {
-                      required: "Debe seleccionar una fecha",
-                    })}
-                    onMouseEnter={() => activar("fecha")}
-                    onFocus={() => activar("fecha")}
-                    onMouseLeave={limpiar}
+                    selected={fechaSeleccionadaDate}
+
+
+                    onChange={(date) => {
+                      const fechaTexto = formatearFechaLocal(date);
+                      setValue("ac_fecha_cita", fechaTexto, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                      setValue("ac_hora_cita", "");
+                      setMensajeError("");
+                      clearErrors("ac_fecha_cita");
+
+
+                    }}
+                    minDate={new Date()}
+                    filterDate={(date) => !esDomingoFecha(date)}
+                    dateFormat="dd/MM/yyyy"
+                    locale="es"
+                    placeholderText="Seleccione una fecha"
+                    customInput={
+                      <CustomDateInput
+                        onFocus={() => activar("fecha")}
+                        onBlur={limpiar}
+                      />
+                    }
                   />
                 </div>
 
                 {campoActivo === "fecha" && (
-                  <p className="help-message">¿Cuál fecha desea?</p>
+                  <p className="help-message">
+                    Seleccione una fecha. Los domingos no están disponibles.
+                  </p>
                 )}
                 {errors.ac_fecha_cita && (
                   <p className="error">{errors.ac_fecha_cita.message}</p>
@@ -455,7 +578,7 @@ function AgendaForm({ onSuccess }) {
                       {cargandoHorarios ? "Cargando horarios..." : "Seleccione una hora"}
                     </option>
 
-                    {HORARIOS_BASE.map((hora) => {
+                    {horariosDelDia.map((hora) => {
                       const ocupado = horariosOcupados.includes(hora);
 
                       return (
@@ -470,11 +593,25 @@ function AgendaForm({ onSuccess }) {
                 {campoActivo === "hora" && (
                   <p className="help-message">¿Cuál hora desea?</p>
                 )}
+
+                {fechaSeleccionada && esSabadoTexto(fechaSeleccionada) && (
+                  <p className="help-message">
+                    Horario de sábado disponible: 10:00, 11:00, 12:00 y 14:00
+                  </p>
+                )}
+
+                {fechaSeleccionada && !esSabadoTexto(fechaSeleccionada) && (
+                  <p className="help-message">
+                    Horario de lunes a viernes: 09:00 a 18:00
+                  </p>
+                )}
+
                 {fechaSeleccionada && !cargandoHorarios && horariosOcupados.length > 0 && (
                   <p className="help-message">
                     Horas no disponibles: {horariosOcupados.join(", ")}
                   </p>
                 )}
+
                 {errors.ac_hora_cita && (
                   <p className="error">{errors.ac_hora_cita.message}</p>
                 )}
@@ -538,14 +675,11 @@ function AgendaForm({ onSuccess }) {
                 onMouseLeave={limpiar}
               />
 
-              {campoActivo === "descripcion" && (
-                <p className="help-message">
-                  Describe brevemente los detalles de tu consulta para que el abogado pueda revisarla.
-                </p>
-              )}
+
               {errors.ac_descripcion_consulta && (
                 <p className="error">{errors.ac_descripcion_consulta.message}</p>
               )}
+
             </div>
 
             {mensajeExito && <div className="mensaje-exito">{mensajeExito}</div>}
