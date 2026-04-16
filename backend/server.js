@@ -14,9 +14,11 @@ const PORT = process.env.PORT || 3000;
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://revera-staging.vercel.app",
+    "https://revera-omega.vercel.app",
     "https://test.revera.com"
-  ]
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
 }));
 
 app.use(express.json());
