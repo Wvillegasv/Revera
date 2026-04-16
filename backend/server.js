@@ -16,28 +16,34 @@ const allowedOrigins = [
   "https://test.revera.com",
 ];
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
+// Middleware manual CORS primero, antes de todo
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
 
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
+  if (!origin || allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin || "*");
+  }
 
-    return callback(new Error(`Origen no permitido por CORS: ${origin}`));
-  },
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, ngrok-skip-browser-warning");
+  res.header("Access-Control-Allow-Credentials", "true");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
+app.use(cors({
+  origin: allowedOrigins,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "ngrok-skip-browser-warning"],
   credentials: true,
-};
-
-/* MIDDLEWARES */
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+}));
 
 app.use(express.json());
 
-/* RUTA DE PRUEBA */
 app.get("/", (req, res) => {
   res.send("API REVERA funcionando");
 });
@@ -49,12 +55,10 @@ app.get("/api/test", (req, res) => {
   });
 });
 
-/* ROUTES */
 app.use("/api", citasRoutes);
 app.use("/api", estudioRegistrabilidadRoutes);
 app.use("/api", registroMarcaRoutes);
 
-/* SERVIDOR */
 app.listen(PORT, () => {
   console.log(`Servidor puerto ${PORT}`);
 });
