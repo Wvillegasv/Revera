@@ -10,22 +10,43 @@ const registroMarcaRoutes = require("./routes/registroMarcaRoutes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://revera-omega.vercel.app",
+  "https://test.revera.com",
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`Origen no permitido por CORS: ${origin}`));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+};
+
 /* MIDDLEWARES */
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "https://revera-omega.vercel.app",
-    "https://test.revera.com"
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  credentials: true
-}));
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 
 /* RUTA DE PRUEBA */
 app.get("/", (req, res) => {
   res.send("API REVERA funcionando");
+});
+
+app.get("/api/test", (req, res) => {
+  res.json({
+    ok: true,
+    mensaje: "Backend conectado",
+  });
 });
 
 /* ROUTES */
@@ -37,5 +58,3 @@ app.use("/api", registroMarcaRoutes);
 app.listen(PORT, () => {
   console.log(`Servidor puerto ${PORT}`);
 });
-
-
