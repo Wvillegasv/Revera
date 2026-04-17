@@ -213,6 +213,9 @@ async function crearCita(req, res) {
 
 async function consultarHorariosDisponibles(req, res) {
   try {
+    console.log("Entró a consultarHorariosDisponibles");
+    console.log("Query params:", req.query);
+
     const { fecha } = req.query;
 
     if (!fecha) {
@@ -223,6 +226,8 @@ async function consultarHorariosDisponibles(req, res) {
     }
 
     const hoy = obtenerFechaHoyLocal();
+    console.log("Fecha recibida:", fecha);
+    console.log("Fecha hoy:", hoy);
 
     if (fecha < hoy) {
       return res.status(400).json({
@@ -231,7 +236,11 @@ async function consultarHorariosDisponibles(req, res) {
       });
     }
 
+    console.log("Antes de obtenerHorariosOcupadosPorFecha");
+
     const horariosOcupados = await obtenerHorariosOcupadosPorFecha(pool, fecha);
+
+    console.log("Horarios ocupados:", horariosOcupados);
 
     const horariosDisponibles = HORARIOS_PERMITIDOS.filter(
       (hora) => !horariosOcupados.includes(hora)

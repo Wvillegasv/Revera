@@ -59,6 +59,7 @@ function normalizarPayload(body) {
     detalleProductosServicios: sanitizarTexto(body.detalleProductosServicios),
     claseNiza: sanitizarTexto(body.claseNiza),
     paisOrigen: sanitizarTexto(body.paisOrigen),
+    paisOrigenOtro: sanitizarTexto(body.paisOrigenOtro),
     direccionEstablecimiento: sanitizarTexto(body.direccionEstablecimiento),
     informacionAdicional: sanitizarTexto(body.informacionAdicional),
     registroPrevioOtroPais: sanitizarTexto(body.registroPrevioOtroPais),
@@ -73,13 +74,16 @@ function normalizarPayload(body) {
     personaNumeroIdentificacion: sanitizarTexto(body.personaNumeroIdentificacion),
     personaDireccion: sanitizarTexto(body.personaDireccion),
     personaPaisNacionalidad: sanitizarTexto(body.personaPaisNacionalidad),
+    personaPaisNacionalidadOtro: sanitizarTexto(body.personaPaisNacionalidadOtro),
     personaPaisResidencia: sanitizarTexto(body.personaPaisResidencia),
+    personaPaisResidenciaOtro: sanitizarTexto(body.personaPaisResidenciaOtro),
     personaTelefono: sanitizarTexto(body.personaTelefono),
     personaInformacionAdicional: sanitizarTexto(body.personaInformacionAdicional),
 
     empresaNombre: sanitizarTexto(body.empresaNombre),
     empresaIdentificacion: sanitizarTexto(body.empresaIdentificacion),
     empresaPaisConstitucion: sanitizarTexto(body.empresaPaisConstitucion),
+    empresaPaisConstitucionOtro: sanitizarTexto(body.empresaPaisConstitucionOtro),
     empresaDomicilioSocial: sanitizarTexto(body.empresaDomicilioSocial),
     representanteNombre: sanitizarTexto(body.representanteNombre),
     representanteEstadoCivil: sanitizarTexto(body.representanteEstadoCivil),
@@ -87,7 +91,9 @@ function normalizarPayload(body) {
     representanteTipoIdentificacion: sanitizarTexto(body.representanteTipoIdentificacion),
     representanteNumeroIdentificacion: sanitizarTexto(body.representanteNumeroIdentificacion),
     representantePaisNacionalidad: sanitizarTexto(body.representantePaisNacionalidad),
+    representantePaisNacionalidadOtro: sanitizarTexto(body.representantePaisNacionalidadOtro),
     representantePaisResidencia: sanitizarTexto(body.representantePaisResidencia),
+    representantePaisResidenciaOtro: sanitizarTexto(body.representantePaisResidenciaOtro),
     representanteDireccion: sanitizarTexto(body.representanteDireccion),
     representanteTelefono: sanitizarTexto(body.representanteTelefono),
     empresaInformacionAdicional: sanitizarTexto(body.empresaInformacionAdicional),
@@ -144,6 +150,10 @@ function validarPayload(data) {
       throw crearError("El país de origen es obligatorio.");
     }
 
+    if (data.paisOrigen === "Otro" && !data.paisOrigenOtro) {
+      throw crearError("Debe indicar el otro país de origen.");
+    }
+
     if (!data.direccionEstablecimiento || data.direccionEstablecimiento.length < 10) {
       throw crearError("La dirección del establecimiento es obligatoria.");
     }
@@ -168,6 +178,10 @@ function validarPayload(data) {
 
     if (!data.paisOrigen) {
       throw crearError("El país de origen es obligatorio.");
+    }
+
+    if (data.paisOrigen === "Otro" && !data.paisOrigenOtro) {
+      throw crearError("Debe indicar el otro país de origen.");
     }
 
     if (!data.direccionEstablecimiento || data.direccionEstablecimiento.length < 10) {
@@ -195,6 +209,14 @@ function validarPayload(data) {
     if (!data.personaTelefono || !validarTelefono(data.personaTelefono)) {
       throw crearError("El teléfono del titular no es válido.");
     }
+
+    if (data.personaPaisNacionalidad === "Otro" && !data.personaPaisNacionalidadOtro) {
+      throw crearError("Debe indicar el otro país de nacionalidad del titular.");
+    }
+
+    if (data.personaPaisResidencia === "Otro" && !data.personaPaisResidenciaOtro) {
+      throw crearError("Debe indicar el otro país de residencia del titular.");
+    }
   }
 
   if (data.tipoTitular === "Empresa") {
@@ -208,6 +230,10 @@ function validarPayload(data) {
 
     if (!data.empresaPaisConstitucion) {
       throw crearError("El país de constitución es obligatorio.");
+    }
+
+    if (data.empresaPaisConstitucion === "Otro" && !data.empresaPaisConstitucionOtro) {
+      throw crearError("Debe indicar el otro país de constitución de la empresa.");
     }
 
     if (!data.empresaDomicilioSocial || data.empresaDomicilioSocial.length < 10) {
@@ -233,7 +259,28 @@ function validarPayload(data) {
     if (!data.representanteTelefono || !validarTelefono(data.representanteTelefono)) {
       throw crearError("El teléfono del representante no es válido.");
     }
+
+    if (
+      data.representantePaisNacionalidad === "Otro" &&
+      !data.representantePaisNacionalidadOtro
+    ) {
+      throw crearError("Debe indicar el otro país de nacionalidad del representante.");
+    }
+
+    if (
+      data.representantePaisResidencia === "Otro" &&
+      !data.representantePaisResidenciaOtro
+    ) {
+      throw crearError("Debe indicar el otro país de residencia del representante.");
+    }
   }
+}
+
+function resolverValorPais(valor, valorOtro) {
+  if (valor === "Otro") {
+    return valorOtro || "Otro";
+  }
+  return valor || "";
 }
 
 async function obtenerSiguienteId(connection, tableName, idColumn) {
@@ -397,6 +444,31 @@ async function insertarSolicitud(connection, personaId, payload, files) {
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
+  const payloadGuardar = {
+    ...payload,
+    paisOrigen: resolverValorPais(payload.paisOrigen, payload.paisOrigenOtro),
+    personaPaisNacionalidad: resolverValorPais(
+      payload.personaPaisNacionalidad,
+      payload.personaPaisNacionalidadOtro
+    ),
+    personaPaisResidencia: resolverValorPais(
+      payload.personaPaisResidencia,
+      payload.personaPaisResidenciaOtro
+    ),
+    empresaPaisConstitucion: resolverValorPais(
+      payload.empresaPaisConstitucion,
+      payload.empresaPaisConstitucionOtro
+    ),
+    representantePaisNacionalidad: resolverValorPais(
+      payload.representantePaisNacionalidad,
+      payload.representantePaisNacionalidadOtro
+    ),
+    representantePaisResidencia: resolverValorPais(
+      payload.representantePaisResidencia,
+      payload.representantePaisResidenciaOtro
+    ),
+  };
+
   const [result] = await connection.execute(sql, [
     personaId,
     payload.correo,
@@ -406,7 +478,7 @@ async function insertarSolicitud(connection, personaId, payload, files) {
     payload.tipoTitular,
     files.length > 0 ? "S" : "N",
     "P",
-    JSON.stringify(payload),
+    JSON.stringify(payloadGuardar),
     DB_USER,
   ]);
 
@@ -447,8 +519,8 @@ async function insertarAdjunto(connection, solicitudId, file) {
 async function obtenerCorreosDestinatariosRegistroMarca(connection) {
   const sql = `
     SELECT DISTINCT ce.co_correo
-    FROM revera.re_usuario u
-    INNER JOIN revera.re_correo_electronico ce
+    FROM re_usuario u
+    INNER JOIN re_correo_electronico ce
       ON u.us_persona_id = ce.co_persona_id
     WHERE u.us_estado = 'A'
       AND u.us_atiende_clientes = 'S'
@@ -462,14 +534,15 @@ async function obtenerCorreosDestinatariosRegistroMarca(connection) {
   return rows.map((row) => row.co_correo);
 }
 
-async function registrarSolicitudRegistroMarca({ body, files }) {
+async function registrarSolicitudRegistroMarca({ body, files = [] }) {
   const payload = normalizarPayload(body);
   validarPayload(payload);
 
+  const promisePool = pool.promise();
   let connection;
 
   try {
-    connection = await pool.getConnection();
+    connection = await promisePool.getConnection();
 
     if (!connection) {
       throw crearError("No se pudo obtener conexión a la base de datos.", 500);
