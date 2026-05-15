@@ -1,0 +1,512 @@
+.guia-revera-page {
+  min-height: 100vh;
+  background: #f6f6f8;
+  padding: 1px 0 80px;
+}
+
+.guia-revera-main {
+  width: min(930px, calc(100% - 48px));
+  margin: 34px auto 0;
+}
+
+/* BOTÓN VOLVER */
+
+.guia-revera-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 32px;
+  padding: 9px 14px;
+
+  border-radius: 999px;
+
+  color: #939598;
+  text-decoration: none;
+
+  font-size: 15px;
+  font-weight: 500;
+
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
+}
+
+.guia-revera-back:hover {
+  background: rgba(141, 130, 194, 0.16);
+  color: #6f60aa;
+  box-shadow: 0 8px 18px rgba(18, 7, 66, 0.08);
+  transform: translateX(-2px);
+}
+
+/* CARDS BASE */
+
+.guia-revera-article,
+.guia-revera-body,
+.guia-revera-related,
+.guia-placeholder-card {
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 16px 34px rgba(18, 7, 66, 0.12);
+  overflow: hidden;
+}
+
+/* HERO */
+
+.guia-revera-cover {
+  height: 350px;
+
+  background: linear-gradient(
+    110deg,
+    #8d82c2 0%,
+    #4c3d86 48%,
+    #26145f 100%
+  );
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.guia-revera-logo-text {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  user-select: none;
+  overflow: visible;
+}
+
+.guia-revera-logo-text img {
+  width: 122%;
+  max-width: none;
+  height: auto;
+
+  transform: scale(0.78);
+
+  display: block;
+  object-fit: contain;
+
+  filter:
+    brightness(0.36)
+    saturate(240%)
+    contrast(1.22)
+    hue-rotate(8deg);
+
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* HEADER */
+
+.guia-revera-header {
+  padding: 46px 48px 50px;
+}
+
+.guia-revera-badge {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 28px;
+  padding: 0 13px;
+
+  border-radius: 999px;
+
+  background: rgba(141, 130, 194, 0.15);
+  color: #6f60aa;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.guia-revera-header h1,
+.guia-placeholder-card h1 {
+  max-width: 720px;
+
+  margin: 24px 0 0;
+
+  color: #00001b;
+
+  font-size: clamp(34px, 4.2vw, 48px);
+  line-height: 1.04;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-rendering: optimizeLegibility;
+}
+
+.guia-revera-meta {
+  margin-top: 24px;
+
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+
+  color: #939598;
+  font-size: 15px;
+}
+
+.guia-revera-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* SHARE */
+
+.guia-revera-share {
+  margin-top: 28px;
+
+  padding: 0;
+  border: 0;
+  background: transparent;
+
+  color: #6f60aa;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.guia-revera-share:hover {
+  color: #8d82c2;
+  transform: translateX(2px);
+}
+
+/* BODY */
+
+.guia-revera-body {
+  margin-top: 34px;
+  padding: 44px 48px;
+}
+
+.guia-revera-body p {
+  margin: 0 0 24px;
+
+  color: #00001b;
+
+  font-size: 16px;
+  line-height: 1.78;
+  font-weight: 400;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-rendering: optimizeLegibility;
+}
+
+.guia-revera-body p:last-child {
+  margin-bottom: 0;
+}
+
+.guia-revera-body h2 {
+  margin: 42px 0 20px;
+
+  color: #00001b;
+
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-rendering: optimizeLegibility;
+}
+
+/* FIGURA / DIAGRAMA */
+
+.guia-revera-figure {
+  width: 100%;
+  max-width: 100%;
+  margin: 42px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.guia-revera-figure-image {
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 14px;
+  background: rgba(141, 130, 194, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+}
+
+.guia-revera-figure-image img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  object-position: center center;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 14px;
+  transform: translateX(8px);
+}
+
+.guia-revera-figure figcaption {
+  width: 100%;
+  margin-top: 12px;
+  color: #939598;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* RELACIONADOS */
+
+.guia-revera-related {
+  margin-top: 34px;
+  padding: 36px 48px 42px;
+}
+
+.guia-revera-related h2 {
+  margin: 0 0 34px;
+
+  color: #00001b;
+
+  font-size: 24px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-rendering: optimizeLegibility;
+}
+
+.guia-revera-related-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 44px;
+}
+
+.guia-revera-related-item {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 18px;
+
+  align-items: center;
+
+  padding: 14px;
+
+  border-radius: 16px;
+
+  text-decoration: none;
+
+  transition:
+    background 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
+}
+
+.guia-revera-related-item:hover {
+  background: rgba(141, 130, 194, 0.1);
+  box-shadow: 0 12px 24px rgba(18, 7, 66, 0.1);
+  transform: translateY(-3px);
+}
+
+.guia-revera-related-image {
+  width: 96px;
+  height: 96px;
+
+  border-radius: 12px;
+
+  background: linear-gradient(
+    135deg,
+    #7361ad 0%,
+    #120742 100%
+  );
+}
+
+.guia-revera-related-item h3 {
+  margin: 0;
+
+  color: #00001b;
+
+  font-size: 15px;
+  line-height: 1.38;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-rendering: optimizeLegibility;
+}
+
+.guia-revera-related-item p {
+  margin: 12px 0 0;
+
+  color: #939598;
+
+  font-size: 14px;
+}
+
+/* PLACEHOLDER */
+
+.guia-placeholder-card {
+  padding: 56px 48px;
+}
+
+.guia-placeholder-card p {
+  max-width: 620px;
+
+  margin: 18px 0 0;
+
+  color: #939598;
+
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+/* TABLET */
+
+@media (max-width: 768px) {
+  .guia-revera-main {
+    width: min(100% - 28px, 680px);
+    margin-top: 28px;
+  }
+
+  .guia-revera-cover {
+    height: 280px;
+  }
+
+  .guia-revera-logo-text img {
+    width: 124%;
+    max-width: none;
+    transform: scale(0.72);
+  }
+
+  .guia-revera-header,
+  .guia-revera-body,
+  .guia-revera-related,
+  .guia-placeholder-card {
+    padding: 34px 26px;
+  }
+
+  .guia-revera-header h1,
+  .guia-placeholder-card h1 {
+    font-size: 32px;
+  }
+
+  .guia-revera-body p {
+    font-size: 15px;
+    line-height: 1.72;
+  }
+
+  .guia-revera-figure {
+    margin: 34px auto;
+  }
+
+  .guia-revera-figure-image {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 12px;
+  }
+
+  .guia-revera-figure-image img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    object-position: center center;
+    border-radius: 12px;
+  }
+
+  .guia-revera-related-grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 480px) {
+  .guia-revera-main {
+    width: calc(100% - 22px);
+  }
+
+  .guia-revera-cover {
+    height: 210px;
+  }
+
+  .guia-revera-logo-text img {
+    width: 132%;
+    max-width: none;
+    transform: scale(0.62);
+  }
+
+  .guia-revera-header h1,
+  .guia-placeholder-card h1 {
+    font-size: 27px;
+  }
+
+  .guia-revera-body p {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .guia-revera-figure {
+    margin: 30px auto;
+  }
+
+  .guia-revera-figure-image {
+    width: 100%;
+    max-width: 100%;
+    border-radius: 10px;
+  }
+
+  .guia-revera-figure-image img {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    object-position: center center;
+    border-radius: 10px;
+  }
+
+  .guia-revera-figure figcaption {
+    font-size: 12px;
+  }
+
+  .guia-revera-related-item {
+    grid-template-columns: 74px 1fr;
+    gap: 14px;
+  }
+
+  .guia-revera-related-image {
+    width: 74px;
+    height: 74px;
+  }
+}

@@ -2,12 +2,16 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 
 const citasRoutes = require("./routes/citasRoutes");
 const estudioRegistrabilidadRoutes = require("./routes/estudioRegistrabilidadRoutes");
 const registroMarcaRoutes = require("./routes/registroMarcaRoutes");
+const articulosRoutes = require("./routes/articulosRoutes");
+const articulosAdminRoutes = require("./routes/articulosAdminRoutes");
 
 const app = express();
+
 const PORT = process.env.PORT || 3000;
 
 const allowedOrigins = [
@@ -16,7 +20,10 @@ const allowedOrigins = [
   "https://test.revera.com",
 ];
 
-// Middleware manual CORS primero, antes de todo
+/* =========================================
+   CORS MANUAL
+========================================= */
+
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
@@ -24,8 +31,16 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", origin || "*");
   }
 
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization, ngrok-skip-browser-warning");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,POST,PUT,DELETE,OPTIONS"
+  );
+
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, ngrok-skip-browser-warning"
+  );
+
   res.header("Access-Control-Allow-Credentials", "true");
 
   if (req.method === "OPTIONS") {
@@ -35,14 +50,39 @@ app.use((req, res, next) => {
   next();
 });
 
+/* =========================================
+   CORS EXPRESS
+========================================= */
+
 app.use(cors({
   origin: allowedOrigins,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "ngrok-skip-browser-warning"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "ngrok-skip-browser-warning",
+  ],
   credentials: true,
 }));
 
+/* =========================================
+   JSON
+========================================= */
+
 app.use(express.json());
+
+/* =========================================
+   STATIC FILES
+========================================= */
+
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
+
+/* =========================================
+   TEST
+========================================= */
 
 app.get("/", (req, res) => {
   res.send("API REVERA funcionando");
@@ -55,9 +95,23 @@ app.get("/api/test", (req, res) => {
   });
 });
 
+/* =========================================
+   ROUTES
+========================================= */
+
 app.use("/api", citasRoutes);
+
 app.use("/api", estudioRegistrabilidadRoutes);
+
 app.use("/api", registroMarcaRoutes);
+
+app.use("/api", articulosRoutes);
+
+app.use("/api", articulosAdminRoutes);
+
+/* =========================================
+   START SERVER
+========================================= */
 
 app.listen(PORT, () => {
   console.log(`Servidor puerto ${PORT}`);

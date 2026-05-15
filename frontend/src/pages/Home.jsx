@@ -7,31 +7,39 @@ import ChatbotRegistroMarca from "../components/chatbot-registro-marca/ChatbotRe
 import "../styles/revera.css";
 import "../styles/hero.css";
 import "../styles/agenda.css";
+import Footer from "../components/Footer";
+import FloatingHelpButton from "../components/FloatingHelpButton";
 
 function Home() {
   const [mostrarContacto, setMostrarContacto] = useState(false);
   const [mostrarRegistroMarca, setMostrarRegistroMarca] = useState(false);
 
   const servicios = [
-    {
-      id: 1,
-      icon: <Search size={34} strokeWidth={2.2} />,
-      title: "Estudio de Registrabilidad",
-      description: "Verificamos si tu marca puede ser registrada legalmente",
-    },
-    {
-      id: 2,
-      icon: <FileText size={34} strokeWidth={2.2} />,
-      title: "Registro de Marca",
-      description: "Iniciamos el proceso completo de registro de tu marca",
-      action: () => setMostrarRegistroMarca(true),
-    },
-    {
-      id: 3,
-      icon: <CalendarDays size={34} strokeWidth={2.2} />,
-      title: "Asesoría Personalizada",
-      description: "Agenda una cita con nuestros expertos",
-    },
+  {
+    id: 1,
+    icon: <Search size={36} strokeWidth={2.2} />,
+    title: "Radiografía de Marca",
+    subtitle: "Cómo validar tu marca antes de registrarla",
+    description:
+      "Revera te da una visión clara y estructurada de la viabilidad de tu marca antes de invertir tiempo, dinero o identidad en ella.",
+  },
+  {
+    id: 2,
+    icon: <FileText size={36} strokeWidth={2.2} />,
+    title: "Registro Estratégico de Marca",
+    subtitle: "Registra tu marca con seguridad desde el inicio",
+    description:
+      "Gestionamos el proceso aplicando criterios jurídicos para reducir riesgos y evitar errores que puedan costarte.",
+    action: () => setMostrarRegistroMarca(true),
+  },
+  {
+    id: 3,
+    icon: <CalendarDays size={36} strokeWidth={2.2} />,
+    title: "Asesoría Personalizada",
+    subtitle: "Si prefieres hablarlo antes de avanzar, este es tu punto de partida",
+    description:
+      "Agenda una sesión personalizada y obtén claridad sobre tu marca o cualquier cuestión de propiedad intelectual.",
+  },
   ];
 
   const abrirContacto = () => {
@@ -92,9 +100,9 @@ function Home() {
             </div>
           </div>
 
-          <h1>¿Necesitas ayuda con tu marca?</h1>
-          <h2>¡Nosotros te ayudamos!</h2>
-          <p>Selecciona el servicio que necesitas</p>
+          <h1>Un sistema claro para tomar decisiones sobre tu marca</h1>
+          <h2>Analiza, registra o resuelve tus dudas con criterio jurídico en cada etapa del proceso.</h2>
+          <p>Selecciona el camino que mejor se adapte a tu caso</p>
         </section>
 
         <section className="services-section">
@@ -104,11 +112,14 @@ function Home() {
               onClick={service.action ? service.action : undefined}
               style={{ cursor: service.action ? "pointer" : "default" }}
             >
-              <ServiceCard
-                icon={service.icon}
-                title={service.title}
-                description={service.description}
-              />
+              
+            <ServiceCard
+              icon={service.icon}
+              title={service.title}
+              subtitle={service.subtitle}
+              description={service.description}
+            />
+
             </div>
           ))}
         </section>
@@ -143,6 +154,11 @@ function Home() {
         abierto={mostrarRegistroMarca}
         onClose={cerrarRegistroMarca}
       />
+
+      <Footer />
+
+      <FloatingHelpButton />
+
     </div>
   );
 }

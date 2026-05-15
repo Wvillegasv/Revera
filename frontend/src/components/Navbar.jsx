@@ -8,29 +8,26 @@ function Navbar({ onContactoClick }) {
 
   const irAContacto = () => {
     if (location.pathname === "/") {
-      if (onContactoClick) {
-        onContactoClick();
-      }
-    } else {
-      navigate("/");
+      onContactoClick?.();
+      return;
     }
+
+    navigate("/", {
+      state: { abrirContacto: true },
+    });
   };
 
   return (
     <header className="navbar">
-      <div className="navbar-brand">
-        <img
-          src={reveraLogo}
-          alt="REVERA"
-          className="navbar-logo-image"
-        />
-      </div>
+      <Link to="/" className="navbar-brand" aria-label="Ir a inicio REVERA">
+        <img src={reveraLogo} alt="REVERA" className="navbar-logo-image" />
+      </Link>
 
-      <nav className="navbar-menu">
+      <nav className="navbar-menu" aria-label="Menú principal">
         <Link
-          to="/chatbot-registrabilidad"
+          to="/"
           className={`navbar-pill ${
-            location.pathname === "/chatbot-registrabilidad" ? "active" : ""
+            location.pathname === "/" ? "active" : ""
           }`}
         >
           Chat
@@ -45,12 +42,12 @@ function Navbar({ onContactoClick }) {
         </button>
 
         <Link
-          to="/blog"
+          to="/guia"
           className={`navbar-link ${
-            location.pathname === "/blog" ? "active-link" : ""
+            location.pathname === "/guia" ? "active-link" : ""
           }`}
         >
-          Blog
+          Guía
         </Link>
       </nav>
     </header>

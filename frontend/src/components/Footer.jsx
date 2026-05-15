@@ -1,29 +1,43 @@
+import {
+  Instagram,
+  Facebook,
+  Linkedin,
+  Twitter,
+} from "lucide-react";
+
 import "../styles/footer.css";
 
 function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-content">
+      <div className="footer-left">
+        <span>Aviso de Privacidad</span>
 
-        <div className="footer-top">
-          <p className="footer-text">
-            © {new Date().getFullYear()} REVERA. Todos los derechos reservados.
-          </p>
+        <div className="footer-divider"></div>
+
+        <span>© 2026 REVERA. Todos los derechos reservados.</span>
+      </div>
+
+      <div className="footer-right">
+        <span className="footer-social-label">Síguenos:</span>
+
+        <div className="footer-socials">
+          <a href="#" aria-label="Instagram">
+            <Instagram size={22} strokeWidth={2} />
+          </a>
+
+          <a href="#" aria-label="Facebook">
+            <Facebook size={22} strokeWidth={2} />
+          </a>
+
+          <a href="#" aria-label="LinkedIn">
+            <Linkedin size={22} strokeWidth={2} />
+          </a>
+
+          <a href="#" aria-label="Twitter">
+            <Twitter size={22} strokeWidth={2} />
+          </a>
         </div>
-
-        <div className="footer-middle">
-          <div className="footer-links">
-            <a href="#">Aviso de Privacidad</a>
-            <a href="#">Términos y Condiciones</a>
-          </div>
-
-          <div className="footer-social">
-            <a href="#" aria-label="Facebook">Facebook</a>
-            <a href="#" aria-label="Instagram">Instagram</a>
-            <a href="#" aria-label="LinkedIn">LinkedIn</a>
-          </div>
-        </div>
-
       </div>
     </footer>
   );
