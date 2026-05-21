@@ -1,9 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, CalendarDays, Clock } from "lucide-react";
 import Navbar from "../components/Navbar";
 import { obtenerArticulos } from "../services/articulosApi";
 import "../styles/guia.css";
+
+const ORDEN_GUIA = [
+  "clasificacion-de-marcas",
+  "inteligencia-artificial-servicio-cliente",
+  "productividad-negocio",
+  "automatizacion-2026",
+  "tendencias-atencion-cliente",
+  "sistema-gestion-empresa",
+  "trabajo-remoto-colaboracion-digital",
+];
+
+function ordenarArticulosGuia(articulos) {
+  return articulos
+    .filter((articulo) => ORDEN_GUIA.includes(articulo.slug))
+    .sort(
+      (a, b) =>
+        ORDEN_GUIA.indexOf(a.slug) - ORDEN_GUIA.indexOf(b.slug)
+    );
+}
 
 function Guia() {
   const [articulos, setArticulos] = useState([]);
@@ -14,7 +33,7 @@ function Guia() {
     async function cargarArticulos() {
       try {
         const data = await obtenerArticulos();
-        setArticulos(data);
+        setArticulos(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Error cargando artículos:", err);
         setError("No fue posible cargar la guía.");
@@ -26,8 +45,17 @@ function Guia() {
     cargarArticulos();
   }, []);
 
-  const destacado = articulos.find((a) => a.destacado === "S");
-  const listado = articulos.filter((a) => a.destacado !== "S");
+  const destacado = useMemo(
+    () => articulos.find((articulo) => articulo.destacado === "S"),
+    [articulos]
+  );
+
+  const listado = useMemo(
+    () => ordenarArticulosGuia(
+      articulos.filter((articulo) => articulo.destacado !== "S")
+    ),
+    [articulos]
+  );
 
   return (
     <div className="guia-page">
@@ -48,37 +76,44 @@ function Guia() {
 
         {!cargando && !error && destacado && (
           <section className="guia-feature-card">
+            <div className="guia-feature-logo" aria-hidden="true">
+              <svg
+                viewBox="0 0 100 100"
+                className="guia-feature-logo-svg"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="44"
+                  className="guia-feature-logo-ring"
+                />
 
+                <g transform="translate(-2, 3)">
+                  <path
+                    d="M40 25 H58 C80 25, 80 52, 58 52 H40"
+                    className="guia-feature-logo-stroke"
+                  />
 
-              <div className="guia-feature-logo" aria-hidden="true">
-                <svg
-                  viewBox="0 0 100 100"
-                  className="guia-feature-logo-svg"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <circle cx="50" cy="50" r="44" className="guia-feature-logo-ring" />
+                  <circle
+                    cx="40"
+                    cy="52"
+                    r="3.5"
+                    className="guia-feature-logo-fill"
+                  />
 
-                  <g transform="translate(-2, 3)">
-                    <path
-                      d="M40 25 H58 C80 25, 80 52, 58 52 H40"
-                      className="guia-feature-logo-stroke"
-                    />
+                  <path
+                    d="M32 65 H39 L43.5 52 H36.5 L32 65 Z"
+                    className="guia-feature-logo-fill"
+                  />
 
-                    <circle cx="40" cy="52" r="3.5" className="guia-feature-logo-fill" />
-
-                    <path
-                      d="M32 65 H39 L43.5 52 H36.5 L32 65 Z"
-                      className="guia-feature-logo-fill"
-                    />
-
-                    <path
-                      d="M58 52 C65 52, 72 58, 72 65"
-                      className="guia-feature-logo-stroke"
-                    />
-                  </g>
-                </svg>
-              </div>
-
+                  <path
+                    d="M58 52 C65 52, 72 58, 72 65"
+                    className="guia-feature-logo-stroke"
+                  />
+                </g>
+              </svg>
+            </div>
 
             <div className="guia-feature-content">
               <span className="guia-badge">

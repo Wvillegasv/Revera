@@ -18,8 +18,71 @@ function validarCorreo(correo) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
 }
 
-function validarTelefono(telefono) {
-  return /^[0-9+\-\s()]{8,30}$/.test(telefono);
+function generarTelefonoCompleto(codigoPais, numero) {
+  const codigo = sanitizarTexto(codigoPais);
+  const telefono = sanitizarTexto(numero);
+
+  if (!codigo || !telefono) return "";
+
+  return `${codigo}${telefono}`;
+}
+
+function obtenerTelefonoNormalizado(data) {
+  const codigoPais = sanitizarTexto(data.telefonoCodigoPais);
+  const numero = sanitizarTexto(data.telefonoNumero);
+  const telefono = sanitizarTexto(data.telefono);
+
+  if (codigoPais || numero) {
+    if (!codigoPais || !numero) {
+      throw crearError("Debe indicar código de país y número de teléfono.");
+    }
+
+    if (!/^\d+$/.test(codigoPais)) {
+      throw crearError("El código de país debe contener solo números.");
+    }
+
+    if (!/^\d+$/.test(numero)) {
+      throw crearError("El número de teléfono debe contener solo números.");
+    }
+
+    if (codigoPais === "506" && numero.length !== 8) {
+      throw crearError("Para Costa Rica, el número debe tener 8 dígitos.");
+    }
+
+    return {
+      codigoPais,
+      numero,
+      completo: `${codigoPais}${numero}`,
+    };
+  }
+
+  if (!telefono) {
+    return {
+      codigoPais: "",
+      numero: "",
+      completo: "",
+    };
+  }
+
+  const limpio = telefono.replace(/\D/g, "");
+
+  if (limpio.startsWith("506") && limpio.length === 11) {
+    return {
+      codigoPais: "506",
+      numero: limpio.substring(3),
+      completo: limpio,
+    };
+  }
+
+  throw crearError(
+    "El teléfono debe enviarse como código país y número. Ejemplo: 506 y 88887777."
+  );
+}
+
+function validarTelefonoSeparado(data) {
+  const telefonoData = obtenerTelefonoNormalizado(data);
+
+  return Boolean(telefonoData.codigoPais && telefonoData.numero);
 }
 
 function dividirNombreCompleto(nombreCompleto) {
@@ -49,7 +112,19 @@ function normalizarPayload(body) {
   return {
     correo: sanitizarTexto(body.correo).toLowerCase(),
     nombreCompleto: sanitizarTexto(body.nombreCompleto),
-    telefono: sanitizarTexto(body.telefono),
+
+    direccionContacto: sanitizarTexto(
+       body.direccionContacto ||
+       body.personaDireccion ||
+       body.empresaDomicilioSocial ||
+       body.direccionEstablecimiento
+    ),
+
+    telefonoCodigoPais: sanitizarTexto(body.telefonoCodigoPais),
+    telefonoNumero: sanitizarTexto(body.telefonoNumero),
+    telefono:
+      generarTelefonoCompleto(body.telefonoCodigoPais, body.telefonoNumero) ||
+      sanitizarTexto(body.telefono),
 
     tipoTramite: sanitizarTexto(body.tipoTramite),
     nombreMarca: sanitizarTexto(body.nombreMarca),
@@ -71,32 +146,75 @@ function normalizarPayload(body) {
     personaEstadoCivil: sanitizarTexto(body.personaEstadoCivil),
     personaProfesion: sanitizarTexto(body.personaProfesion),
     personaTipoIdentificacion: sanitizarTexto(body.personaTipoIdentificacion),
-    personaNumeroIdentificacion: sanitizarTexto(body.personaNumeroIdentificacion),
+    personaNumeroIdentificacion: sanitizarTexto(
+      body.personaNumeroIdentificacion
+    ),
     personaDireccion: sanitizarTexto(body.personaDireccion),
     personaPaisNacionalidad: sanitizarTexto(body.personaPaisNacionalidad),
-    personaPaisNacionalidadOtro: sanitizarTexto(body.personaPaisNacionalidadOtro),
+    personaPaisNacionalidadOtro: sanitizarTexto(
+      body.personaPaisNacionalidadOtro
+    ),
     personaPaisResidencia: sanitizarTexto(body.personaPaisResidencia),
     personaPaisResidenciaOtro: sanitizarTexto(body.personaPaisResidenciaOtro),
-    personaTelefono: sanitizarTexto(body.personaTelefono),
-    personaInformacionAdicional: sanitizarTexto(body.personaInformacionAdicional),
+
+    personaTelefonoCodigoPais: sanitizarTexto(body.personaTelefonoCodigoPais),
+    personaTelefonoNumero: sanitizarTexto(body.personaTelefonoNumero),
+    personaTelefono:
+      generarTelefonoCompleto(
+        body.personaTelefonoCodigoPais,
+        body.personaTelefonoNumero
+      ) || sanitizarTexto(body.personaTelefono),
+
+    personaInformacionAdicional: sanitizarTexto(
+      body.personaInformacionAdicional
+    ),
 
     empresaNombre: sanitizarTexto(body.empresaNombre),
     empresaIdentificacion: sanitizarTexto(body.empresaIdentificacion),
     empresaPaisConstitucion: sanitizarTexto(body.empresaPaisConstitucion),
-    empresaPaisConstitucionOtro: sanitizarTexto(body.empresaPaisConstitucionOtro),
+    empresaPaisConstitucionOtro: sanitizarTexto(
+      body.empresaPaisConstitucionOtro
+    ),
     empresaDomicilioSocial: sanitizarTexto(body.empresaDomicilioSocial),
+
     representanteNombre: sanitizarTexto(body.representanteNombre),
     representanteEstadoCivil: sanitizarTexto(body.representanteEstadoCivil),
     representanteProfesion: sanitizarTexto(body.representanteProfesion),
-    representanteTipoIdentificacion: sanitizarTexto(body.representanteTipoIdentificacion),
-    representanteNumeroIdentificacion: sanitizarTexto(body.representanteNumeroIdentificacion),
-    representantePaisNacionalidad: sanitizarTexto(body.representantePaisNacionalidad),
-    representantePaisNacionalidadOtro: sanitizarTexto(body.representantePaisNacionalidadOtro),
-    representantePaisResidencia: sanitizarTexto(body.representantePaisResidencia),
-    representantePaisResidenciaOtro: sanitizarTexto(body.representantePaisResidenciaOtro),
+    representanteTipoIdentificacion: sanitizarTexto(
+      body.representanteTipoIdentificacion
+    ),
+    representanteNumeroIdentificacion: sanitizarTexto(
+      body.representanteNumeroIdentificacion
+    ),
+    representantePaisNacionalidad: sanitizarTexto(
+      body.representantePaisNacionalidad
+    ),
+    representantePaisNacionalidadOtro: sanitizarTexto(
+      body.representantePaisNacionalidadOtro
+    ),
+    representantePaisResidencia: sanitizarTexto(
+      body.representantePaisResidencia
+    ),
+    representantePaisResidenciaOtro: sanitizarTexto(
+      body.representantePaisResidenciaOtro
+    ),
     representanteDireccion: sanitizarTexto(body.representanteDireccion),
-    representanteTelefono: sanitizarTexto(body.representanteTelefono),
-    empresaInformacionAdicional: sanitizarTexto(body.empresaInformacionAdicional),
+
+    representanteTelefonoCodigoPais: sanitizarTexto(
+      body.representanteTelefonoCodigoPais
+    ),
+    representanteTelefonoNumero: sanitizarTexto(
+      body.representanteTelefonoNumero
+    ),
+    representanteTelefono:
+      generarTelefonoCompleto(
+        body.representanteTelefonoCodigoPais,
+        body.representanteTelefonoNumero
+      ) || sanitizarTexto(body.representanteTelefono),
+
+    empresaInformacionAdicional: sanitizarTexto(
+      body.empresaInformacionAdicional
+    ),
   };
 }
 
@@ -109,7 +227,7 @@ function validarPayload(data) {
     throw crearError("El nombre completo es obligatorio.");
   }
 
-  if (!data.telefono || !validarTelefono(data.telefono)) {
+  if (!validarTelefonoSeparado(data)) {
     throw crearError("El número de teléfono no es válido.");
   }
 
@@ -118,7 +236,9 @@ function validarPayload(data) {
   }
 
   if (!data.nombreMarca || data.nombreMarca.length < 2) {
-    throw crearError("El nombre de la marca o nombre comercial es obligatorio.");
+    throw crearError(
+      "El nombre de la marca o nombre comercial es obligatorio."
+    );
   }
 
   if (!data.tipoTitular) {
@@ -135,10 +255,15 @@ function validarPayload(data) {
     }
 
     if (!data.productosServiciosTipo) {
-      throw crearError("Debe indicar si corresponde a productos, servicios o ambos.");
+      throw crearError(
+        "Debe indicar si corresponde a productos, servicios o ambos."
+      );
     }
 
-    if (!data.detalleProductosServicios || data.detalleProductosServicios.length < 10) {
+    if (
+      !data.detalleProductosServicios ||
+      data.detalleProductosServicios.length < 10
+    ) {
       throw crearError("Debe detallar los productos o servicios.");
     }
 
@@ -154,7 +279,10 @@ function validarPayload(data) {
       throw crearError("Debe indicar el otro país de origen.");
     }
 
-    if (!data.direccionEstablecimiento || data.direccionEstablecimiento.length < 10) {
+    if (
+      !data.direccionEstablecimiento ||
+      data.direccionEstablecimiento.length < 10
+    ) {
       throw crearError("La dirección del establecimiento es obligatoria.");
     }
   }
@@ -169,10 +297,15 @@ function validarPayload(data) {
     }
 
     if (!data.productosServiciosTipo) {
-      throw crearError("Debe indicar si corresponde a productos, servicios o ambos.");
+      throw crearError(
+        "Debe indicar si corresponde a productos, servicios o ambos."
+      );
     }
 
-    if (!data.detalleProductosServicios || data.detalleProductosServicios.length < 10) {
+    if (
+      !data.detalleProductosServicios ||
+      data.detalleProductosServicios.length < 10
+    ) {
       throw crearError("Debe detallar los productos o servicios.");
     }
 
@@ -184,7 +317,10 @@ function validarPayload(data) {
       throw crearError("Debe indicar el otro país de origen.");
     }
 
-    if (!data.direccionEstablecimiento || data.direccionEstablecimiento.length < 10) {
+    if (
+      !data.direccionEstablecimiento ||
+      data.direccionEstablecimiento.length < 10
+    ) {
       throw crearError("La dirección del establecimiento es obligatoria.");
     }
   }
@@ -199,23 +335,41 @@ function validarPayload(data) {
     }
 
     if (!data.personaNumeroIdentificacion) {
-      throw crearError("El número de identificación del titular es obligatorio.");
+      throw crearError(
+        "El número de identificación del titular es obligatorio."
+      );
     }
 
     if (!data.personaDireccion || data.personaDireccion.length < 10) {
       throw crearError("La dirección del titular es obligatoria.");
     }
 
-    if (!data.personaTelefono || !validarTelefono(data.personaTelefono)) {
+    if (
+      !validarTelefonoSeparado({
+        telefonoCodigoPais: data.personaTelefonoCodigoPais,
+        telefonoNumero: data.personaTelefonoNumero,
+        telefono: data.personaTelefono,
+      })
+    ) {
       throw crearError("El teléfono del titular no es válido.");
     }
 
-    if (data.personaPaisNacionalidad === "Otro" && !data.personaPaisNacionalidadOtro) {
-      throw crearError("Debe indicar el otro país de nacionalidad del titular.");
+    if (
+      data.personaPaisNacionalidad === "Otro" &&
+      !data.personaPaisNacionalidadOtro
+    ) {
+      throw crearError(
+        "Debe indicar el otro país de nacionalidad del titular."
+      );
     }
 
-    if (data.personaPaisResidencia === "Otro" && !data.personaPaisResidenciaOtro) {
-      throw crearError("Debe indicar el otro país de residencia del titular.");
+    if (
+      data.personaPaisResidencia === "Otro" &&
+      !data.personaPaisResidenciaOtro
+    ) {
+      throw crearError(
+        "Debe indicar el otro país de residencia del titular."
+      );
     }
   }
 
@@ -232,11 +386,19 @@ function validarPayload(data) {
       throw crearError("El país de constitución es obligatorio.");
     }
 
-    if (data.empresaPaisConstitucion === "Otro" && !data.empresaPaisConstitucionOtro) {
-      throw crearError("Debe indicar el otro país de constitución de la empresa.");
+    if (
+      data.empresaPaisConstitucion === "Otro" &&
+      !data.empresaPaisConstitucionOtro
+    ) {
+      throw crearError(
+        "Debe indicar el otro país de constitución de la empresa."
+      );
     }
 
-    if (!data.empresaDomicilioSocial || data.empresaDomicilioSocial.length < 10) {
+    if (
+      !data.empresaDomicilioSocial ||
+      data.empresaDomicilioSocial.length < 10
+    ) {
       throw crearError("El domicilio social es obligatorio.");
     }
 
@@ -245,18 +407,31 @@ function validarPayload(data) {
     }
 
     if (!data.representanteTipoIdentificacion) {
-      throw crearError("El tipo de identificación del representante es obligatorio.");
+      throw crearError(
+        "El tipo de identificación del representante es obligatorio."
+      );
     }
 
     if (!data.representanteNumeroIdentificacion) {
-      throw crearError("El número de identificación del representante es obligatorio.");
+      throw crearError(
+        "El número de identificación del representante es obligatorio."
+      );
     }
 
-    if (!data.representanteDireccion || data.representanteDireccion.length < 10) {
+    if (
+      !data.representanteDireccion ||
+      data.representanteDireccion.length < 10
+    ) {
       throw crearError("La dirección del representante es obligatoria.");
     }
 
-    if (!data.representanteTelefono || !validarTelefono(data.representanteTelefono)) {
+    if (
+      !validarTelefonoSeparado({
+        telefonoCodigoPais: data.representanteTelefonoCodigoPais,
+        telefonoNumero: data.representanteTelefonoNumero,
+        telefono: data.representanteTelefono,
+      })
+    ) {
       throw crearError("El teléfono del representante no es válido.");
     }
 
@@ -264,14 +439,18 @@ function validarPayload(data) {
       data.representantePaisNacionalidad === "Otro" &&
       !data.representantePaisNacionalidadOtro
     ) {
-      throw crearError("Debe indicar el otro país de nacionalidad del representante.");
+      throw crearError(
+        "Debe indicar el otro país de nacionalidad del representante."
+      );
     }
 
     if (
       data.representantePaisResidencia === "Otro" &&
       !data.representantePaisResidenciaOtro
     ) {
-      throw crearError("Debe indicar el otro país de residencia del representante.");
+      throw crearError(
+        "Debe indicar el otro país de residencia del representante."
+      );
     }
   }
 }
@@ -280,12 +459,18 @@ function resolverValorPais(valor, valorOtro) {
   if (valor === "Otro") {
     return valorOtro || "Otro";
   }
+
   return valor || "";
 }
 
 async function obtenerSiguienteId(connection, tableName, idColumn) {
-  const sql = `SELECT IFNULL(MAX(${idColumn}), 0) + 1 AS siguiente_id FROM ${tableName}`;
+  const sql = `
+    SELECT IFNULL(MAX(${idColumn}), 0) + 1 AS siguiente_id
+    FROM ${tableName}
+  `;
+
   const [rows] = await connection.execute(sql);
+
   return rows[0].siguiente_id;
 }
 
@@ -295,18 +480,26 @@ async function buscarPersonaPorCorreo(connection, correo) {
     FROM re_persona p
     INNER JOIN re_correo_electronico c
       ON p.pe_persona_id = c.co_persona_id
-    WHERE c.co_correo = ?
+    WHERE LOWER(c.co_correo) = LOWER(?)
       AND c.co_estado = 'A'
+      AND p.pe_estado = 'A'
     LIMIT 1
   `;
 
   const [rows] = await connection.execute(sql, [correo]);
+
   return rows.length ? rows[0].pe_persona_id : null;
 }
 
 async function insertarPersona(connection, nombreCompleto) {
-  const personaId = await obtenerSiguienteId(connection, "re_persona", "pe_persona_id");
-  const { nombre, apellido1, apellido2 } = dividirNombreCompleto(nombreCompleto);
+  const personaId = await obtenerSiguienteId(
+    connection,
+    "re_persona",
+    "pe_persona_id"
+  );
+
+  const { nombre, apellido1, apellido2 } =
+    dividirNombreCompleto(nombreCompleto);
 
   const sql = `
     INSERT INTO re_persona (
@@ -336,6 +529,7 @@ async function insertarPersona(connection, nombreCompleto) {
   ];
 
   await connection.execute(sql, valores);
+
   return personaId;
 }
 
@@ -344,17 +538,22 @@ async function existeCorreoActivo(connection, personaId, correo) {
     SELECT co_correo_id
     FROM re_correo_electronico
     WHERE co_persona_id = ?
-      AND co_correo = ?
+      AND LOWER(co_correo) = LOWER(?)
       AND co_estado = 'A'
     LIMIT 1
   `;
 
   const [rows] = await connection.execute(sql, [personaId, correo]);
+
   return rows.length > 0;
 }
 
 async function insertarCorreo(connection, personaId, correo) {
-  const correoId = await obtenerSiguienteId(connection, "re_correo_electronico", "co_correo_id");
+  const correoId = await obtenerSiguienteId(
+    connection,
+    "re_correo_electronico",
+    "co_correo_id"
+  );
 
   const sql = `
     INSERT INTO re_correo_electronico (
@@ -382,22 +581,36 @@ async function insertarCorreo(connection, personaId, correo) {
   return correoId;
 }
 
-async function existeTelefonoActivo(connection, personaId, telefono) {
+async function existeTelefonoActivo(connection, personaId, payload) {
+  const telefonoData = obtenerTelefonoNormalizado(payload);
+
   const sql = `
     SELECT te_telefono_id
     FROM re_telefono
     WHERE te_persona_id = ?
+      AND te_codigo_pais = ?
       AND te_telefono = ?
       AND te_estado = 'A'
     LIMIT 1
   `;
 
-  const [rows] = await connection.execute(sql, [personaId, telefono]);
+  const [rows] = await connection.execute(sql, [
+    personaId,
+    telefonoData.codigoPais,
+    telefonoData.numero,
+  ]);
+
   return rows.length > 0;
 }
 
-async function insertarTelefono(connection, personaId, telefono) {
-  const telefonoId = await obtenerSiguienteId(connection, "re_telefono", "te_telefono_id");
+async function insertarTelefono(connection, personaId, payload) {
+  const telefonoData = obtenerTelefonoNormalizado(payload);
+
+  const telefonoId = await obtenerSiguienteId(
+    connection,
+    "re_telefono",
+    "te_telefono_id"
+  );
 
   const sql = `
     INSERT INTO re_telefono (
@@ -416,8 +629,8 @@ async function insertarTelefono(connection, personaId, telefono) {
   await connection.execute(sql, [
     telefonoId,
     personaId,
-    506,
-    telefono,
+    telefonoData.codigoPais,
+    telefonoData.numero,
     "S",
     "M",
     "A",
@@ -426,6 +639,85 @@ async function insertarTelefono(connection, personaId, telefono) {
 
   return telefonoId;
 }
+
+
+function obtenerDireccionCliente(payload) {
+  return sanitizarTexto(
+    payload.direccionContacto ||
+      payload.personaDireccion ||
+      payload.empresaDomicilioSocial ||
+      payload.direccionEstablecimiento
+  );
+}
+
+async function obtenerDireccion(connection, personaId, direccion) {
+  const sql = `
+    SELECT di_direccion_id
+    FROM re_direccion
+    WHERE di_persona_id = ?
+      AND TRIM(LOWER(di_detalle)) = TRIM(LOWER(?))
+      AND di_estado = 'A'
+    LIMIT 1
+  `;
+
+  const [rows] = await connection.execute(sql, [personaId, direccion]);
+
+  return rows[0] || null;
+}
+
+async function insertarDireccion(connection, personaId, direccion) {
+  const direccionId = await obtenerSiguienteId(
+    connection,
+    "re_direccion",
+    "di_direccion_id"
+  );
+
+  const sql = `
+    INSERT INTO re_direccion (
+      di_direccion_id,
+      di_persona_id,
+      di_detalle,
+      di_principal,
+      di_tipo_direccion,
+      di_estado,
+      di_usuario_crea
+    )
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  await connection.execute(sql, [
+    direccionId,
+    personaId,
+    direccion,
+    "S",
+    "O",
+    "A",
+    DB_USER,
+  ]);
+
+  return direccionId;
+}
+
+async function obtenerOCrearDireccion(connection, personaId, payload) {
+  const direccion = obtenerDireccionCliente(payload);
+
+  if (!direccion) {
+    return null;
+  }
+
+  const direccionExistente = await obtenerDireccion(
+    connection,
+    personaId,
+    direccion
+  );
+
+  if (direccionExistente) {
+    return direccionExistente.di_direccion_id;
+  }
+
+  return insertarDireccion(connection, personaId, direccion);
+}
+
 
 async function insertarSolicitud(connection, personaId, payload, files) {
   const sql = `
@@ -531,14 +823,17 @@ async function obtenerCorreosDestinatariosRegistroMarca(connection) {
   `;
 
   const [rows] = await connection.execute(sql);
+
   return rows.map((row) => row.co_correo);
 }
 
 async function registrarSolicitudRegistroMarca({ body, files = [] }) {
   const payload = normalizarPayload(body);
+
   validarPayload(payload);
 
   const promisePool = pool.promise();
+
   let connection;
 
   try {
@@ -556,23 +851,42 @@ async function registrarSolicitudRegistroMarca({ body, files = [] }) {
       personaId = await insertarPersona(connection, payload.nombreCompleto);
     }
 
-    const correoExiste = await existeCorreoActivo(connection, personaId, payload.correo);
+    const correoExiste = await existeCorreoActivo(
+      connection,
+      personaId,
+      payload.correo
+    );
+
     if (!correoExiste) {
       await insertarCorreo(connection, personaId, payload.correo);
     }
 
-    const telefonoExiste = await existeTelefonoActivo(connection, personaId, payload.telefono);
+    const telefonoExiste = await existeTelefonoActivo(
+      connection,
+      personaId,
+      payload
+    );
+
     if (!telefonoExiste) {
-      await insertarTelefono(connection, personaId, payload.telefono);
+      await insertarTelefono(connection, personaId, payload);
     }
 
-    const solicitudId = await insertarSolicitud(connection, personaId, payload, files);
+    await obtenerOCrearDireccion(connection, personaId, payload);
+
+    const solicitudId = await insertarSolicitud(
+      connection,
+      personaId,
+      payload,
+      files
+    ); 
 
     for (const file of files) {
       await insertarAdjunto(connection, solicitudId, file);
     }
 
-    const destinatarios = await obtenerCorreosDestinatariosRegistroMarca(connection);
+    const destinatarios = await obtenerCorreosDestinatariosRegistroMarca(
+      connection
+    );
 
     await connection.commit();
 
@@ -588,6 +902,7 @@ async function registrarSolicitudRegistroMarca({ body, files = [] }) {
     if (connection) {
       await connection.rollback();
     }
+
     throw error;
   } finally {
     if (connection) {

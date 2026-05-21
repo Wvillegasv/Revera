@@ -20,6 +20,7 @@ import {
   validateTexto,
   buildResumenItems,
   buildRequestFormData,
+  formatearTelefonoVisual,
 } from "./chatbotHelpers";
 import "../../styles/chatbot-registro-marca.css";
 
@@ -94,9 +95,22 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
         value !== null &&
         value !== ""
       ) {
+        let textoRespuesta = String(value);
+
+        if (step.type === "file") {
+          textoRespuesta = value?.name || "Archivo adjunto";
+        }
+
+        if (step.type === "phone") {
+          textoRespuesta = formatearTelefonoVisual({
+            codigoPais: formData[step.phoneKeys?.codigoPais],
+            numero: formData[step.phoneKeys?.numero],
+          });
+        }
+
         result.push({
           from: "user",
-          text: step.type === "file" ? value?.name || "Archivo adjunto" : String(value),
+          text: textoRespuesta,
         });
       }
     }
@@ -159,10 +173,42 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
     }));
   }
 
+  function setPhoneFieldValue(step, value) {
+    const codigoPais = String(value?.codigoPais || "").trim();
+    const numero = String(value?.numero || "").trim();
+    const completo = `${codigoPais}${numero}`;
+
+    const phoneKeys = step.phoneKeys || {};
+
+    setFormData((prev) => ({
+      ...prev,
+      [phoneKeys.codigoPais || `${step.key}CodigoPais`]: codigoPais,
+      [phoneKeys.numero || `${step.key}Numero`]: numero,
+      [phoneKeys.completo || step.key]: completo,
+    }));
+  }
+
+  function getCurrentPhoneValue() {
+    const phoneKeys = currentStep?.phoneKeys || {};
+
+    if (typeof inputValue === "object" && inputValue !== null) {
+      return inputValue;
+    }
+
+    return {
+      codigoPais:
+        formData[phoneKeys.codigoPais] ||
+        currentStep?.placeholderCodigoPais ||
+        "506",
+      numero: formData[phoneKeys.numero] || "",
+    };
+  }
+
   function validateCurrentValue(value) {
     if (!currentStep || typeof currentStep.validate !== "function") {
       return "";
     }
+
     return currentStep.validate(value);
   }
 
@@ -214,7 +260,12 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
 
     setErrorActual("");
 
-    setFieldValue(currentStep.key, value);
+    if (currentStep.type === "phone") {
+      setPhoneFieldValue(currentStep, value);
+    } else {
+      setFieldValue(currentStep.key, value);
+    }
+
     setInputValue("");
 
     const nextIndex = stepIndex + 1;
@@ -239,6 +290,14 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
     if (isSubmitting) return;
 
     await handleAdvance(inputValue);
+  }
+
+  async function handlePhoneSubmit(event) {
+    event.preventDefault();
+
+    if (isSubmitting) return;
+
+    await handleAdvance(getCurrentPhoneValue());
   }
 
   async function handleOptionClick(option) {
@@ -336,6 +395,58 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
               </div>
 
               <div className="crm-input-panel">
+                {!modoConfirmacionFinal && currentStep?.type === "phone" && (
+                  <form onSubmit={handlePhoneSubmit} className="crm-form-inline crm-phone-inline">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      className="crm-input crm-phone-code"
+                      value={getCurrentPhoneValue().codigoPais}
+                      onChange={(event) => {
+                        const current = getCurrentPhoneValue();
+
+                        setInputValue({
+                          ...current,
+                          codigoPais: event.target.value.replace(/\D/g, ""),
+                        });
+
+                        if (errorActual) setErrorActual("");
+                      }}
+                      placeholder={currentStep.placeholderCodigoPais || "506"}
+                      disabled={isSubmitting}
+                      aria-label="Código de país"
+                    />
+
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      className="crm-input crm-phone-number"
+                      value={getCurrentPhoneValue().numero}
+                      onChange={(event) => {
+                        const current = getCurrentPhoneValue();
+
+                        setInputValue({
+                          ...current,
+                          numero: event.target.value.replace(/\D/g, ""),
+                        });
+
+                        if (errorActual) setErrorActual("");
+                      }}
+                      placeholder={currentStep.placeholderNumero || "88887777"}
+                      disabled={isSubmitting}
+                      aria-label="Número de teléfono"
+                    />
+
+                    <button
+                      type="submit"
+                      className="crm-send-btn"
+                      disabled={isSubmitting}
+                    >
+                      <Send size={18} />
+                    </button>
+                  </form>
+                )}
+
                 {!modoConfirmacionFinal && currentStep?.type === "text" && (
                   <form onSubmit={handleTextSubmit} className="crm-form-inline">
                     <input

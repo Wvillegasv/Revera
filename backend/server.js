@@ -9,6 +9,7 @@ const estudioRegistrabilidadRoutes = require("./routes/estudioRegistrabilidadRou
 const registroMarcaRoutes = require("./routes/registroMarcaRoutes");
 const articulosRoutes = require("./routes/articulosRoutes");
 const articulosAdminRoutes = require("./routes/articulosAdminRoutes");
+const radiografiaMarcaRoutes = require("./routes/radiografiaMarcaRoutes");
 
 const app = express();
 
@@ -100,14 +101,11 @@ app.get("/api/test", (req, res) => {
 ========================================= */
 
 app.use("/api", citasRoutes);
-
 app.use("/api", estudioRegistrabilidadRoutes);
-
 app.use("/api", registroMarcaRoutes);
-
 app.use("/api", articulosRoutes);
-
 app.use("/api", articulosAdminRoutes);
+app.use("/api", radiografiaMarcaRoutes);
 
 /* =========================================
    START SERVER

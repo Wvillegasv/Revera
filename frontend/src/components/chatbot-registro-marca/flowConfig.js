@@ -85,6 +85,8 @@ export const INITIAL_FORM = {
   personaPaisResidencia: "",
   personaPaisResidenciaOtro: "",
   personaTelefono: "",
+  personaTelefonoCodigoPais: "506",
+  personaTelefonoNumero: "",
   personaInformacionAdicional: "",
 
   empresaNombre: "",
@@ -103,10 +105,14 @@ export const INITIAL_FORM = {
   representantePaisResidenciaOtro: "",
   representanteDireccion: "",
   representanteTelefono: "",
+  representanteTelefonoCodigoPais: "506",
+  representanteTelefonoNumero: "",
   empresaInformacionAdicional: "",
 
   nombreCompleto: "",
   telefono: "",
+  telefonoCodigoPais: "506",
+  telefonoNumero: "",
 };
 
 export function buildBaseSteps(validators) {
@@ -401,9 +407,15 @@ export function buildPersonaSteps(validators) {
     },
     {
       key: "personaTelefono",
-      type: "text",
-      question: "Número de teléfono del titular (con código de país)",
-      placeholder: "Ejemplo: 506 88887777",
+      type: "phone",
+      question: "Número de teléfono del titular",
+      placeholderCodigoPais: "506",
+      placeholderNumero: "88887777",
+      phoneKeys: {
+        codigoPais: "personaTelefonoCodigoPais",
+        numero: "personaTelefonoNumero",
+        completo: "personaTelefono",
+      },
       validate: validators.validateTelefono,
     },
     {
@@ -453,13 +465,17 @@ export function buildEmpresaSteps(validators) {
       question: "¿Cuál es la dirección exacta del domicilio social de la empresa?",
       placeholder: "Domicilio social",
       validate: (value) =>
-        validators.validateTexto(value, 10, "Ingresa el domicilio social."),
+        validators.validateTexto(
+          value,
+          10,
+          "Ingresa el domicilio social de la empresa."
+        ),
     },
     {
       key: "representanteNombre",
       type: "text",
       question:
-        "¿Cuál es el nombre completo del representante legal o apoderado de la empresa? Incluye todos los nombres y apellidos.",
+        "Indica el nombre completo del representante legal de la empresa.",
       placeholder: "Nombre completo del representante",
       validate: (value) =>
         validators.validateTexto(
@@ -471,80 +487,85 @@ export function buildEmpresaSteps(validators) {
     {
       key: "representanteEstadoCivil",
       type: "options",
-      question: "Estado civil del representante legal o apoderado",
+      question: "Estado civil del representante",
       options: OPCIONES_ESTADO_CIVIL,
       validate: validators.validateRequiredOption,
     },
     {
       key: "representanteProfesion",
       type: "text",
-      question: "Profesión/Ocupación del representante legal o apoderado",
+      question: "Profesión/Ocupación del representante",
       placeholder: "Profesión u ocupación",
       validate: (value) =>
         validators.validateTexto(
           value,
           3,
-          "Ingresa la profesión u ocupación."
+          "Ingresa la profesión u ocupación del representante."
         ),
     },
     {
       key: "representanteTipoIdentificacion",
       type: "options",
-      question: "Tipo de identificación del representante legal o apoderado",
+      question: "Tipo de identificación del representante",
       options: OPCIONES_TIPO_IDENTIFICACION,
       validate: validators.validateRequiredOption,
     },
     {
       key: "representanteNumeroIdentificacion",
       type: "text",
-      question: "Número de identificación del representante legal o apoderado",
+      question: "Número de identificación del representante",
       placeholder: "Número de identificación",
       validate: (value) =>
         validators.validateTexto(
           value,
           5,
-          "Ingresa el número de identificación del representante."
+          "Ingresa un número de identificación válido."
         ),
     },
     {
       key: "representantePaisNacionalidad",
       type: "options",
-      question: "País de nacionalidad del representante legal o apoderado",
+      question: "País de nacionalidad del representante",
       options: OPCIONES_PAISES,
       validate: validators.validateRequiredOption,
     },
     {
       key: "representantePaisResidencia",
       type: "options",
-      question: "País de residencia del representante legal o apoderado",
+      question: "País de residencia del representante",
       options: OPCIONES_PAISES,
       validate: validators.validateRequiredOption,
     },
     {
       key: "representanteDireccion",
       type: "textarea",
-      question: "Dirección exacta del representante legal o apoderado",
+      question: "Dirección exacta del representante",
       placeholder: "Dirección exacta",
       validate: (value) =>
         validators.validateTexto(
           value,
           10,
-          "Ingresa la dirección del representante."
+          "Ingresa la dirección exacta del representante."
         ),
     },
     {
       key: "representanteTelefono",
-      type: "text",
-      question:
-        "Número de teléfono del representante legal o apoderado (con código de país)",
-      placeholder: "Ejemplo: 506 88887777",
+      type: "phone",
+      question: "Número de teléfono del representante",
+      placeholderCodigoPais: "506",
+      placeholderNumero: "88887777",
+      phoneKeys: {
+        codigoPais: "representanteTelefonoCodigoPais",
+        numero: "representanteTelefonoNumero",
+        completo: "representanteTelefono",
+      },
       validate: validators.validateTelefono,
     },
     {
       key: "empresaInformacionAdicional",
       type: "textarea",
       question:
-        "¿Quieres contarnos algo más sobre la empresa dueña de la marca o nombre comercial? El micrófono es tuyo.",
+        "¿Quieres contarnos algo más sobre la empresa dueña de la marca o nombre comercial?",
       placeholder: "Información adicional",
       validate: () => "",
     },
@@ -557,78 +578,128 @@ export function buildContactoFinalSteps(validators) {
       key: "nombreCompleto",
       type: "text",
       question:
-        "Ahora cuéntanos tus datos para contactarte. ¿Cuál es tu nombre completo?",
-      placeholder: "Nombre y apellidos",
+        "Finalmente, indícanos tu nombre completo para contactarte.",
+      placeholder: "Nombre completo",
       validate: (value) =>
         validators.validateTexto(value, 8, "Ingresa tu nombre completo."),
     },
     {
       key: "telefono",
-      type: "text",
-      question: "¿Cuál es tu número de teléfono? (Con código de país)",
-      placeholder: "Ejemplo: 506 88887777",
+      type: "phone",
+      question: "¿Cuál es tu número de teléfono?",
+      placeholderCodigoPais: "506",
+      placeholderNumero: "88887777",
+      phoneKeys: {
+        codigoPais: "telefonoCodigoPais",
+        numero: "telefonoNumero",
+        completo: "telefono",
+      },
       validate: validators.validateTelefono,
     },
     {
-      key: "__confirmacion__",
+      key: "confirmacionFinal",
       type: "confirmation",
-      question: "Revisemos la información antes de enviarla.",
-      validate: () => "",
+      question: "¿Desea enviar la información?",
     },
   ];
 }
 
-export function insertarPasosOtroPais(steps, formData, validators) {
+function crearPasoOtroPais(baseKey, question, placeholder, validators) {
+  return {
+    key: `${baseKey}Otro`,
+    type: "text",
+    question,
+    placeholder,
+    validate: (value) =>
+      validators.validateTexto(value, 2, "Indica el país correspondiente."),
+  };
+}
+
+export function insertarPasosOtroPais(flujoBase, formData, validators) {
   const resultado = [];
 
-  const mapaOtroPais = {
-    paisOrigen: {
-      extraKey: "paisOrigenOtro",
-      question: "Indica el nombre del otro país de origen.",
-      placeholder: "Escribe el país",
-    },
-    personaPaisNacionalidad: {
-      extraKey: "personaPaisNacionalidadOtro",
-      question: "Indica el otro país de nacionalidad.",
-      placeholder: "Escribe el país",
-    },
-    personaPaisResidencia: {
-      extraKey: "personaPaisResidenciaOtro",
-      question: "Indica el otro país de residencia.",
-      placeholder: "Escribe el país",
-    },
-    empresaPaisConstitucion: {
-      extraKey: "empresaPaisConstitucionOtro",
-      question: "Indica el otro país de constitución de la empresa.",
-      placeholder: "Escribe el país",
-    },
-    representantePaisNacionalidad: {
-      extraKey: "representantePaisNacionalidadOtro",
-      question: "Indica el otro país de nacionalidad del representante.",
-      placeholder: "Escribe el país",
-    },
-    representantePaisResidencia: {
-      extraKey: "representantePaisResidenciaOtro",
-      question: "Indica el otro país de residencia del representante.",
-      placeholder: "Escribe el país",
-    },
-  };
-
-  steps.forEach((step) => {
+  flujoBase.forEach((step) => {
     resultado.push(step);
 
-    const config = mapaOtroPais[step.key];
-    if (!config) return;
+    if (step.key === "paisOrigen" && formData.paisOrigen === "Otro") {
+      resultado.push(
+        crearPasoOtroPais(
+          "paisOrigen",
+          "Indica el país de origen.",
+          "País de origen",
+          validators
+        )
+      );
+    }
 
-    if (formData[step.key] === "Otro") {
-      resultado.push({
-        key: config.extraKey,
-        type: "text",
-        question: config.question,
-        placeholder: config.placeholder,
-        validate: (value) =>
-          validators.validateTexto(value, 2, "Debes indicar el nombre del país."),
-      });
+    if (
+      step.key === "personaPaisNacionalidad" &&
+      formData.personaPaisNacionalidad === "Otro"
+    ) {
+      resultado.push(
+        crearPasoOtroPais(
+          "personaPaisNacionalidad",
+          "Indica el país de nacionalidad del titular.",
+          "País de nacionalidad",
+          validators
+        )
+      );
+    }
+
+    if (
+      step.key === "personaPaisResidencia" &&
+      formData.personaPaisResidencia === "Otro"
+    ) {
+      resultado.push(
+        crearPasoOtroPais(
+          "personaPaisResidencia",
+          "Indica el país de residencia del titular.",
+          "País de residencia",
+          validators
+        )
+      );
+    }
+
+    if (
+      step.key === "empresaPaisConstitucion" &&
+      formData.empresaPaisConstitucion === "Otro"
+    ) {
+      resultado.push(
+        crearPasoOtroPais(
+          "empresaPaisConstitucion",
+          "Indica el país de constitución de la empresa.",
+          "País de constitución",
+          validators
+        )
+      );
+    }
+
+    if (
+      step.key === "representantePaisNacionalidad" &&
+      formData.representantePaisNacionalidad === "Otro"
+    ) {
+      resultado.push(
+        crearPasoOtroPais(
+          "representantePaisNacionalidad",
+          "Indica el país de nacionalidad del representante.",
+          "País de nacionalidad",
+          validators
+        )
+      );
+    }
+
+    if (
+      step.key === "representantePaisResidencia" &&
+      formData.representantePaisResidencia === "Otro"
+    ) {
+      resultado.push(
+        crearPasoOtroPais(
+          "representantePaisResidencia",
+          "Indica el país de residencia del representante.",
+          "País de residencia",
+          validators
+        )
+      );
     }
   });
 

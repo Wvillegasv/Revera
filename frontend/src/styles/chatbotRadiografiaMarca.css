@@ -1,0 +1,757 @@
+.radiografia-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+
+  background: rgba(0, 0, 27, 0.46);
+  backdrop-filter: blur(6px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+}
+
+.radiografia-modal {
+  position: relative;
+
+  width: min(860px, 100%);
+  max-height: min(92vh, 900px);
+
+  border-radius: 28px;
+
+  background: #ffffff;
+
+  box-shadow: 0 28px 70px rgba(18, 7, 66, 0.28);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+.radiografia-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 3;
+
+  width: 38px;
+  height: 38px;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: rgba(141, 130, 194, 0.14);
+  color: #00001b;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease;
+}
+
+.radiografia-close:hover {
+  background: #8d82c2;
+  color: #ffffff;
+  transform: rotate(90deg);
+}
+
+.radiografia-header {
+  padding: 34px 42px 28px;
+
+  background: linear-gradient(
+    110deg,
+    #8d82c2 0%,
+    #4c3d86 48%,
+    #26145f 100%
+  );
+
+  color: #ffffff;
+}
+
+.radiografia-header span {
+  display: inline-flex;
+  margin-bottom: 14px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #ffffff;
+  font-size: clamp(30px, 3.2vw, 42px);
+  line-height: 1.06;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.radiografia-header h2 {
+  margin: 0;
+
+  max-width: 680px;
+
+  font-size: clamp(24px, 2.6vw, 34px);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-rendering: optimizeLegibility;
+}
+
+.radiografia-header p {
+  max-width: 680px;
+
+  margin: 14px 0 0;
+
+  color: rgba(255, 255, 255, 0.88);
+
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.radiografia-chat {
+  padding: 28px 34px;
+
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.radiografia-message {
+  max-width: 78%;
+
+  padding: 14px 16px;
+
+  border-radius: 18px;
+
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.radiografia-message.bot {
+  align-self: flex-start;
+
+  background: #f2f2f6;
+  color: #00001b;
+
+  border-bottom-left-radius: 6px;
+}
+
+.radiografia-message.bot.current {
+  background: rgba(141, 130, 194, 0.14);
+
+  font-weight: 700;
+}
+
+.radiografia-message.user {
+  align-self: flex-end;
+
+  background: #6f60aa;
+  color: #ffffff;
+
+  border-bottom-right-radius: 6px;
+}
+
+.radiografia-answer-block {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.required {
+  margin-left: 4px;
+  color: #b42318;
+}
+
+.radiografia-footer {
+  padding: 18px 28px 24px;
+
+  border-top: 1px solid rgba(18, 7, 66, 0.08);
+
+  background: #ffffff;
+}
+
+.radiografia-input-area {
+  display: flex;
+  gap: 12px;
+}
+
+.radiografia-input-area input,
+.radiografia-input-area textarea {
+  flex: 1;
+
+  border: 1px solid rgba(18, 7, 66, 0.12);
+  border-radius: 16px;
+
+  padding: 13px 15px;
+
+  font-family: inherit;
+  font-size: 14px;
+
+  color: #00001b;
+  background: #ffffff;
+
+  outline: none;
+
+  transition:
+    border 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.radiografia-input-area textarea {
+  resize: vertical;
+  min-height: 92px;
+}
+
+.radiografia-input-area input:focus,
+.radiografia-input-area textarea:focus {
+  border-color: #8d82c2;
+  box-shadow: 0 0 0 4px rgba(141, 130, 194, 0.14);
+}
+
+.radiografia-input-area button,
+.radiografia-file-submit,
+.radiografia-summary-actions button {
+  min-height: 44px;
+
+  border: 0;
+  border-radius: 999px;
+
+  padding: 0 18px;
+
+  background: #6f60aa;
+  color: #ffffff;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+}
+
+.radiografia-input-area button:hover,
+.radiografia-file-submit:hover,
+.radiografia-summary-actions button:hover {
+  background: #8d82c2;
+  box-shadow: 0 10px 18px rgba(141, 130, 194, 0.26);
+  transform: translateY(-1px);
+}
+
+.radiografia-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.radiografia-options button {
+  min-height: 42px;
+
+  border: 1px solid rgba(111, 96, 170, 0.2);
+  border-radius: 999px;
+
+  padding: 0 16px;
+
+  background: #ffffff;
+  color: #00001b;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    box-shadow 0.22s ease,
+    transform 0.22s ease;
+}
+
+.radiografia-options button:hover {
+  background: #8d82c2;
+  color: #ffffff;
+  box-shadow: 0 8px 16px rgba(141, 130, 194, 0.22);
+  transform: translateY(-1px);
+}
+
+.radiografia-file-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.radiografia-file-label {
+  min-height: 44px;
+
+  padding: 0 16px;
+
+  border-radius: 999px;
+
+  background: rgba(141, 130, 194, 0.14);
+  color: #6f60aa;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.22s ease,
+    color 0.22s ease;
+}
+
+.radiografia-file-label:hover {
+  background: #8d82c2;
+  color: #ffffff;
+}
+
+.radiografia-file-label input {
+  display: none;
+}
+
+.radiografia-file-name {
+  margin: 0;
+
+  color: #939598;
+
+  font-size: 13px;
+}
+
+.radiografia-error {
+  margin: 0 0 12px;
+
+  color: #b42318;
+
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.radiografia-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.radiografia-summary-card {
+  width: 100%;
+
+  border-radius: 20px;
+
+  background: #f8f8fb;
+
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.radiografia-summary-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.radiografia-summary-row strong {
+  color: #00001b;
+  font-size: 13px;
+}
+
+.radiografia-summary-row span {
+  color: #6f60aa;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.radiografia-summary-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.radiografia-summary-actions .secondary {
+  background: #e6e7e8;
+  color: #00001b;
+}
+
+.radiografia-summary-actions .secondary:hover {
+  background: #d8d8df;
+}
+
+.radiografia-success-layout {
+  width: 100%;
+
+  border-radius: 24px;
+
+  background: #ffffff;
+
+  overflow: hidden;
+
+  box-shadow: 0 16px 34px rgba(18, 7, 66, 0.1);
+
+  border: 1px solid rgba(18, 7, 66, 0.08);
+}
+
+.radiografia-success-header {
+  padding: 34px 36px 24px;
+
+  background: #fbf9ff;
+
+  border-bottom: 1px solid rgba(18, 7, 66, 0.1);
+}
+
+.radiografia-success-header h2 {
+  margin: 0;
+
+  color: #120742;
+
+  font-size: 32px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  text-rendering: optimizeLegibility;
+}
+
+.radiografia-success-header p {
+  margin: 14px 0 0;
+
+  color: #5c6685;
+
+  font-size: 20px;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+.radiografia-success-content {
+  padding: 34px 36px 38px;
+
+  background: #ffffff;
+}
+
+.radiografia-success-icon {
+  width: 56px;
+  height: 56px;
+
+  border-radius: 50%;
+
+  border: 5px solid #16a34a;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #16a34a;
+
+  margin-bottom: 26px;
+}
+
+.radiografia-success-icon span {
+  font-size: 32px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.radiografia-success-content h3 {
+  margin: 0;
+
+  color: #120742;
+
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.radiografia-success-content p {
+  margin: 26px 0 0;
+
+  color: #5c6685;
+
+  font-size: 20px;
+  line-height: 1.55;
+  font-weight: 400;
+}
+
+.radiografia-phone-area {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  align-items: flex-start;
+}
+
+.radiografia-phone-code {
+  text-align: center;
+}
+
+.radiografia-phone-number {
+  min-width: 0;
+}
+
+.crm-phone-inline {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.crm-phone-code {
+  text-align: center;
+}
+
+.crm-phone-number {
+  min-width: 0;
+}
+
+/* TABLET */
+@media (max-width: 768px) {
+  .radiografia-overlay {
+    padding: 16px;
+  }
+
+  .radiografia-modal {
+    max-height: 94vh;
+    border-radius: 24px;
+  }
+
+  .radiografia-header {
+    padding: 30px 26px 24px;
+  }
+
+
+    .radiografia-header span {
+    font-size: 30px;
+    }
+
+    .radiografia-header h2 {
+    font-size: 24px;
+    }
+
+    .radiografia-success-message h3 {
+    font-size: 22px;
+    }
+
+
+  .radiografia-chat {
+    padding: 24px 22px;
+  }
+
+  .radiografia-message {
+    max-width: 88%;
+  }
+
+  .radiografia-input-area {
+    flex-direction: column;
+  }
+
+  .radiografia-input-area button {
+    width: 100%;
+  }
+
+.radiografia-success-header {
+  padding: 30px 26px 22px;
+}
+
+.radiografia-success-header h2 {
+  font-size: 28px;
+}
+
+.radiografia-success-header p {
+  font-size: 17px;
+}
+
+.radiografia-success-content {
+  padding: 30px 26px 34px;
+}
+
+.radiografia-success-content h3 {
+  font-size: 22px;
+}
+
+.radiografia-success-content p {
+  font-size: 17px;
+}
+
+.radiografia-success-icon {
+  width: 52px;
+  height: 52px;
+}
+
+.radiografia-phone-area {
+    grid-template-columns: 100px 1fr;
+  }
+
+  .radiografia-phone-area button {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .crm-phone-inline {
+    grid-template-columns: 100px 1fr;
+  }
+
+  .crm-phone-inline .crm-send-btn {
+    grid-column: 1 / -1;
+    width: 100%;
+  }  
+
+}
+
+/* MOBILE */
+@media (max-width: 480px) {
+  .radiografia-overlay {
+    padding: 10px;
+  }
+
+  .radiografia-modal {
+    border-radius: 20px;
+  }
+
+  .radiografia-header {
+    padding: 28px 20px 22px;
+  }
+
+    .radiografia-header span {
+    font-size: 25px;
+    }
+
+    .radiografia-header h2 {
+    font-size: 20px;
+    }
+
+    .radiografia-success-message {
+    padding: 20px;
+    }
+
+    .radiografia-success-message h3 {
+    font-size: 20px;
+    }
+
+    .radiografia-success-message p {
+    font-size: 14px;
+    }
+
+  .radiografia-chat {
+    padding: 20px 16px;
+  }
+
+  .radiografia-message {
+    max-width: 94%;
+    font-size: 14px;
+  }
+
+  .radiografia-footer {
+    padding: 16px;
+  }
+
+  .radiografia-options {
+    flex-direction: column;
+  }
+
+  .radiografia-options button {
+    width: 100%;
+  }
+
+  .radiografia-file-area {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .radiografia-file-submit,
+  .radiografia-file-label {
+    width: 100%;
+    justify-content: center;
+  }
+
+.radiografia-success-layout {
+  border-radius: 20px;
+}
+
+.radiografia-success-header {
+  padding: 26px 20px 20px;
+}
+
+.radiografia-success-header h2 {
+  font-size: 25px;
+}
+
+.radiografia-success-header p {
+  font-size: 15px;
+}
+
+.radiografia-success-content {
+  padding: 28px 20px 32px;
+}
+
+.radiografia-success-icon {
+  width: 48px;
+  height: 48px;
+  border-width: 4px;
+  margin-bottom: 22px;
+}
+
+.radiografia-success-icon span {
+  font-size: 28px;
+}
+
+.radiografia-success-content h3 {
+  font-size: 20px;
+}
+
+.radiografia-success-content p {
+  margin-top: 22px;
+  font-size: 15px;
+}
+
+ .radiografia-phone-area {
+    grid-template-columns: 88px 1fr;
+    gap: 10px;
+  }
+
+  .radiografia-phone-code,
+  .radiografia-phone-number {
+    height: 48px;
+  }
+
+ .crm-phone-inline {
+    grid-template-columns: 88px 1fr;
+    gap: 10px;
+  }
+
+  .crm-phone-code,
+  .crm-phone-number {
+    height: 48px;
+  }
+
+
+}
+

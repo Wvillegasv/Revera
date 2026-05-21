@@ -36,6 +36,8 @@
   letter-spacing: 0.01em;
 }
 
+/* DESTACADO REVERA */
+
 .guia-feature-card {
   width: 100%;
   min-height: 264px;
@@ -43,12 +45,10 @@
   background: linear-gradient(110deg, #7361ad 0%, #120742 100%);
   box-shadow: 0 16px 34px rgba(18, 7, 66, 0.18);
   overflow: hidden;
-
   display: grid;
   grid-template-columns: 390px 1fr;
   align-items: center;
   gap: 70px;
-
   padding: 32px 72px 32px 118px;
 }
 
@@ -57,11 +57,9 @@
   height: 200px;
   border-radius: 50%;
   background: #ffffff;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   box-shadow: 0 12px 26px rgba(18, 7, 66, 0.16);
 }
 
@@ -92,7 +90,7 @@
 
 .guia-feature-content {
   max-width: 740px;
-  margin-left: -8.00rem;
+  margin-left: -8rem;
   color: #ffffff;
 }
 
@@ -135,12 +133,11 @@
   font-family: inherit;
   font-size: 15px;
   font-weight: 800;
+  text-decoration: none;
   cursor: pointer;
-
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
@@ -149,10 +146,13 @@
   transform: translateX(2px);
 }
 
+/* GRID DE ARTÍCULOS */
+
 .guia-grid {
   margin-top: 48px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
   gap: 32px;
 }
 
@@ -162,6 +162,10 @@
   background: #ffffff;
   overflow: hidden;
   box-shadow: 0 12px 28px rgba(18, 7, 66, 0.12);
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
   transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 
@@ -172,25 +176,32 @@
 
 .guia-article-image {
   height: 192px;
-  background: linear-gradient(135deg, #7361ad 0%, #120742 100%);
+  flex: 0 0 auto;
+  background: linear-gradient(135deg, #8d82c2 0%, #120742 100%);
+  transition: filter 0.25s ease;
+}
+
+.guia-article-card:hover .guia-article-image {
+  filter: brightness(1.08) saturate(1.08);
 }
 
 .guia-article-content {
   padding: 24px 24px 20px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
 }
 
 .guia-article-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
+  width: fit-content;
   min-height: 28px;
   padding: 0 13px;
   border-radius: 999px;
-
   background: #e6e7e8;
   color: #00001b;
-
   font-size: 13px;
   line-height: 1;
   font-weight: 700;
@@ -204,6 +215,14 @@
   line-height: 1.38;
   font-weight: 800;
   letter-spacing: -0.015em;
+  transition: color 0.22s ease, transform 0.22s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.guia-article-card:hover .guia-article-content h3 {
+  color: #8d82c2;
 }
 
 .guia-article-content p {
@@ -215,12 +234,12 @@
 }
 
 .guia-article-meta {
-  margin-top: 20px;
+  margin-top: auto;
+  padding-top: 20px;
   display: flex;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
-
   color: #939598;
   font-size: 13px;
 }
@@ -231,7 +250,22 @@
   gap: 5px;
 }
 
-/* TABLET */
+/* ESTADOS */
+
+.guia-status {
+  margin: 40px 0;
+  text-align: center;
+  color: #8d82c2;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.guia-status-error {
+  color: #b42318;
+}
+
+/* TABLET GRANDE */
+
 @media (max-width: 1100px) {
   .guia-feature-card {
     grid-template-columns: 260px 1fr;
@@ -249,12 +283,17 @@
     height: 160px;
   }
 
+  .guia-feature-content {
+    margin-left: 0;
+  }
+
   .guia-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* MOBILE */
+/* TABLET / MOBILE */
+
 @media (max-width: 768px) {
   .guia-main {
     width: min(100% - 28px, 680px);
@@ -281,6 +320,10 @@
     justify-items: center;
   }
 
+  .guia-feature-content {
+    margin-left: 0;
+  }
+
   .guia-feature-content h2 {
     font-size: 25px;
   }
@@ -302,12 +345,21 @@
   .guia-article-content p {
     min-height: auto;
   }
+
+  .guia-article-meta {
+    margin-top: 20px;
+  }
 }
 
 /* MOBILE PEQUEÑO */
+
 @media (max-width: 480px) {
   .guia-page {
     padding-bottom: 54px;
+  }
+
+  .guia-main {
+    width: calc(100% - 22px);
   }
 
   .guia-hero h1 {
@@ -336,21 +388,12 @@
   .guia-article-content {
     padding: 22px 20px 20px;
   }
-}
 
-.guia-status {
-  margin: 40px 0;
-  text-align: center;
-  color: #8d82c2;
-  font-size: 15px;
-  font-weight: 600;
-}
+  .guia-article-content h3 {
+    font-size: 19px;
+  }
 
-.guia-status-error {
-  color: #b42318;
-}
-
-.guia-article-card {
-  text-decoration: none;
-  color: inherit;
+  .guia-article-content p {
+    font-size: 15px;
+  }
 }
