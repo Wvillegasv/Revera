@@ -133,8 +133,8 @@
 
   color: #00001b;
 
-  font-size: clamp(34px, 4.2vw, 48px);
-  line-height: 1.04;
+  font-size: clamp(30px, 3.6vw, 42px);
+  line-height: 1.08;
   font-weight: 700;
   letter-spacing: -0.015em;
 
@@ -222,6 +222,7 @@
 }
 
 /* TÍTULOS PRINCIPALES DEL CONTENIDO */
+
 .guia-revera-block-title {
   margin: 38px 0 16px;
 
@@ -243,6 +244,7 @@
 }
 
 /* SUBTÍTULOS DEL CONTENIDO */
+
 .guia-revera-block-subtitle,
 .guia-revera-body h3 {
   margin: 24px 0 8px;
@@ -261,6 +263,7 @@
 }
 
 /* SOPORTE PARA H2 ANTERIORES */
+
 .guia-revera-body h2:not(.guia-revera-block-title) {
   margin: 38px 0 16px;
 
@@ -525,7 +528,7 @@
 
   .guia-revera-header h1,
   .guia-placeholder-card h1 {
-    font-size: 32px;
+    font-size: 29px;
   }
 
   .guia-revera-block-paragraph,
@@ -596,7 +599,7 @@
 
   .guia-revera-header h1,
   .guia-placeholder-card h1 {
-    font-size: 27px;
+    font-size: 25px;
   }
 
   .guia-revera-block-paragraph,
