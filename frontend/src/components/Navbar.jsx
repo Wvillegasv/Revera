@@ -7,14 +7,12 @@ function Navbar({ onContactoClick }) {
   const navigate = useNavigate();
 
   const irAContacto = () => {
-    if (location.pathname === "/") {
-      onContactoClick?.();
+    if (location.pathname === "/" && typeof onContactoClick === "function") {
+      onContactoClick();
       return;
     }
 
-    navigate("/", {
-      state: { abrirContacto: true },
-    });
+    navigate("/?abrirAgenda=true");
   };
 
   return (
@@ -44,7 +42,7 @@ function Navbar({ onContactoClick }) {
         <Link
           to="/guia"
           className={`navbar-link ${
-            location.pathname === "/guia" ? "active-link" : ""
+            location.pathname.startsWith("/guia") ? "active-link" : ""
           }`}
         >
           Guía

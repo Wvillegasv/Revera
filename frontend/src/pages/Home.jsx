@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Search, FileText, CalendarDays, X } from "lucide-react";
 
 import Navbar from "../components/Navbar";
@@ -15,9 +16,46 @@ import "../styles/hero.css";
 import "../styles/agenda.css";
 
 function Home() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [mostrarContacto, setMostrarContacto] = useState(false);
   const [mostrarRegistroMarca, setMostrarRegistroMarca] = useState(false);
   const [mostrarRadiografiaMarca, setMostrarRadiografiaMarca] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+
+    const abrirAgenda = params.get("abrirAgenda");
+    const abrirRadiografia = params.get("abrirRadiografia");
+    const abrirRegistroMarca = params.get("abrirRegistroMarca");
+
+    if (abrirAgenda === "true") {
+      setMostrarRegistroMarca(false);
+      setMostrarRadiografiaMarca(false);
+      setMostrarContacto(true);
+
+      navigate("/", { replace: true });
+      return;
+    }
+
+    if (abrirRadiografia === "true") {
+      setMostrarContacto(false);
+      setMostrarRegistroMarca(false);
+      setMostrarRadiografiaMarca(true);
+
+      navigate("/", { replace: true });
+      return;
+    }
+
+    if (abrirRegistroMarca === "true") {
+      setMostrarContacto(false);
+      setMostrarRadiografiaMarca(false);
+      setMostrarRegistroMarca(true);
+
+      navigate("/", { replace: true });
+    }
+  }, [location.search, navigate]);
 
   const servicios = [
     {
@@ -51,6 +89,8 @@ function Home() {
   ];
 
   const abrirContacto = () => {
+    setMostrarRegistroMarca(false);
+    setMostrarRadiografiaMarca(false);
     setMostrarContacto(true);
   };
 
