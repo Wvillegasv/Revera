@@ -7,9 +7,19 @@ function obtenerUrlImagen(imagenUrl) {
     return imagenUrl;
   }
 
-  const apiBaseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  /*
+    Si la imagen viene como /uploads/archivo.png,
+    la dejamos como ruta relativa al mismo host.
 
-  return `${apiBaseUrl}${imagenUrl}`;
+    Con ngrok + Vite proxy, esto permite que:
+    https://decency-womb-pulsate.ngrok-free.dev/uploads/...
+    sea redirigido internamente al backend localhost:3000/uploads/...
+  */
+  if (imagenUrl.startsWith("/")) {
+    return imagenUrl;
+  }
+
+  return `/${imagenUrl}`;
 }
 
 function parsearContenidoConLinks(texto = "") {
@@ -143,6 +153,7 @@ function ArticleRenderer({ bloques = [] }) {
                   <img
                     src={imagenFinalUrl}
                     alt={bloque.altText || bloque.contenido || ""}
+                    loading="lazy"
                   />
                 ) : (
                   bloque.contenido

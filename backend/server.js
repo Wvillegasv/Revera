@@ -15,35 +15,64 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://revera-omega.vercel.app",
-  "https://test.revera.com",
-];
-
 /* =========================================
-   CORS MANUAL
+   ORÍGENES PERMITIDOS
 ========================================= */
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  "https://revera-omega.vercel.app",
+  "https://test.revera.com",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+/* =========================================
+   CORS
+========================================= */
+
+const corsOptions = {
+  origin(origin, callback) {
+    /*
+      Permitir requests sin origin:
+      - Postman
+      - navegador directo
+      - proxy interno de Vite
+      - health checks
+    */
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    console.warn("CORS bloqueado para origin:", origin);
+
+    return callback(new Error(`Origen no permitido por CORS: ${origin}`));
+  },
+
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "ngrok-skip-browser-warning",
+  ],
+
+  credentials: true,
+
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+
+/*
+  Manejo seguro de preflight OPTIONS.
+  Evitamos app.options("*") porque puede fallar en algunas versiones.
+*/
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-
-  if (!origin || allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin || "*");
-  }
-
-  res.header(
-    "Access-Control-Allow-Methods",
-    "GET,POST,PUT,DELETE,OPTIONS"
-  );
-
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, ngrok-skip-browser-warning"
-  );
-
-  res.header("Access-Control-Allow-Credentials", "true");
-
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
   }
@@ -52,37 +81,20 @@ app.use((req, res, next) => {
 });
 
 /* =========================================
-   CORS EXPRESS
+   BODY PARSERS
 ========================================= */
 
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-    "ngrok-skip-browser-warning",
-  ],
-  credentials: true,
-}));
-
-/* =========================================
-   JSON
-========================================= */
-
-app.use(express.json());
+app.use(express.json({ limit: "20mb" }));
+app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
 /* =========================================
    STATIC FILES
 ========================================= */
 
-app.use(
-  "/uploads",
-  express.static(path.join(__dirname, "uploads"))
-);
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 /* =========================================
-   TEST
+   TEST / HEALTH CHECK
 ========================================= */
 
 app.get("/", (req, res) => {
@@ -93,6 +105,7 @@ app.get("/api/test", (req, res) => {
   res.json({
     ok: true,
     mensaje: "Backend conectado",
+    entorno: process.env.APP_ENV || process.env.NODE_ENV || "local",
   });
 });
 
@@ -108,9 +121,43 @@ app.use("/api", articulosAdminRoutes);
 app.use("/api", radiografiaMarcaRoutes);
 
 /* =========================================
+   404 API
+========================================= */
+
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    ok: false,
+    mensaje: "Ruta API no encontrada",
+    path: req.originalUrl,
+  });
+});
+
+/* =========================================
+   ERROR HANDLER
+========================================= */
+
+app.use((err, req, res, next) => {
+  console.error("Error backend REVERA:", err.message);
+
+  if (err.message?.includes("CORS") || err.message?.includes("Origen no permitido")) {
+    return res.status(403).json({
+      ok: false,
+      mensaje: err.message,
+    });
+  }
+
+  return res.status(err.status || 500).json({
+    ok: false,
+    mensaje: err.message || "Error interno del servidor",
+  });
+});
+
+/* =========================================
    START SERVER
 ========================================= */
 
 app.listen(PORT, () => {
   console.log(`Servidor puerto ${PORT}`);
+  console.log(`Entorno: ${process.env.APP_ENV || process.env.NODE_ENV || "local"}`);
+  console.log("Origins permitidos:", allowedOrigins);
 });
