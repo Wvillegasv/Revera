@@ -1,8 +1,11 @@
 const express = require("express");
 
 const uploadGuia = require("../middlewares/uploadGuia");
+const { validarAdmin } = require("../middlewares/validarAdmin");
 
 const {
+  listarArticulosAdmin,
+  obtenerArticuloAdminPorId,
   crearArticuloAdmin,
   actualizarArticuloAdmin,
   cambiarEstadoArticuloAdmin,
@@ -17,17 +20,58 @@ const {
 
 const router = express.Router();
 
+/* =========================================
+   SEGURIDAD TEMPORAL ETAPA A
+========================================= */
+
+router.use("/admin", validarAdmin);
+
+/* =========================================
+   ARTÍCULOS
+========================================= */
+
+router.get("/admin/articulos", listarArticulosAdmin);
+router.get("/admin/articulos/:id", obtenerArticuloAdminPorId);
+
 router.post("/admin/articulos", crearArticuloAdmin);
 router.put("/admin/articulos/:id", actualizarArticuloAdmin);
 router.patch("/admin/articulos/:id/estado", cambiarEstadoArticuloAdmin);
 router.delete("/admin/articulos/:id", eliminarArticuloAdmin);
 
+/* =========================================
+   BLOQUES
+========================================= */
+
 router.post("/admin/articulos/:articuloId/bloques", crearBloqueAdmin);
 router.put("/admin/articulos/bloques/:bloqueId", actualizarBloqueAdmin);
 router.delete("/admin/articulos/bloques/:bloqueId", eliminarBloqueAdmin);
 
+/* =========================================
+   RELACIONADOS
+========================================= */
+
 router.post("/admin/articulos/:articuloId/relacionados", crearRelacionadoAdmin);
-router.delete("/admin/articulos/relacionados/:relacionId", eliminarRelacionadoAdmin);
+
+/*
+  Ruta recomendada:
+  inactiva únicamente la relación entre el artículo actual y el relacionado.
+*/
+router.delete(
+  "/admin/articulos/:articuloId/relacionados/:relacionadoId",
+  eliminarRelacionadoAdmin
+);
+
+/*
+  Ruta anterior conservada por compatibilidad.
+*/
+router.delete(
+  "/admin/articulos/relacionados/:relacionId",
+  eliminarRelacionadoAdmin
+);
+
+/* =========================================
+   IMÁGENES
+========================================= */
 
 router.post(
   "/admin/articulos/:articuloId/imagenes",

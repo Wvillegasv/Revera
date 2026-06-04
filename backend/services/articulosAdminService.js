@@ -1,9 +1,140 @@
 const pool = require("../config/db");
 
-const DB_USER = process.env.DB_USER || "WEBUSER";
+function normalizarEstado(valor, defaultValue = "A") {
+  if (!valor) return defaultValue;
+
+  const estado = String(valor).trim().toUpperCase();
+
+  return estado === "I" ? "I" : "A";
+}
+
+function normalizarDestacado(valor) {
+  if (!valor) return "N";
+
+  const destacado = String(valor).trim().toUpperCase();
+
+  return destacado === "S" ? "S" : "N";
+}
+
+function generarSlug(texto = "") {
+  return String(texto)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+async function listarArticulos() {
+  const promisePool = pool.promise();
+
+  const sql = `
+    SELECT
+      ar_articulo_id AS id,
+      ar_slug AS slug,
+      ar_titulo AS titulo,
+      ar_subtitulo AS subtitulo,
+      ar_categoria AS categoria,
+      ar_extracto AS extracto,
+      ar_imagen_portada AS imagenPortada,
+      ar_tiempo_lectura AS tiempoLectura,
+      DATE_FORMAT(ar_fecha_publicacion, '%Y-%m-%d') AS fechaPublicacion,
+      ar_destacado AS destacado,
+      ar_estado AS estado,
+      ar_orden AS orden
+    FROM re_articulo
+    ORDER BY ar_orden ASC, ar_fecha_publicacion DESC, ar_articulo_id DESC
+  `;
+
+  const [rows] = await promisePool.query(sql);
+  return rows;
+}
+
+async function obtenerArticuloPorId(id) {
+  const promisePool = pool.promise();
+
+  const sqlArticulo = `
+    SELECT
+      ar_articulo_id AS id,
+      ar_slug AS slug,
+      ar_titulo AS titulo,
+      ar_subtitulo AS subtitulo,
+      ar_categoria AS categoria,
+      ar_extracto AS extracto,
+      ar_imagen_portada AS imagenPortada,
+      ar_tiempo_lectura AS tiempoLectura,
+      DATE_FORMAT(ar_fecha_publicacion, '%Y-%m-%d') AS fechaPublicacion,
+      ar_destacado AS destacado,
+      ar_estado AS estado,
+      ar_orden AS orden
+    FROM re_articulo
+    WHERE ar_articulo_id = ?
+    LIMIT 1
+  `;
+
+  const [articulos] = await promisePool.query(sqlArticulo, [id]);
+
+  if (articulos.length === 0) {
+    return null;
+  }
+
+  const articulo = articulos[0];
+
+  const sqlBloques = `
+    SELECT
+      ab_bloque_id AS id,
+      ab_orden AS orden,
+      ab_tipo AS tipo,
+      ab_contenido AS contenido,
+      ab_imagen_url AS imagenUrl,
+      ab_alt_text AS altText,
+      ab_caption AS caption,
+      ab_estado AS estado
+    FROM re_articulo_bloque
+    WHERE ab_articulo_id = ?
+    ORDER BY ab_orden ASC, ab_bloque_id ASC
+  `;
+
+  const [bloques] = await promisePool.query(sqlBloques, [id]);
+
+  const sqlRelacionados = `
+    SELECT
+      rr.rr_articulo_id AS articuloId,
+      rr.rr_articulo_relacionado_id AS relacionadoId,
+      rr.rr_orden AS orden,
+      rr.rr_estado AS estado,
+      r.ar_titulo AS titulo,
+      r.ar_slug AS slug,
+      r.ar_categoria AS categoria
+    FROM re_articulo_relacionado rr
+    INNER JOIN re_articulo r
+      ON rr.rr_articulo_relacionado_id = r.ar_articulo_id
+    WHERE rr.rr_articulo_id = ?
+    ORDER BY rr.rr_orden ASC
+  `;
+
+  const [relacionados] = await promisePool.query(sqlRelacionados, [id]);
+
+  return {
+    ...articulo,
+    bloques,
+    relacionados,
+  };
+}
 
 async function crearArticulo(data) {
   const promisePool = pool.promise();
+
+  const titulo = String(data.titulo || "").trim();
+
+  if (!titulo) {
+    const error = new Error("El título del artículo es obligatorio.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const slug = data.slug?.trim() || generarSlug(titulo);
 
   const sql = `
     INSERT INTO re_articulo (
@@ -15,36 +146,48 @@ async function crearArticulo(data) {
       ar_imagen_portada,
       ar_tiempo_lectura,
       ar_fecha_publicacion,
-      ar_estado,
       ar_destacado,
-      ar_orden,
-      ar_usuario_crea
+      ar_estado,
+      ar_orden
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const valores = [
-    data.slug,
-    data.titulo,
+    slug,
+    titulo,
     data.subtitulo || null,
-    data.categoria || null,
-    data.extracto || null,
+    data.categoria || "General",
+    data.extracto || "",
     data.imagenPortada || null,
-    data.tiempoLectura || null,
-    data.fechaPublicacion || null,
-    data.estado || "B",
-    data.destacado || "N",
-    data.orden || 0,
-    DB_USER,
+    data.tiempoLectura || "5 min",
+    data.fechaPublicacion || new Date(),
+    normalizarDestacado(data.destacado),
+    normalizarEstado(data.estado),
+    Number(data.orden || 0),
   ];
 
   const [result] = await promisePool.query(sql, valores);
 
-  return result.insertId;
+  return {
+    id: result.insertId,
+    slug,
+    titulo,
+  };
 }
 
 async function actualizarArticulo(id, data) {
   const promisePool = pool.promise();
+
+  const titulo = String(data.titulo || "").trim();
+
+  if (!titulo) {
+    const error = new Error("El título del artículo es obligatorio.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const slug = data.slug?.trim() || generarSlug(titulo);
 
   const sql = `
     UPDATE re_articulo
@@ -57,33 +200,34 @@ async function actualizarArticulo(id, data) {
       ar_imagen_portada = ?,
       ar_tiempo_lectura = ?,
       ar_fecha_publicacion = ?,
-      ar_estado = ?,
       ar_destacado = ?,
-      ar_orden = ?,
-      ar_usuario_modifica = ?,
-      ar_fecha_modifica = NOW()
+      ar_estado = ?,
+      ar_orden = ?
     WHERE ar_articulo_id = ?
   `;
 
   const valores = [
-    data.slug,
-    data.titulo,
+    slug,
+    titulo,
     data.subtitulo || null,
-    data.categoria || null,
-    data.extracto || null,
+    data.categoria || "General",
+    data.extracto || "",
     data.imagenPortada || null,
-    data.tiempoLectura || null,
-    data.fechaPublicacion || null,
-    data.estado || "B",
-    data.destacado || "N",
-    data.orden || 0,
-    DB_USER,
+    data.tiempoLectura || "5 min",
+    data.fechaPublicacion || new Date(),
+    normalizarDestacado(data.destacado),
+    normalizarEstado(data.estado),
+    Number(data.orden || 0),
     id,
   ];
 
-  const [result] = await promisePool.query(sql, valores);
+  await promisePool.query(sql, valores);
 
-  return result.affectedRows;
+  return {
+    id,
+    slug,
+    titulo,
+  };
 }
 
 async function cambiarEstadoArticulo(id, estado) {
@@ -91,24 +235,35 @@ async function cambiarEstadoArticulo(id, estado) {
 
   const sql = `
     UPDATE re_articulo
-    SET
-      ar_estado = ?,
-      ar_usuario_modifica = ?,
-      ar_fecha_modifica = NOW()
+    SET ar_estado = ?
     WHERE ar_articulo_id = ?
   `;
 
-  const [result] = await promisePool.query(sql, [estado, DB_USER, id]);
-
-  return result.affectedRows;
+  await promisePool.query(sql, [normalizarEstado(estado), id]);
 }
 
 async function eliminarArticuloLogico(id) {
   return cambiarEstadoArticulo(id, "I");
 }
 
+async function obtenerSiguienteOrdenBloque(articuloId) {
+  const promisePool = pool.promise();
+
+  const sql = `
+    SELECT COALESCE(MAX(ab_orden), 0) + 1 AS siguienteOrden
+    FROM re_articulo_bloque
+    WHERE ab_articulo_id = ?
+  `;
+
+  const [rows] = await promisePool.query(sql, [articuloId]);
+
+  return rows[0]?.siguienteOrden || 1;
+}
+
 async function crearBloque(articuloId, data) {
   const promisePool = pool.promise();
+
+  const orden = data.orden || (await obtenerSiguienteOrdenBloque(articuloId));
 
   const sql = `
     INSERT INTO re_articulo_bloque (
@@ -119,27 +274,30 @@ async function crearBloque(articuloId, data) {
       ab_imagen_url,
       ab_alt_text,
       ab_caption,
-      ab_estado,
-      ab_usuario_crea
+      ab_estado
     )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const valores = [
     articuloId,
-    data.orden || 0,
-    data.tipo,
-    data.contenido || null,
+    Number(orden),
+    data.tipo || "parrafo",
+    data.contenido || "",
     data.imagenUrl || null,
     data.altText || null,
     data.caption || null,
-    data.estado || "A",
-    DB_USER,
+    normalizarEstado(data.estado),
   ];
 
   const [result] = await promisePool.query(sql, valores);
 
-  return result.insertId;
+  return {
+    id: result.insertId,
+    articuloId,
+    orden,
+    tipo: data.tipo || "parrafo",
+  };
 }
 
 async function actualizarBloque(bloqueId, data) {
@@ -159,19 +317,17 @@ async function actualizarBloque(bloqueId, data) {
   `;
 
   const valores = [
-    data.orden || 0,
-    data.tipo,
-    data.contenido || null,
+    Number(data.orden || 0),
+    data.tipo || "parrafo",
+    data.contenido || "",
     data.imagenUrl || null,
     data.altText || null,
     data.caption || null,
-    data.estado || "A",
+    normalizarEstado(data.estado),
     bloqueId,
   ];
 
-  const [result] = await promisePool.query(sql, valores);
-
-  return result.affectedRows;
+  await promisePool.query(sql, valores);
 }
 
 async function eliminarBloqueLogico(bloqueId) {
@@ -183,89 +339,127 @@ async function eliminarBloqueLogico(bloqueId) {
     WHERE ab_bloque_id = ?
   `;
 
-  const [result] = await promisePool.query(sql, [bloqueId]);
-
-  return result.affectedRows;
+  await promisePool.query(sql, [bloqueId]);
 }
 
-async function crearRelacionado(articuloId, relacionadoId, orden = 0) {
+async function crearRelacionado(articuloId, data) {
   const promisePool = pool.promise();
 
-  const sql = `
+  const relacionadoId = data.relacionadoId || data.articuloRelacionadoId;
+
+  if (!relacionadoId) {
+    const error = new Error("Debe indicar el artículo relacionado.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const orden = Number(data.orden || 1);
+
+  const sqlInsert = `
     INSERT INTO re_articulo_relacionado (
       rr_articulo_id,
       rr_articulo_relacionado_id,
       rr_orden,
       rr_estado
     )
-    VALUES (?, ?, ?, 'A')
+    SELECT ?, ?, ?, 'A'
+    WHERE NOT EXISTS (
+      SELECT 1
+      FROM re_articulo_relacionado rr
+      WHERE rr.rr_articulo_id = ?
+        AND rr.rr_articulo_relacionado_id = ?
+    )
   `;
 
-  const [result] = await promisePool.query(sql, [
+  await promisePool.query(sqlInsert, [
     articuloId,
     relacionadoId,
     orden,
+    articuloId,
+    relacionadoId,
   ]);
 
-  return result.insertId;
+  const sqlUpdate = `
+    UPDATE re_articulo_relacionado
+    SET
+      rr_orden = ?,
+      rr_estado = 'A'
+    WHERE rr_articulo_id = ?
+      AND rr_articulo_relacionado_id = ?
+  `;
+
+  await promisePool.query(sqlUpdate, [orden, articuloId, relacionadoId]);
+
+  return {
+    articuloId,
+    relacionadoId,
+    orden,
+  };
 }
 
-async function eliminarRelacionado(relacionId) {
+async function eliminarRelacionado(relacionadoId, articuloId = null) {
   const promisePool = pool.promise();
 
+  if (!relacionadoId) {
+    const error = new Error("Debe indicar el artículo relacionado.");
+    error.statusCode = 400;
+    throw error;
+  }
+
+  /*
+    Forma recomendada:
+    inactiva solo la relación exacta:
+    artículo principal + artículo relacionado.
+  */
+  if (articuloId) {
+    const sql = `
+      UPDATE re_articulo_relacionado
+      SET rr_estado = 'I'
+      WHERE rr_articulo_id = ?
+        AND rr_articulo_relacionado_id = ?
+    `;
+
+    await promisePool.query(sql, [articuloId, relacionadoId]);
+    return;
+  }
+
+  /*
+    Compatibilidad con ruta anterior.
+    Usar solo si no viene articuloId.
+  */
   const sql = `
     UPDATE re_articulo_relacionado
     SET rr_estado = 'I'
-    WHERE rr_relacion_id = ?
+    WHERE rr_articulo_relacionado_id = ?
   `;
 
-  const [result] = await promisePool.query(sql, [relacionId]);
-
-  return result.affectedRows;
+  await promisePool.query(sql, [relacionadoId]);
 }
 
+
 async function registrarImagenArticulo(articuloId, file, data = {}) {
-  const promisePool = pool.promise();
+  const rutaPublica = `/uploads/guia/${file.filename}`;
 
-  const rutaArchivo = `/uploads/guia/${file.filename}`;
-
-  const sql = `
-    INSERT INTO re_articulo_imagen (
-      ai_articulo_id,
-      ai_nombre_original,
-      ai_nombre_archivo,
-      ai_ruta_archivo,
-      ai_mime_type,
-      ai_peso_bytes,
-      ai_alt_text,
-      ai_caption,
-      ai_estado,
-      ai_usuario_crea
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'A', ?)
-  `;
-
-  const valores = [
-    articuloId,
-    file.originalname,
-    file.filename,
-    rutaArchivo,
-    file.mimetype,
-    file.size,
-    data.altText || null,
-    data.caption || null,
-    DB_USER,
-  ];
-
-  const [result] = await promisePool.query(sql, valores);
+  const bloque = await crearBloque(articuloId, {
+    tipo: "imagen",
+    contenido: data.contenido || data.altText || file.originalname,
+    imagenUrl: rutaPublica,
+    altText: data.altText || file.originalname,
+    caption: data.caption || "",
+    estado: "A",
+  });
 
   return {
-    id: result.insertId,
-    url: rutaArchivo,
+    ...bloque,
+    imagenUrl: rutaPublica,
+    filename: file.filename,
+    originalname: file.originalname,
   };
 }
 
 module.exports = {
+  listarArticulos,
+  obtenerArticuloPorId,
   crearArticulo,
   actualizarArticulo,
   cambiarEstadoArticulo,

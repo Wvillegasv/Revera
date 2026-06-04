@@ -5,23 +5,20 @@ import Navbar from "../components/Navbar";
 import { obtenerArticulos } from "../services/articulosApi";
 import "../styles/guia.css";
 
-const ORDEN_GUIA = [
-  "clasificacion-de-marcas",
-  "inteligencia-artificial-servicio-cliente",
-  "productividad-negocio",
-  "automatizacion-2026",
-  "tendencias-atencion-cliente",
-  "sistema-gestion-empresa",
-  "trabajo-remoto-colaboracion-digital",
-];
+function ordenarListadoGuia(articulos) {
+  return [...articulos].sort((a, b) => {
+    const ordenA = Number(a.orden ?? 9999);
+    const ordenB = Number(b.orden ?? 9999);
 
-function ordenarArticulosGuia(articulos) {
-  return articulos
-    .filter((articulo) => ORDEN_GUIA.includes(articulo.slug))
-    .sort(
-      (a, b) =>
-        ORDEN_GUIA.indexOf(a.slug) - ORDEN_GUIA.indexOf(b.slug)
-    );
+    if (ordenA !== ordenB) {
+      return ordenA - ordenB;
+    }
+
+    const fechaA = new Date(a.fechaPublicacion || 0).getTime();
+    const fechaB = new Date(b.fechaPublicacion || 0).getTime();
+
+    return fechaB - fechaA;
+  });
 }
 
 function Guia() {
@@ -50,12 +47,13 @@ function Guia() {
     [articulos]
   );
 
-  const listado = useMemo(
-    () => ordenarArticulosGuia(
-      articulos.filter((articulo) => articulo.destacado !== "S")
-    ),
-    [articulos]
-  );
+  const listado = useMemo(() => {
+    const articulosNoDestacados = articulos.filter(
+      (articulo) => articulo.destacado !== "S"
+    );
+
+    return ordenarListadoGuia(articulosNoDestacados);
+  }, [articulos]);
 
   return (
     <div className="guia-page">
@@ -168,6 +166,10 @@ function Guia() {
                 </div>
               </Link>
             ))}
+
+            {listado.length === 0 && (
+              <p className="guia-status">No hay artículos disponibles.</p>
+            )}
           </section>
         )}
       </main>

@@ -1,4 +1,6 @@
 const {
+  listarArticulos,
+  obtenerArticuloPorId,
   crearArticulo,
   actualizarArticulo,
   cambiarEstadoArticulo,
@@ -8,40 +10,71 @@ const {
   eliminarBloqueLogico,
   crearRelacionado,
   eliminarRelacionado,
+  registrarImagenArticulo,
 } = require("../services/articulosAdminService");
 
-function validarArticulo(body) {
-  if (!body.slug || !body.titulo) {
-    return "El slug y el título son obligatorios.";
-  }
+async function listarArticulosAdmin(req, res) {
+  try {
+    const articulos = await listarArticulos();
 
-  return null;
+    return res.json({
+      ok: true,
+      data: articulos,
+    });
+  } catch (error) {
+    console.error("Error listando artículos admin:", error);
+
+    return res.status(500).json({
+      ok: false,
+      mensaje: "Error al listar artículos admin",
+      error: error.message,
+    });
+  }
+}
+
+async function obtenerArticuloAdminPorId(req, res) {
+  try {
+    const { id } = req.params;
+
+    const articulo = await obtenerArticuloPorId(id);
+
+    if (!articulo) {
+      return res.status(404).json({
+        ok: false,
+        mensaje: "Artículo no encontrado",
+      });
+    }
+
+    return res.json({
+      ok: true,
+      data: articulo,
+    });
+  } catch (error) {
+    console.error("Error obteniendo artículo admin:", error);
+
+    return res.status(500).json({
+      ok: false,
+      mensaje: "Error al obtener artículo admin",
+      error: error.message,
+    });
+  }
 }
 
 async function crearArticuloAdmin(req, res) {
   try {
-    const error = validarArticulo(req.body);
-
-    if (error) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: error,
-      });
-    }
-
-    const id = await crearArticulo(req.body);
+    const articulo = await crearArticulo(req.body);
 
     return res.status(201).json({
       ok: true,
-      mensaje: "Artículo creado correctamente.",
-      data: { id },
+      mensaje: "Artículo creado correctamente",
+      data: articulo,
     });
   } catch (error) {
-    console.error("Error creando artículo:", error);
+    console.error("Error creando artículo admin:", error);
 
     return res.status(500).json({
       ok: false,
-      mensaje: "Error creando artículo.",
+      mensaje: "Error al crear artículo",
       error: error.message,
     });
   }
@@ -50,34 +83,19 @@ async function crearArticuloAdmin(req, res) {
 async function actualizarArticuloAdmin(req, res) {
   try {
     const { id } = req.params;
-    const error = validarArticulo(req.body);
 
-    if (error) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: error,
-      });
-    }
-
-    const affectedRows = await actualizarArticulo(id, req.body);
-
-    if (affectedRows === 0) {
-      return res.status(404).json({
-        ok: false,
-        mensaje: "Artículo no encontrado.",
-      });
-    }
+    await actualizarArticulo(id, req.body);
 
     return res.json({
       ok: true,
-      mensaje: "Artículo actualizado correctamente.",
+      mensaje: "Artículo actualizado correctamente",
     });
   } catch (error) {
-    console.error("Error actualizando artículo:", error);
+    console.error("Error actualizando artículo admin:", error);
 
     return res.status(500).json({
       ok: false,
-      mensaje: "Error actualizando artículo.",
+      mensaje: "Error al actualizar artículo",
       error: error.message,
     });
   }
@@ -88,32 +106,18 @@ async function cambiarEstadoArticuloAdmin(req, res) {
     const { id } = req.params;
     const { estado } = req.body;
 
-    if (!["A", "B", "I"].includes(estado)) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Estado inválido. Use A, B o I.",
-      });
-    }
-
-    const affectedRows = await cambiarEstadoArticulo(id, estado);
-
-    if (affectedRows === 0) {
-      return res.status(404).json({
-        ok: false,
-        mensaje: "Artículo no encontrado.",
-      });
-    }
+    await cambiarEstadoArticulo(id, estado);
 
     return res.json({
       ok: true,
-      mensaje: "Estado actualizado correctamente.",
+      mensaje: "Estado del artículo actualizado correctamente",
     });
   } catch (error) {
-    console.error("Error cambiando estado:", error);
+    console.error("Error cambiando estado artículo admin:", error);
 
     return res.status(500).json({
       ok: false,
-      mensaje: "Error cambiando estado.",
+      mensaje: "Error al cambiar estado del artículo",
       error: error.message,
     });
   }
@@ -123,25 +127,18 @@ async function eliminarArticuloAdmin(req, res) {
   try {
     const { id } = req.params;
 
-    const affectedRows = await eliminarArticuloLogico(id);
-
-    if (affectedRows === 0) {
-      return res.status(404).json({
-        ok: false,
-        mensaje: "Artículo no encontrado.",
-      });
-    }
+    await eliminarArticuloLogico(id);
 
     return res.json({
       ok: true,
-      mensaje: "Artículo eliminado correctamente.",
+      mensaje: "Artículo eliminado correctamente",
     });
   } catch (error) {
-    console.error("Error eliminando artículo:", error);
+    console.error("Error eliminando artículo admin:", error);
 
     return res.status(500).json({
       ok: false,
-      mensaje: "Error eliminando artículo.",
+      mensaje: "Error al eliminar artículo",
       error: error.message,
     });
   }
@@ -151,26 +148,19 @@ async function crearBloqueAdmin(req, res) {
   try {
     const { articuloId } = req.params;
 
-    if (!req.body.tipo) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "El tipo de bloque es obligatorio.",
-      });
-    }
-
-    const id = await crearBloque(articuloId, req.body);
+    const bloque = await crearBloque(articuloId, req.body);
 
     return res.status(201).json({
       ok: true,
-      mensaje: "Bloque creado correctamente.",
-      data: { id },
+      mensaje: "Bloque creado correctamente",
+      data: bloque,
     });
   } catch (error) {
-    console.error("Error creando bloque:", error);
+    console.error("Error creando bloque admin:", error);
 
     return res.status(500).json({
       ok: false,
-      mensaje: "Error creando bloque.",
+      mensaje: "Error al crear bloque",
       error: error.message,
     });
   }
@@ -180,32 +170,18 @@ async function actualizarBloqueAdmin(req, res) {
   try {
     const { bloqueId } = req.params;
 
-    if (!req.body.tipo) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "El tipo de bloque es obligatorio.",
-      });
-    }
-
-    const affectedRows = await actualizarBloque(bloqueId, req.body);
-
-    if (affectedRows === 0) {
-      return res.status(404).json({
-        ok: false,
-        mensaje: "Bloque no encontrado.",
-      });
-    }
+    await actualizarBloque(bloqueId, req.body);
 
     return res.json({
       ok: true,
-      mensaje: "Bloque actualizado correctamente.",
+      mensaje: "Bloque actualizado correctamente",
     });
   } catch (error) {
-    console.error("Error actualizando bloque:", error);
+    console.error("Error actualizando bloque admin:", error);
 
     return res.status(500).json({
       ok: false,
-      mensaje: "Error actualizando bloque.",
+      mensaje: "Error al actualizar bloque",
       error: error.message,
     });
   }
@@ -215,25 +191,18 @@ async function eliminarBloqueAdmin(req, res) {
   try {
     const { bloqueId } = req.params;
 
-    const affectedRows = await eliminarBloqueLogico(bloqueId);
-
-    if (affectedRows === 0) {
-      return res.status(404).json({
-        ok: false,
-        mensaje: "Bloque no encontrado.",
-      });
-    }
+    await eliminarBloqueLogico(bloqueId);
 
     return res.json({
       ok: true,
-      mensaje: "Bloque eliminado correctamente.",
+      mensaje: "Bloque eliminado correctamente",
     });
   } catch (error) {
-    console.error("Error eliminando bloque:", error);
+    console.error("Error eliminando bloque admin:", error);
 
     return res.status(500).json({
       ok: false,
-      mensaje: "Error eliminando bloque.",
+      mensaje: "Error al eliminar bloque",
       error: error.message,
     });
   }
@@ -242,28 +211,20 @@ async function eliminarBloqueAdmin(req, res) {
 async function crearRelacionadoAdmin(req, res) {
   try {
     const { articuloId } = req.params;
-    const { relacionadoId, orden } = req.body;
 
-    if (!relacionadoId) {
-      return res.status(400).json({
-        ok: false,
-        mensaje: "Debe indicar el artículo relacionado.",
-      });
-    }
-
-    const id = await crearRelacionado(articuloId, relacionadoId, orden || 0);
+    const relacionado = await crearRelacionado(articuloId, req.body);
 
     return res.status(201).json({
       ok: true,
-      mensaje: "Relacionado creado correctamente.",
-      data: { id },
+      mensaje: "Artículo relacionado creado correctamente",
+      data: relacionado,
     });
   } catch (error) {
-    console.error("Error creando relacionado:", error);
+    console.error("Error creando relacionado admin:", error);
 
     return res.status(500).json({
       ok: false,
-      mensaje: "Error creando relacionado.",
+      mensaje: "Error al crear artículo relacionado",
       error: error.message,
     });
   }
@@ -271,27 +232,22 @@ async function crearRelacionadoAdmin(req, res) {
 
 async function eliminarRelacionadoAdmin(req, res) {
   try {
-    const { relacionId } = req.params;
+    const { articuloId, relacionadoId, relacionId } = req.params;
 
-    const affectedRows = await eliminarRelacionado(relacionId);
+    const idRelacionado = relacionadoId || relacionId;
 
-    if (affectedRows === 0) {
-      return res.status(404).json({
-        ok: false,
-        mensaje: "Relacionado no encontrado.",
-      });
-    }
+    await eliminarRelacionado(idRelacionado, articuloId);
 
     return res.json({
       ok: true,
-      mensaje: "Relacionado eliminado correctamente.",
+      mensaje: "Artículo relacionado eliminado correctamente",
     });
   } catch (error) {
-    console.error("Error eliminando relacionado:", error);
+    console.error("Error eliminando relacionado admin:", error);
 
     return res.status(500).json({
       ok: false,
-      mensaje: "Error eliminando relacionado.",
+      mensaje: "Error al eliminar artículo relacionado",
       error: error.message,
     });
   }
@@ -308,30 +264,27 @@ async function subirImagenArticuloAdmin(req, res) {
       });
     }
 
-    const imagen = await registrarImagenArticulo(
-      articuloId,
-      req.file,
-      req.body
-    );
+    const imagen = await registrarImagenArticulo(articuloId, req.file, req.body);
 
     return res.status(201).json({
       ok: true,
-      mensaje: "Imagen subida correctamente.",
+      mensaje: "Imagen registrada correctamente",
       data: imagen,
     });
   } catch (error) {
-    console.error("Error subiendo imagen:", error);
+    console.error("Error subiendo imagen admin:", error);
 
     return res.status(500).json({
       ok: false,
-      mensaje: "Error subiendo imagen.",
+      mensaje: "Error al subir imagen del artículo",
       error: error.message,
     });
   }
 }
 
-
 module.exports = {
+  listarArticulosAdmin,
+  obtenerArticuloAdminPorId,
   crearArticuloAdmin,
   actualizarArticuloAdmin,
   cambiarEstadoArticuloAdmin,

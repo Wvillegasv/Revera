@@ -9,6 +9,7 @@ const estudioRegistrabilidadRoutes = require("./routes/estudioRegistrabilidadRou
 const registroMarcaRoutes = require("./routes/registroMarcaRoutes");
 const articulosRoutes = require("./routes/articulosRoutes");
 const articulosAdminRoutes = require("./routes/articulosAdminRoutes");
+
 const radiografiaMarcaRoutes = require("./routes/radiografiaMarcaRoutes");
 
 const app = express();
@@ -89,6 +90,8 @@ app.use(express.urlencoded({ extended: true, limit: "20mb" }));
 
 /* =========================================
    STATIC FILES
+   Permite servir imágenes desde:
+   /uploads/...
 ========================================= */
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -110,15 +113,18 @@ app.get("/api/test", (req, res) => {
 });
 
 /* =========================================
-   ROUTES
+   ROUTES PÚBLICAS / FUNCIONALES
 ========================================= */
 
 app.use("/api", citasRoutes);
 app.use("/api", estudioRegistrabilidadRoutes);
 app.use("/api", registroMarcaRoutes);
 app.use("/api", articulosRoutes);
-app.use("/api", articulosAdminRoutes);
 app.use("/api", radiografiaMarcaRoutes);
+app.use("/api", articulosAdminRoutes);
+
+
+// app.use("/api", articulosAdminRoutes);
 
 /* =========================================
    404 API
@@ -139,7 +145,10 @@ app.use("/api", (req, res) => {
 app.use((err, req, res, next) => {
   console.error("Error backend REVERA:", err.message);
 
-  if (err.message?.includes("CORS") || err.message?.includes("Origen no permitido")) {
+  if (
+    err.message?.includes("CORS") ||
+    err.message?.includes("Origen no permitido")
+  ) {
     return res.status(403).json({
       ok: false,
       mensaje: err.message,
@@ -158,6 +167,9 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Servidor puerto ${PORT}`);
-  console.log(`Entorno: ${process.env.APP_ENV || process.env.NODE_ENV || "local"}`);
+  console.log(
+    `Entorno: ${process.env.APP_ENV || process.env.NODE_ENV || "local"}`
+  );
   console.log("Origins permitidos:", allowedOrigins);
+  console.log("Rutas admin de artículos: DESACTIVADAS TEMPORALMENTE");
 });
