@@ -13,6 +13,19 @@ const {
   registrarImagenArticulo,
 } = require("../services/articulosAdminService");
 
+function responderError(res, error, mensajeDefault) {
+  const status = error.statusCode || 500;
+
+  return res.status(status).json({
+    ok: false,
+    mensaje: error.message || mensajeDefault,
+  });
+}
+
+/* =========================================
+   ARTÍCULOS
+========================================= */
+
 async function listarArticulosAdmin(req, res) {
   try {
     const articulos = await listarArticulos();
@@ -24,11 +37,11 @@ async function listarArticulosAdmin(req, res) {
   } catch (error) {
     console.error("Error listando artículos admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al listar artículos admin",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al listar artículos admin"
+    );
   }
 }
 
@@ -52,11 +65,11 @@ async function obtenerArticuloAdminPorId(req, res) {
   } catch (error) {
     console.error("Error obteniendo artículo admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al obtener artículo admin",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al obtener artículo admin"
+    );
   }
 }
 
@@ -72,11 +85,11 @@ async function crearArticuloAdmin(req, res) {
   } catch (error) {
     console.error("Error creando artículo admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al crear artículo",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al crear artículo"
+    );
   }
 }
 
@@ -84,20 +97,21 @@ async function actualizarArticuloAdmin(req, res) {
   try {
     const { id } = req.params;
 
-    await actualizarArticulo(id, req.body);
+    const articulo = await actualizarArticulo(id, req.body);
 
     return res.json({
       ok: true,
       mensaje: "Artículo actualizado correctamente",
+      data: articulo,
     });
   } catch (error) {
     console.error("Error actualizando artículo admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al actualizar artículo",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al actualizar artículo"
+    );
   }
 }
 
@@ -115,11 +129,11 @@ async function cambiarEstadoArticuloAdmin(req, res) {
   } catch (error) {
     console.error("Error cambiando estado artículo admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al cambiar estado del artículo",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al cambiar estado del artículo"
+    );
   }
 }
 
@@ -131,18 +145,22 @@ async function eliminarArticuloAdmin(req, res) {
 
     return res.json({
       ok: true,
-      mensaje: "Artículo eliminado correctamente",
+      mensaje: "Artículo inactivado correctamente",
     });
   } catch (error) {
     console.error("Error eliminando artículo admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al eliminar artículo",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al inactivar artículo"
+    );
   }
 }
+
+/* =========================================
+   BLOQUES
+========================================= */
 
 async function crearBloqueAdmin(req, res) {
   try {
@@ -158,11 +176,11 @@ async function crearBloqueAdmin(req, res) {
   } catch (error) {
     console.error("Error creando bloque admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al crear bloque",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al crear bloque"
+    );
   }
 }
 
@@ -179,11 +197,11 @@ async function actualizarBloqueAdmin(req, res) {
   } catch (error) {
     console.error("Error actualizando bloque admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al actualizar bloque",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al actualizar bloque"
+    );
   }
 }
 
@@ -195,18 +213,22 @@ async function eliminarBloqueAdmin(req, res) {
 
     return res.json({
       ok: true,
-      mensaje: "Bloque eliminado correctamente",
+      mensaje: "Bloque inactivado correctamente",
     });
   } catch (error) {
     console.error("Error eliminando bloque admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al eliminar bloque",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al inactivar bloque"
+    );
   }
 }
+
+/* =========================================
+   RELACIONADOS
+========================================= */
 
 async function crearRelacionadoAdmin(req, res) {
   try {
@@ -222,11 +244,11 @@ async function crearRelacionadoAdmin(req, res) {
   } catch (error) {
     console.error("Error creando relacionado admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al crear artículo relacionado",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al crear artículo relacionado"
+    );
   }
 }
 
@@ -240,18 +262,22 @@ async function eliminarRelacionadoAdmin(req, res) {
 
     return res.json({
       ok: true,
-      mensaje: "Artículo relacionado eliminado correctamente",
+      mensaje: "Artículo relacionado quitado correctamente",
     });
   } catch (error) {
     console.error("Error eliminando relacionado admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al eliminar artículo relacionado",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al quitar artículo relacionado"
+    );
   }
 }
+
+/* =========================================
+   IMÁGENES
+========================================= */
 
 async function subirImagenArticuloAdmin(req, res) {
   try {
@@ -264,21 +290,25 @@ async function subirImagenArticuloAdmin(req, res) {
       });
     }
 
-    const imagen = await registrarImagenArticulo(articuloId, req.file, req.body);
+    const imagen = await registrarImagenArticulo(
+      articuloId,
+      req.file,
+      req.body
+    );
 
     return res.status(201).json({
       ok: true,
-      mensaje: "Imagen registrada correctamente",
+      mensaje: "Imagen subida correctamente",
       data: imagen,
     });
   } catch (error) {
     console.error("Error subiendo imagen admin:", error);
 
-    return res.status(500).json({
-      ok: false,
-      mensaje: "Error al subir imagen del artículo",
-      error: error.message,
-    });
+    return responderError(
+      res,
+      error,
+      "Error al subir imagen del artículo"
+    );
   }
 }
 

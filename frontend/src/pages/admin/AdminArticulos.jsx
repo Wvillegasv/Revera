@@ -8,6 +8,7 @@ import {
   crearBloqueAdmin,
   actualizarBloqueAdmin,
   eliminarBloqueAdmin,
+  subirImagenArticuloAdmin,
   crearRelacionadoAdmin,
   eliminarRelacionadoAdmin,
 } from "../../services/articulosAdminApi";
@@ -114,6 +115,30 @@ function obtenerResumenBloque(bloque) {
   return bloque.contenido || "Bloque sin contenido";
 }
 
+function esFechaDDMMYYYYValida(fecha = "") {
+  if (!/^\d{2}-\d{2}-\d{4}$/.test(fecha)) {
+    return false;
+  }
+
+  const [day, month, year] = fecha.split("-").map(Number);
+  const fechaObj = new Date(year, month - 1, day);
+
+  return (
+    fechaObj.getFullYear() === year &&
+    fechaObj.getMonth() === month - 1 &&
+    fechaObj.getDate() === day
+  );
+}
+
+function esSlugValido(slug = "") {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+}
+
+function esNumeroValido(valor) {
+  const numero = Number(valor);
+  return Number.isFinite(numero) && numero >= 0;
+}
+
 function AdminArticulos() {
   const [articulos, setArticulos] = useState([]);
   const [bloques, setBloques] = useState([]);
@@ -123,11 +148,14 @@ function AdminArticulos() {
   const [bloqueForm, setBloqueForm] = useState(BLOQUE_INICIAL);
   const [relacionadoForm, setRelacionadoForm] = useState(RELACIONADO_INICIAL);
 
+  const [imagenArchivo, setImagenArchivo] = useState(null);
+
   const [busqueda, setBusqueda] = useState("");
   const [cargando, setCargando] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [guardandoBloque, setGuardandoBloque] = useState(false);
   const [guardandoRelacionado, setGuardandoRelacionado] = useState(false);
+  const [subiendoImagen, setSubiendoImagen] = useState(false);
 
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
@@ -233,6 +261,7 @@ function AdminArticulos() {
       setMensaje("");
       setBloqueForm(BLOQUE_INICIAL);
       setRelacionadoForm(RELACIONADO_INICIAL);
+      setImagenArchivo(null);
 
       await recargarArticuloSeleccionado(id);
     } catch (err) {
@@ -251,6 +280,7 @@ function AdminArticulos() {
     setRelacionados([]);
     setBloqueForm(BLOQUE_INICIAL);
     setRelacionadoForm(RELACIONADO_INICIAL);
+    setImagenArchivo(null);
     setMensaje("");
     setError("");
   }
@@ -326,6 +356,7 @@ function AdminArticulos() {
 
   function limpiarBloque() {
     setBloqueForm(BLOQUE_INICIAL);
+    setImagenArchivo(null);
     setMensaje("");
     setError("");
   }
@@ -333,18 +364,44 @@ function AdminArticulos() {
   async function guardarArticulo(event) {
     event.preventDefault();
 
-    if (!form.titulo.trim()) {
-      setError("El título es obligatorio.");
-      return;
-    }
 
-    if (
-      form.fechaPublicacion &&
-      !/^\d{2}-\d{2}-\d{4}$/.test(form.fechaPublicacion)
-    ) {
-      setError("La fecha debe tener el formato dd-mm-yyyy.");
-      return;
-    }
+  if (!form.titulo.trim()) {
+    setError("El título es obligatorio.");
+    return;
+  }
+
+  if (!form.slug.trim()) {
+    setError("El slug es obligatorio.");
+    return;
+  }
+
+  if (!esSlugValido(form.slug.trim())) {
+    setError(
+      "El slug solo puede contener letras minúsculas, números y guiones. Ejemplo: articulo-de-prueba"
+    );
+    return;
+  }
+
+  if (!form.categoria.trim()) {
+    setError("La categoría es obligatoria.");
+    return;
+  }
+
+  if (!form.fechaPublicacion.trim()) {
+    setError("La fecha de publicación es obligatoria.");
+    return;
+  }
+
+  if (!esFechaDDMMYYYYValida(form.fechaPublicacion.trim())) {
+    setError("La fecha debe ser válida y tener el formato dd-mm-yyyy.");
+    return;
+  }
+
+  if (!esNumeroValido(form.orden)) {
+    setError("El orden del artículo debe ser un número válido mayor o igual a cero.");
+    return;
+  }
+
 
     try {
       setGuardando(true);
@@ -442,6 +499,16 @@ function AdminArticulos() {
       return;
     }
 
+    if (!bloqueForm.tipo) {
+      setError("Debe seleccionar el tipo de bloque.");
+      return;
+    }
+
+    if (!esNumeroValido(bloqueForm.orden)) {
+      setError("El orden del bloque debe ser un número válido mayor o igual a cero.");
+      return;
+    }
+
     if (bloqueForm.tipo !== "imagen" && !bloqueForm.contenido.trim()) {
       setError("El contenido del bloque es obligatorio.");
       return;
@@ -513,6 +580,49 @@ function AdminArticulos() {
     }
   }
 
+  async function subirImagen(event) {
+    event.preventDefault();
+
+    if (!form.id) {
+      setError("Primero seleccione o cree un artículo.");
+      return;
+    }
+
+    if (!imagenArchivo) {
+      setError("Debe seleccionar una imagen.");
+      return;
+    }
+
+    try {
+      setSubiendoImagen(true);
+      setError("");
+      setMensaje("");
+
+      const formData = new FormData();
+      formData.append("imagen", imagenArchivo);
+      formData.append("altText", bloqueForm.altText || imagenArchivo.name);
+      formData.append("caption", bloqueForm.caption || "");
+      formData.append("contenido", bloqueForm.contenido || imagenArchivo.name);
+
+      await subirImagenArticuloAdmin(form.id, formData);
+
+      setImagenArchivo(null);
+      setBloqueForm(BLOQUE_INICIAL);
+
+      setMensaje("Imagen subida y bloque creado correctamente.");
+      await recargarArticuloSeleccionado(form.id);
+    } catch (err) {
+      console.error("Error subiendo imagen:", err);
+      setError(
+        err.response?.data?.mensaje ||
+          err.response?.data?.error ||
+          "No fue posible subir la imagen."
+      );
+    } finally {
+      setSubiendoImagen(false);
+    }
+  }
+
   async function agregarRelacionado(event) {
     event.preventDefault();
 
@@ -523,6 +633,16 @@ function AdminArticulos() {
 
     if (!relacionadoForm.relacionadoId) {
       setError("Debe seleccionar un artículo relacionado.");
+      return;
+    }
+
+    if (Number(relacionadoForm.relacionadoId) === Number(form.id)) {
+      setError("Un artículo no puede relacionarse consigo mismo.");
+      return;
+    }
+
+    if (!esNumeroValido(relacionadoForm.orden)) {
+      setError("El orden del relacionado debe ser un número válido mayor o igual a cero.");
       return;
     }
 
@@ -618,6 +738,7 @@ function AdminArticulos() {
 
       <main className="admin-articulos-layout">
         <aside className="admin-articulos-list-card">
+
           <div className="admin-card-title-row">
             <h2>Artículos</h2>
             <span>{articulos.length}</span>
@@ -672,21 +793,36 @@ function AdminArticulos() {
         </aside>
 
         <section className="admin-articulos-editor-card">
-          <div className="admin-card-title-row">
+
+            <div className="admin-card-title-row">
             <h2>{form.id ? "Editar artículo" : "Nuevo artículo"}</h2>
 
-            {form.id && (
-              <span
-                className={
-                  form.estado === "A"
-                    ? "admin-status active"
-                    : "admin-status inactive"
-                }
-              >
-                {form.estado === "A" ? "Activo" : "Inactivo"}
-              </span>
-            )}
-          </div>
+            <div className="admin-title-actions">
+                {form.id && form.slug && (
+                <a
+                    href={`/guia/${form.slug}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="admin-btn ghost small admin-link-button"
+                >
+                    Ver artículo
+                </a>
+                )}
+
+                {form.id && (
+                <span
+                    className={
+                    form.estado === "A"
+                        ? "admin-status active"
+                        : "admin-status inactive"
+                    }
+                >
+                    {form.estado === "A" ? "Activo" : "Inactivo"}
+                </span>
+                )}
+            </div>
+            </div>
+
 
           <form onSubmit={guardarArticulo} className="admin-form">
             <div className="admin-form-grid">
@@ -972,6 +1108,71 @@ function AdminArticulos() {
                       disabled={guardandoBloque}
                     >
                       Limpiar
+                    </button>
+                  </div>
+                </form>
+
+                <form className="admin-upload-form" onSubmit={subirImagen}>
+                  <div className="admin-card-title-row">
+                    <div>
+                      <h2>Subir imagen</h2>
+                      <p className="admin-muted">
+                        Cargue una imagen JPG, PNG o WebP. Se creará
+                        automáticamente un bloque tipo imagen.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="admin-form-grid">
+                    <label className="admin-field full">
+                      <span>Archivo de imagen</span>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(event) => {
+                          setImagenArchivo(event.target.files?.[0] || null);
+                        }}
+                      />
+                    </label>
+
+                    <label className="admin-field">
+                      <span>Texto alternativo</span>
+                      <input
+                        name="altText"
+                        value={bloqueForm.altText}
+                        onChange={actualizarCampoBloque}
+                        placeholder="Descripción de la imagen"
+                      />
+                    </label>
+
+                    <label className="admin-field">
+                      <span>Caption</span>
+                      <input
+                        name="caption"
+                        value={bloqueForm.caption}
+                        onChange={actualizarCampoBloque}
+                        placeholder="Texto bajo la imagen"
+                      />
+                    </label>
+
+                    <label className="admin-field full">
+                      <span>Descripción interna</span>
+                      <input
+                        name="contenido"
+                        value={bloqueForm.contenido}
+                        onChange={actualizarCampoBloque}
+                        placeholder="Nombre o descripción breve de la imagen"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="admin-form-actions">
+                    <button
+                      type="submit"
+                      className="admin-btn secondary"
+                      disabled={subiendoImagen}
+                    >
+                      {subiendoImagen ? "Subiendo imagen..." : "Subir imagen"}
                     </button>
                   </div>
                 </form>

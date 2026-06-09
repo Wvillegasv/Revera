@@ -89,6 +89,22 @@ export async function eliminarBloqueAdmin(bloqueId) {
 }
 
 /* =========================================
+   IMÁGENES
+========================================= */
+
+export async function subirImagenArticuloAdmin(articuloId, formData) {
+  const response = await api.post(
+    `/admin/articulos/${articuloId}/imagenes`,
+    formData,
+    {
+      headers: ADMIN_HEADERS,
+    }
+  );
+
+  return response.data.data;
+}
+
+/* =========================================
    RELACIONADOS
 ========================================= */
 
