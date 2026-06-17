@@ -46,9 +46,9 @@ const RELACIONADO_INICIAL = {
 };
 
 const TIPOS_BLOQUE = [
+  { value: "titulo", label: "Título de sección / FAQ" },
+  { value: "subtitulo", label: "Subtítulo / pregunta" },
   { value: "parrafo", label: "Párrafo" },
-  { value: "titulo", label: "Título" },
-  { value: "subtitulo", label: "Subtítulo" },
   { value: "lista", label: "Lista" },
   { value: "cta", label: "CTA / Destacado" },
   { value: "imagen", label: "Imagen" },

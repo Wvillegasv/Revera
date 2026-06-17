@@ -1,3 +1,8 @@
+/* =========================================================
+   REVERA - AGENDA UNA CITA
+   Modal + layout + formulario
+========================================================= */
+
 .agenda-section {
   width: 100%;
   padding: 30px 16px 60px;
@@ -15,6 +20,10 @@
   display: none;
 }
 
+/* =========================================================
+   HEADER GENERAL DE AGENDA
+========================================================= */
+
 .agenda-header {
   text-align: center;
   margin-bottom: 28px;
@@ -23,49 +32,106 @@
 
 .agenda-header h2 {
   margin: 0;
-  color: var(--color-text-primary);
+
+  color: #00001b;
+  font-family: var(--font-primary);
   font-size: clamp(2.2rem, 5vw, 4.2rem);
-  font-weight: 800;
   line-height: 1.05;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.02em;
 }
 
 .agenda-header p {
   margin: 12px 0 0;
-  color: var(--color-text-secondary);
+
+  color: #939598;
+  font-family: var(--font-primary);
   font-size: clamp(1rem, 1.8vw, 1.35rem);
   line-height: 1.5;
-  font-weight: 400;
+  font-weight: var(--font-weight-demi);
 }
+
+/* =========================================================
+   HEADER DEL MODAL CONTACTO
+========================================================= */
+
+.contacto-modal-header {
+  text-align: center;
+  margin-bottom: 26px;
+  padding: 0 42px;
+}
+
+.contacto-modal-header h2 {
+  margin: 0;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.1;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.015em;
+}
+
+.contacto-modal-header p {
+  margin: 8px 0 0;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: var(--font-weight-demi);
+}
+
+/* =========================================================
+   TARJETA PRINCIPAL
+========================================================= */
 
 .agenda-layout-card {
   display: grid;
   grid-template-columns: 360px minmax(0, 1fr);
   align-items: stretch;
+
   border-radius: 24px;
   overflow: hidden;
-  box-shadow: 0 16px 34px rgba(18, 7, 66, 0.14);
+
   background: rgba(255, 255, 255, 0.42);
   border: 1px solid rgba(255, 255, 255, 0.38);
+  box-shadow: 0 16px 34px rgba(18, 7, 66, 0.14);
+
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
 
+/* =========================================================
+   COLUMNA IZQUIERDA - INFORMACIÓN DE CONTACTO
+========================================================= */
+
 .agenda-contact-info {
-  background: linear-gradient(180deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-  color: var(--color-white);
+  background: linear-gradient(
+    180deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
+
+  color: #ffffff;
   padding: 42px 32px;
+
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+
   min-height: 100%;
 }
 
 .agenda-contact-info h3 {
   margin: 0 0 30px;
+
+  color: #ffffff;
+  font-family: var(--font-primary);
   font-size: clamp(1.9rem, 2.5vw, 2.5rem);
-  font-weight: 800;
   line-height: 1.15;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
 }
 
 .contact-info-item {
@@ -79,35 +145,49 @@
   width: 46px;
   height: 46px;
   min-width: 46px;
+
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.12);
+
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .contact-info-icon svg {
-  color: var(--color-white);
+  color: #ffffff;
+  stroke: #ffffff;
 }
 
 .contact-info-item h4 {
   margin: 0 0 6px;
+
+  color: #ffffff;
+  font-family: var(--font-primary);
   font-size: 1.12rem;
-  font-weight: 700;
-  color: var(--color-white);
+  line-height: 1.25;
+  font-weight: var(--font-weight-demi);
 }
 
 .contact-info-item p {
   margin: 0 0 4px;
+
+  color: #ffffff;
+  font-family: var(--font-primary);
   font-size: 1rem;
   line-height: 1.5;
-  color: rgba(255, 255, 255, 0.9);
+  font-weight: var(--font-weight-regular);
 }
+
+/* =========================================================
+   FORMULARIO
+========================================================= */
 
 .agenda-form-card {
   background: rgba(255, 255, 255, 0.34);
   padding: 32px;
   margin: 0;
+
   border-radius: 0;
   box-shadow: none;
 }
@@ -122,44 +202,95 @@
   display: flex;
   align-items: center;
   gap: 10px;
+
   margin-bottom: 10px;
-  color: var(--color-text-primary);
+
+  color: #00001b;
+  font-family: var(--font-primary);
   font-size: 15px;
-  font-weight: 700;
+  line-height: 1.35;
+  font-weight: var(--font-weight-demi);
 }
+
+.agenda-form-group > label svg {
+  color: #00001b;
+  stroke: #00001b;
+}
+
+/* =========================================================
+   INPUTS / SELECTS
+========================================================= */
 
 .input-group {
   display: flex;
   align-items: center;
   gap: 10px;
+
+  min-height: 52px;
+  padding: 0 14px;
+
+  background: #ffffff;
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: var(--color-white);
-  padding: 0 14px;
-  min-height: 52px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .input-group:focus-within {
-  border-color: var(--color-primary);
+  border-color: #6f60aa;
   box-shadow: 0 0 0 3px rgba(111, 96, 170, 0.15);
 }
 
 .input-group svg {
-  color: var(--color-primary);
+  color: #939598;
+  stroke: #939598;
   flex-shrink: 0;
+
+  transition:
+    color 0.2s ease,
+    stroke 0.2s ease;
+}
+
+.input-group:focus-within svg {
+  color: #6f60aa;
+  stroke: #6f60aa;
 }
 
 .input-group input,
 .input-group select {
   flex: 1;
   width: 100%;
+  min-height: 50px;
+
   border: none;
   outline: none;
   background: transparent;
+
+  color: #00001b;
+  font-family: var(--font-primary);
   font-size: 16px;
-  color: var(--color-text-primary);
-  min-height: 50px;
+  line-height: 1.4;
+  font-weight: var(--font-weight-regular);
+}
+
+.input-group input::placeholder,
+.agenda-form-group textarea::placeholder,
+.react-datepicker__input-container input::placeholder {
+  color: #939598;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-regular);
+  opacity: 1;
+}
+
+.input-group select {
+  color: #939598;
+  cursor: pointer;
+}
+
+.input-group select:valid {
+  color: #00001b;
 }
 
 .telefono-row {
@@ -170,18 +301,26 @@
 
 .country-code-group select {
   width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+
+  background: #ffffff;
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: var(--color-white);
-  padding: 0 14px;
-  min-height: 52px;
-  font-size: 16px;
-  color: var(--color-text-primary);
   outline: none;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 16px;
+  font-weight: var(--font-weight-regular);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .country-code-group select:focus {
-  border-color: var(--color-primary);
+  border-color: #6f60aa;
   box-shadow: 0 0 0 3px rgba(111, 96, 170, 0.15);
 }
 
@@ -195,86 +334,206 @@
   gap: 18px;
 }
 
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
 .agenda-form-group textarea {
   width: 100%;
+  min-height: 128px;
+  padding: 15px 16px;
+
+  box-sizing: border-box;
+  resize: vertical;
+
+  background: #ffffff;
   border: 1px solid var(--color-border);
   border-radius: 12px;
-  background: var(--color-white);
-  padding: 15px 16px;
-  font-size: 16px;
-  color: var(--color-text-primary);
   outline: none;
-  min-height: 128px;
-  resize: vertical;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  box-sizing: border-box;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: var(--font-weight-regular);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .agenda-form-group textarea:focus {
-  border-color: var(--color-primary);
+  border-color: #6f60aa;
   box-shadow: 0 0 0 3px rgba(111, 96, 170, 0.15);
 }
 
-.agenda-form-group input::placeholder,
-.agenda-form-group textarea::placeholder,
-.input-group input::placeholder {
-  color: var(--color-text-secondary);
-}
+/* =========================================================
+   MENSAJES
+========================================================= */
 
 .help-message {
   margin: 8px 0 0;
+
+  color: #6f60aa;
+  font-family: var(--font-primary);
   font-size: 13px;
   line-height: 1.4;
-  color: var(--color-primary);
+  font-weight: var(--font-weight-regular);
 }
 
 .error {
   margin: 8px 0 0;
+
+  color: var(--color-error-text);
+  font-family: var(--font-primary);
   font-size: 13px;
   line-height: 1.4;
-  color: var(--color-error-text);
-  font-weight: 600;
+  font-weight: var(--font-weight-demi);
 }
 
 .mensaje-exito {
   margin-top: 8px;
   padding: 12px 14px;
+
   border-radius: 12px;
   background: var(--color-success-bg);
   color: var(--color-success-text);
+
+  font-family: var(--font-primary);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--font-weight-demi);
 }
 
 .mensaje-error {
   margin-top: 8px;
   padding: 12px 14px;
+
   border-radius: 12px;
   background: var(--color-error-bg);
   color: var(--color-error-text);
+
+  font-family: var(--font-primary);
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--font-weight-demi);
 }
+
+/* =========================================================
+   BOTÓN
+========================================================= */
 
 .agenda-submit-btn {
   width: 100%;
   min-height: 54px;
+  margin-top: 14px;
+  padding: 16px 20px;
+
   border: none;
   border-radius: 12px;
-  padding: 16px 20px;
-  margin-top: 14px;
-  background: linear-gradient(90deg, var(--color-primary) 0%, var(--color-secondary) 100%);
-  color: var(--color-white);
+
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
+
+  color: #ffffff;
+  font-family: var(--font-primary);
   font-size: 16px;
-  font-weight: 800;
+  line-height: 1.2;
+  font-weight: var(--font-weight-bold);
+
   cursor: pointer;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .agenda-submit-btn:hover {
   transform: translateY(-1px);
   opacity: 0.96;
+  box-shadow: 0 10px 20px rgba(18, 7, 66, 0.14);
 }
+
+.agenda-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =========================================================
+   DATEPICKER
+========================================================= */
+
+.react-datepicker-wrapper,
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  flex: 1;
+  width: 100%;
+  min-height: 50px;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 16px;
+  font-weight: var(--font-weight-regular);
+}
+
+.react-datepicker-popper {
+  z-index: 99999;
+}
+
+/* =========================================================
+   BOTÓN CERRAR MODAL
+========================================================= */
+
+.contacto-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 3;
+
+  width: 36px;
+  height: 36px;
+
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #120742;
+  cursor: pointer;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.contacto-modal-close:hover {
+  background: #6f60aa;
+  border-color: #6f60aa;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+
+/* =========================================================
+   RESPONSIVE - DESKTOP MEDIO
+========================================================= */
 
 @media (max-width: 1100px) {
   .agenda-layout-card {
@@ -289,6 +548,10 @@
     padding: 28px 24px 30px;
   }
 }
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
 
 @media (max-width: 992px) {
   .agenda-layout-card {
@@ -321,6 +584,19 @@
 
   .agenda-header p {
     font-size: 1rem;
+  }
+
+  .contacto-modal-header {
+    margin-bottom: 22px;
+    padding: 0 34px;
+  }
+
+  .contacto-modal-header h2 {
+    font-size: 26px;
+  }
+
+  .contacto-modal-header p {
+    font-size: 13.5px;
   }
 
   .agenda-form-card {
@@ -372,6 +648,10 @@
   }
 }
 
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
 @media (max-width: 480px) {
   .agenda-section {
     padding: 20px 12px 36px;
@@ -381,10 +661,26 @@
     font-size: 2.5rem;
   }
 
+  .contacto-modal-header {
+    padding: 0 28px;
+  }
+
+  .contacto-modal-header h2 {
+    font-size: 24px;
+  }
+
+  .contacto-modal-header p {
+    font-size: 13px;
+  }
+
   .agenda-contact-info,
   .agenda-form-card {
     padding-left: 16px;
     padding-right: 16px;
+  }
+
+  .agenda-contact-info h3 {
+    font-size: 1.55rem;
   }
 
   .contact-info-icon {
@@ -396,63 +692,11 @@
   .agenda-form-group textarea {
     min-height: 120px;
   }
-}
 
-.react-datepicker-wrapper,
-.react-datepicker__input-container {
-  width: 100%;
-}
-
-.react-datepicker__input-container input {
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 16px;
-  color: var(--color-text-primary);
-  min-height: 50px;
-}
-
-.react-datepicker-wrapper,
-.react-datepicker__input-container {
-  width: 100%;
-}
-
-.react-datepicker__input-container input {
-  flex: 1;
-  width: 100%;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 16px;
-  color: var(--color-text-primary);
-  min-height: 50px;
-}
-
-.react-datepicker-popper {
-  z-index: 99999;
-}
-
-.contacto-modal-close {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 36px;
-  height: 36px;
-  background: var(--color-white);
-  border: 1px solid var(--color-border);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-  color: var(--color-secondary);
-}
-
-.contacto-modal-close:hover {
-  background: var(--color-primary);
-  color: var(--color-white);
-  transform: scale(1.05);
+  .contacto-modal-close {
+    top: 14px;
+    right: 14px;
+    width: 34px;
+    height: 34px;
+  }
 }

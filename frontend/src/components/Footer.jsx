@@ -1,43 +1,64 @@
-import {
-  Instagram,
-  Facebook,
-  Linkedin,
-  Twitter,
-} from "lucide-react";
-
+import { Link } from "react-router-dom";
+import { Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
 import "../styles/footer.css";
 
 function Footer() {
   return (
     <footer className="footer">
       <div className="footer-left">
-        <span>Aviso de Privacidad</span>
+        <Link to="/aviso-privacidad" className="footer-privacy-link">
+          Aviso de Privacidad
+        </Link>
 
-        <div className="footer-divider"></div>
+        <span className="footer-separator">|</span>
 
-        <span>© 2026 REVERA. Todos los derechos reservados.</span>
+        <span className="footer-copy">
+          © 2026 REVERA. Todos los derechos reservados.
+        </span>
       </div>
 
-      <div className="footer-right">
+      <div className="footer-social">
         <span className="footer-social-label">Síguenos:</span>
 
-        <div className="footer-socials">
-          <a href="#" aria-label="Instagram">
-            <Instagram size={22} strokeWidth={2} />
-          </a>
+        <a
+          href="https://www.instagram.com/"
+          className="footer-social-link"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Instagram"
+        >
+          <Instagram size={16} strokeWidth={2} />
+        </a>
 
-          <a href="#" aria-label="Facebook">
-            <Facebook size={22} strokeWidth={2} />
-          </a>
+        <a
+          href="https://www.facebook.com/"
+          className="footer-social-link"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Facebook"
+        >
+          <Facebook size={16} strokeWidth={2} />
+        </a>
 
-          <a href="#" aria-label="LinkedIn">
-            <Linkedin size={22} strokeWidth={2} />
-          </a>
+        <a
+          href="https://www.linkedin.com/"
+          className="footer-social-link"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="LinkedIn"
+        >
+          <Linkedin size={16} strokeWidth={2} />
+        </a>
 
-          <a href="#" aria-label="Twitter">
-            <Twitter size={22} strokeWidth={2} />
-          </a>
-        </div>
+        <a
+          href="https://x.com/"
+          className="footer-social-link"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="X"
+        >
+          <Twitter size={16} strokeWidth={2} />
+        </a>
       </div>
     </footer>
   );

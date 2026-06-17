@@ -1,31 +1,9 @@
-:root {
-  --color-primary: #6F60AA;
-  --color-primary-hover: #5f5198;
-  --color-secondary: #120742;
-  --color-text-primary: #00001B;
-  --color-text-secondary: #939598;
-  --color-bg-light: #E6E7E8;
-  --color-white: #FFFFFF;
+/* =========================================================
+   REVERA - BASE GENERAL
+   Usa variables globales desde theme.css
+========================================================= */
 
-  --color-card: #FFFFFF;
-  --color-border: #d9dbe0;
-  --color-shadow: rgba(0, 0, 0, 0.10);
-  --color-shadow-strong: rgba(0, 0, 0, 0.16);
-
-  --color-success-bg: #eef8f1;
-  --color-success-text: #1f6b43;
-  --color-error-bg: #fdecee;
-  --color-error-text: #c62839;
-
-  /* fondos auxiliares de marca */
-  --color-bg-top: #f1edf8;
-  --color-bg-mid: #e6e7e8;
-  --color-bg-bottom: #e4def4;
-  --color-bg-soft-accent: rgba(111, 96, 170, 0.10);
-  --color-bg-soft-accent-dark: rgba(18, 7, 66, 0.08);
-}
-
-/* RESET GLOBAL */
+/* RESET LOCAL / BASE */
 * {
   box-sizing: border-box;
 }
@@ -38,18 +16,14 @@ body,
 #root {
   margin: 0;
   min-height: 100%;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-primary);
   color: var(--color-text-primary);
+  background: var(--color-bg-base);
   overflow-x: hidden;
-background:
-  radial-gradient(circle at 14% 18%, rgba(111, 96, 170, 0.05) 0%, transparent 22%),
-  radial-gradient(circle at 84% 16%, rgba(18, 7, 66, 0.04) 0%, transparent 20%),
-  linear-gradient(
-    180deg,
-    #efeff2 0%,
-    #e6e7e8 52%,
-    #ececf0 100%
-  );
+}
+
+body {
+  background: var(--color-bg-base);
   background-attachment: fixed;
 }
 
@@ -63,18 +37,221 @@ img {
   display: block;
 }
 
+button,
+input,
+textarea,
+select {
+  font-family: inherit;
+}
+
+/* =========================================================
+   PÁGINAS BASE
+========================================================= */
+
 .home-page,
 .blog-page,
 .chatbot-page {
   min-height: 100vh;
-  background: transparent;
-  padding: 12px 16px 20px;
   position: relative;
   z-index: 1;
+  padding: 12px 16px 20px;
+  background: transparent;
+  overflow: hidden;
 }
 
+.revera-page-shell {
+  position: relative;
+  min-height: 100vh;
+  background: var(--color-bg-base);
+  color: var(--color-text-primary);
+  overflow: hidden;
+}
+
+/*
+  Capa suave encima del fondo base.
+  No debe competir con la imagen principal.
+*/
+.revera-page-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+
+  background:
+    radial-gradient(
+      circle at 18% 18%,
+      rgba(255, 255, 255, 0.24) 0%,
+      rgba(255, 255, 255, 0) 30%
+    ),
+    radial-gradient(
+      circle at 86% 28%,
+      rgba(111, 96, 170, 0.04) 0%,
+      rgba(111, 96, 170, 0) 36%
+    );
+}
+
+/* Capa de contenido sobre todos los fondos */
+.revera-content-layer {
+  position: relative;
+  z-index: 3;
+}
+
+/* =========================================================
+   FONDO HOME - IMAGEN PRINCIPAL
+   Se usa con:
+   <div
+     className="home-main-background-image"
+     style={{ backgroundImage: `url(${homeMainBg})` }}
+     aria-hidden="true"
+   />
+========================================================= */
+
+.home-main-background-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  pointer-events: none;
+  user-select: none;
+
+  background-repeat: no-repeat;
+  background-position: center top;
+  background-size: 100% auto;
+
+  opacity: 1;
+  border: none;
+  box-shadow: none;
+}
+
+/*
+  Elimina la línea inferior que viene al terminar la imagen.
+  No tapa toda la imagen, solo suaviza el borde inferior.
+*/
+.home-main-background-image::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 34px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(230, 231, 232, 0) 0%,
+    rgba(230, 231, 232, 0.78) 52%,
+    var(--color-bg-base) 100%
+  );
+
+  pointer-events: none;
+}
+
+/*
+  Compatibilidad con la clase anterior de imagen de fondo.
+  Si Home.jsx todavía tiene home-background-image,
+  también funcionará como fondo principal.
+*/
+.home-background-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+
+  pointer-events: none;
+  user-select: none;
+
+  background-repeat: no-repeat;
+  background-position: center 90px;
+  background-size: 78% auto;
+
+  opacity: 1;
+  border: none;
+  box-shadow: none;
+}
+
+.home-background-image::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 34px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(230, 231, 232, 0) 0%,
+    rgba(230, 231, 232, 0.78) 52%,
+    var(--color-bg-base) 100%
+  );
+
+  pointer-events: none;
+}
+
+/* =========================================================
+   R GRANDE DE FONDO - DESACTIVADA
+   La nueva imagen ya trae la R grande integrada.
+========================================================= */
+
+.home-background-r {
+  display: none;
+}
+
+.home-background-r-svg,
+.home-background-r-continuous-fill,
+.home-background-r-continuous-line,
+.home-background-r-stroke,
+.home-background-r-fill {
+  display: none;
+}
+
+/* =========================================================
+   BRILLOS SUAVES DE FONDO
+========================================================= */
+
+.home-background-glow {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+  border-radius: 999px;
+  filter: blur(42px);
+  opacity: 0.22;
+}
+
+.home-background-glow-left {
+  width: 220px;
+  height: 220px;
+  left: -80px;
+  top: 210px;
+  background:
+    radial-gradient(
+      circle,
+      rgba(255, 255, 255, 0.42) 0%,
+      rgba(255, 255, 255, 0.14) 34%,
+      rgba(255, 255, 255, 0) 72%
+    );
+}
+
+.home-background-glow-right {
+  width: 200px;
+  height: 200px;
+  right: 14%;
+  top: 360px;
+  background:
+    radial-gradient(
+      circle,
+      rgba(111, 96, 170, 0.16) 0%,
+      rgba(111, 96, 170, 0.08) 32%,
+      rgba(111, 96, 170, 0) 72%
+    );
+}
+
+/* =========================================================
+   AGENDA / MODAL BASE
+========================================================= */
+
 .agenda-section {
-  max-width: 1215px;
+  width: 100%;
+  max-width: var(--layout-max-width);
   margin: 30px auto 0;
   padding: 20px 12px;
 }
@@ -87,31 +264,111 @@ img {
   flex-wrap: wrap;
 }
 
-/* utilitario base para futuras secciones */
+/* =========================================================
+   UTILITARIOS
+========================================================= */
+
 .section-container {
   width: 100%;
-  max-width: 1215px;
+  max-width: var(--layout-max-width);
   margin: 0 auto;
+}
+
+.revera-surface {
+  background: rgba(255, 255, 255, 0.72);
+  border: var(--glass-border);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+}
+
+.revera-text-primary {
+  color: var(--color-text-primary);
+}
+
+.revera-text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.revera-accent {
+  color: var(--color-primary);
+}
+
+/* =========================================================
+   AJUSTES TIPOGRÁFICOS HOME / NAVBAR
+========================================================= */
+
+/* Menú principal: Chat, Contacto, Guía */
+.navbar a,
+.navbar button,
+.navbar-menu a,
+.navbar-menu button,
+.navbar-link,
+.navbar-item {
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-demi);
+}
+
+/* Título principal */
+.hero-content h1 {
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Subtítulo */
+.hero-content h2 {
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-demi);
+}
+
+/* Frase inferior */
+.hero-content p {
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+  .home-main-background-image,
+  .home-background-image {
+    background-position: center 90px;
+    background-size: 86% auto;
+  }
 }
 
 @media (max-width: 992px) {
   .agenda-wrapper {
     gap: 18px;
   }
+
+  .home-main-background-image,
+  .home-background-image {
+    opacity: 0.94;
+    background-position: center 80px;
+    background-size: 96% auto;
+  }
+
+  .home-background-glow-left {
+    width: 170px;
+    height: 170px;
+    left: -58px;
+    top: 220px;
+  }
+
+  .home-background-glow-right {
+    width: 155px;
+    height: 155px;
+    right: 9%;
+    top: 380px;
+  }
 }
 
 @media (max-width: 768px) {
-  body,
-  #root {
-    background:
-      radial-gradient(circle at 18% 16%, rgba(111, 96, 170, 0.10) 0%, transparent 24%),
-      radial-gradient(circle at 84% 12%, rgba(18, 7, 66, 0.07) 0%, transparent 20%),
-      linear-gradient(
-        180deg,
-        #f1edf8 0%,
-        #e6e7e8 46%,
-        #e5e0f3 100%
-      );
+  body {
+    background: var(--color-bg-base);
     background-attachment: fixed;
   }
 
@@ -119,6 +376,27 @@ img {
   .blog-page,
   .chatbot-page {
     padding: 10px 10px 18px;
+  }
+
+  .home-main-background-image,
+  .home-background-image {
+    opacity: 0.88;
+    background-position: center 70px;
+    background-size: 118% auto;
+  }
+
+  .home-background-glow-left {
+    width: 130px;
+    height: 130px;
+    left: -34px;
+    top: 240px;
+  }
+
+  .home-background-glow-right {
+    width: 118px;
+    height: 118px;
+    right: 6%;
+    top: 360px;
   }
 
   .agenda-section {
@@ -133,6 +411,33 @@ img {
 }
 
 @media (max-width: 480px) {
+  .home-page,
+  .blog-page,
+  .chatbot-page {
+    padding: 8px 8px 16px;
+  }
+
+  .home-main-background-image,
+  .home-background-image {
+    opacity: 0.82;
+    background-position: center 65px;
+    background-size: 145% auto;
+  }
+
+  .home-background-glow-left {
+    width: 92px;
+    height: 92px;
+    left: -18px;
+    top: 265px;
+  }
+
+  .home-background-glow-right {
+    width: 84px;
+    height: 84px;
+    right: 4%;
+    top: 345px;
+  }
+
   .agenda-section {
     padding: 8px;
   }

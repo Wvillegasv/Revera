@@ -160,7 +160,11 @@ function ArticleRenderer({ bloques = [] }) {
                 )}
               </div>
 
-              {bloque.caption && <figcaption>{bloque.caption}</figcaption>}
+              {bloque.caption && (
+                <figcaption className="guia-revera-figure-caption">
+                  {bloque.caption}
+                </figcaption>
+              )}
             </figure>
           );
         }

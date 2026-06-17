@@ -1,516 +1,608 @@
+/* =========================================================
+   REVERA - DETALLE DE ARTÍCULOS / GUÍA
+========================================================= */
+
 .guia-revera-page {
   min-height: 100vh;
-  background: #f6f6f8;
-  padding: 1px 0 80px;
+  background: #e6e7e8;
+  color: #00001b;
+  font-family: var(--font-primary);
 }
 
 .guia-revera-main {
-  width: min(930px, calc(100% - 48px));
-  margin: 34px auto 0;
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 34px 0 72px;
 }
 
-/* BOTÓN VOLVER */
+/* =========================================================
+   VOLVER A LA GUÍA
+========================================================= */
 
 .guia-revera-back {
   display: inline-flex;
   align-items: center;
   gap: 8px;
 
-  margin-bottom: 32px;
-  padding: 9px 14px;
-
-  border-radius: 999px;
-
-  color: #939598;
-  text-decoration: none;
-
-  font-size: 15px;
-  font-weight: 500;
-
-  transition:
-    background 0.22s ease,
-    color 0.22s ease,
-    box-shadow 0.22s ease,
-    transform 0.22s ease;
-}
-
-.guia-revera-back:hover {
-  background: rgba(141, 130, 194, 0.16);
-  color: #6f60aa;
-  box-shadow: 0 8px 18px rgba(18, 7, 66, 0.08);
-  transform: translateX(-2px);
-}
-
-/* CARDS BASE */
-
-.guia-revera-article,
-.guia-revera-body,
-.guia-revera-related,
-.guia-placeholder-card {
-  border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 16px 34px rgba(18, 7, 66, 0.12);
-  overflow: hidden;
-}
-
-/* HERO */
-
-.guia-revera-cover {
-  height: 350px;
-
-  background: linear-gradient(
-    110deg,
-    #8d82c2 0%,
-    #4c3d86 48%,
-    #26145f 100%
-  );
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  overflow: hidden;
-}
-
-.guia-revera-logo-text {
-  width: 100%;
-  height: 100%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  user-select: none;
-  overflow: visible;
-}
-
-.guia-revera-logo-text img {
-  width: 122%;
-  max-width: none;
-  height: auto;
-
-  transform: scale(0.78);
-
-  display: block;
-  object-fit: contain;
-
-  filter:
-    brightness(0.36)
-    saturate(240%)
-    contrast(1.22)
-    hue-rotate(8deg);
-
-  image-rendering: -webkit-optimize-contrast;
-}
-
-/* HEADER */
-
-.guia-revera-header {
-  padding: 46px 48px 50px;
-}
-
-.guia-revera-badge {
-  display: inline-flex;
-  align-items: center;
-
-  min-height: 28px;
-  padding: 0 13px;
-
-  border-radius: 999px;
-
-  background: rgba(141, 130, 194, 0.15);
-  color: #6f60aa;
-
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.guia-revera-header h1,
-.guia-placeholder-card h1 {
-  max-width: 720px;
-
-  margin: 24px 0 0;
+  margin: 0 0 22px;
 
   color: #00001b;
-
-  font-size: clamp(30px, 3.6vw, 42px);
-  line-height: 1.08;
-  font-weight: 700;
-  letter-spacing: -0.015em;
-
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  text-rendering: optimizeLegibility;
-}
-
-.guia-revera-meta {
-  margin-top: 24px;
-
-  display: flex;
-  align-items: center;
-  gap: 22px;
-  flex-wrap: wrap;
-
-  color: #939598;
-  font-size: 15px;
-}
-
-.guia-revera-meta span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-
-/* SHARE */
-
-.guia-revera-share {
-  margin-top: 28px;
-
-  padding: 0;
-  border: 0;
-  background: transparent;
-
-  color: #6f60aa;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 700;
-
-  cursor: pointer;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  line-height: 1;
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
 
   transition:
     color 0.2s ease,
     transform 0.2s ease;
 }
 
-.guia-revera-share:hover {
-  color: #8d82c2;
-  transform: translateX(2px);
+.guia-revera-back svg {
+  color: currentColor;
+  stroke: currentColor;
 }
 
-/* BODY */
-
-.guia-revera-body {
-  margin-top: 34px;
-  padding: 44px 48px;
+.guia-revera-back:hover {
+  color: #6f60aa;
+  transform: translateX(-2px);
 }
 
-.guia-revera-block-paragraph,
-.guia-revera-body p {
-  margin: 0 0 24px;
+/* =========================================================
+   PLACEHOLDER / ESTADOS
+========================================================= */
+
+.guia-placeholder-card {
+  padding: 56px 48px;
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(147, 149, 152, 0.18);
+  box-shadow: 0 18px 42px rgba(18, 7, 66, 0.08);
+}
+
+.guia-placeholder-card h1 {
+  margin: 0 0 10px;
 
   color: #00001b;
+  font-family: var(--font-primary);
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.1;
+  font-weight: var(--font-weight-bold);
+}
 
+.guia-placeholder-card p {
+  max-width: 620px;
+  margin: 18px 0 0;
+
+  color: #00001b;
+  font-family: var(--font-primary);
   font-size: 16px;
-  line-height: 1.78;
-  font-weight: 400;
-
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  text-rendering: optimizeLegibility;
+  line-height: 1.65;
+  font-weight: var(--font-weight-regular);
 }
 
-.guia-revera-block-paragraph:last-child,
-.guia-revera-body p:last-child {
-  margin-bottom: 0;
+/* =========================================================
+   ARTÍCULO - CONTENEDOR PRINCIPAL
+========================================================= */
+
+.guia-revera-article {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  border-radius: 30px;
+  background: #ffffff;
+  border: 1px solid rgba(147, 149, 152, 0.18);
+
+  box-shadow: 0 24px 56px rgba(18, 7, 66, 0.1);
 }
 
-/* TÍTULOS PRINCIPALES DEL CONTENIDO */
+/* =========================================================
+   PORTADA SUPERIOR
+========================================================= */
 
-.guia-revera-block-title {
-  margin: 38px 0 16px;
+.guia-revera-cover {
+  position: relative;
+
+  min-height: 235px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  background:
+    radial-gradient(circle at 20% 22%, rgba(255, 255, 255, 0.2) 0%, transparent 34%),
+    radial-gradient(circle at 82% 18%, rgba(18, 7, 66, 0.24) 0%, transparent 32%),
+    linear-gradient(135deg, #120742 0%, #6f60aa 52%, #8d7bc2 100%);
+}
+
+.guia-revera-logo-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.guia-revera-logo-text img {
+  width: min(300px, 62vw);
+  height: auto;
+  display: block;
+  object-fit: contain;
+
+  /*
+    Para color exacto #00001B, lo ideal es exportar el logo
+    desde diseño directamente en #00001B.
+    Este filtro lo fuerza visualmente a negro/azul oscuro.
+  */
+  filter: brightness(0) saturate(100%);
+}
+
+/* =========================================================
+   HEADER DEL ARTÍCULO
+========================================================= */
+
+.guia-revera-header {
+  padding: 34px 42px 42px;
+  background: #ffffff;
+}
+
+.guia-revera-badge {
+  display: inline-flex;
+  align-items: center;
+
+  margin: 0 0 16px;
+  padding: 8px 14px;
+
+  border-radius: 999px;
+  background: rgba(111, 96, 170, 0.1);
 
   color: #6f60aa;
+  font-family: var(--font-primary);
+  font-size: 12.5px;
+  line-height: 1;
+  font-weight: var(--font-weight-demi);
+  letter-spacing: 0.01em;
+}
 
-  font-size: clamp(21px, 2.4vw, 28px);
-  line-height: 1.22;
-  font-weight: 800;
-  letter-spacing: -0.015em;
+/* Encabezado principal de cada artículo */
+.guia-revera-header h1 {
+  max-width: 850px;
+  margin: 0;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: clamp(28px, 3.6vw, 44px);
+  line-height: 1.1;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.025em;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
   text-rendering: optimizeLegibility;
 }
 
-.guia-revera-body > .guia-revera-block-title:first-child {
-  margin-top: 0;
+/* Fechas y tiempo de lectura */
+.guia-revera-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  margin: 22px 0 0;
 }
 
-/* SUBTÍTULOS DEL CONTENIDO */
+.guia-revera-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
 
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  line-height: 1;
+  font-weight: var(--font-weight-regular);
+}
+
+.guia-revera-meta svg {
+  color: #6f60aa;
+  stroke: #6f60aa;
+}
+
+/* Compartir artículo */
+.guia-revera-share {
+  margin: 24px 0 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+
+  min-height: 44px;
+  padding: 0 18px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #e6e7e8;
+  color: #00001b;
+
+  font-family: var(--font-primary);
+  font-size: 14px;
+  line-height: 1;
+  font-weight: var(--font-weight-medium);
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.guia-revera-share svg {
+  color: #00001b;
+  stroke: #00001b;
+}
+
+.guia-revera-share:hover {
+  background: #6f60aa;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(111, 96, 170, 0.22);
+}
+
+.guia-revera-share:hover svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+/* =========================================================
+   CUERPO DEL ARTÍCULO
+   Mismo ancho visual que .guia-revera-article y .guia-revera-related
+========================================================= */
+
+.guia-revera-body {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  margin: 34px auto 0;
+  padding: 34px 42px 44px;
+
+  background: #ffffff;
+  border-radius: 30px;
+  border: 1px solid rgba(147, 149, 152, 0.18);
+
+  color: #00001b;
+  font-family: var(--font-primary);
+
+  box-shadow: 0 24px 56px rgba(18, 7, 66, 0.08);
+}
+
+/* 
+   Títulos principales dentro del cuerpo.
+   Ejemplo: "FAQ"
+   Termina Bold / #6F60AA
+*/
+.guia-revera-block-title,
+.guia-revera-body h2:not(.guia-revera-related h2) {
+  margin: 34px 0 12px;
+
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  font-size: clamp(21px, 2.2vw, 28px);
+  line-height: 1.18;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.014em;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/*
+   Subtítulos dentro del cuerpo.
+   Ejemplo: "¿Qué es la Clasificación de Niza?"
+   Termina Demi / #00001B
+*/
 .guia-revera-block-subtitle,
 .guia-revera-body h3 {
-  margin: 24px 0 8px;
+  margin: 22px 0 10px;
 
-  color: #2f2f46;
-
-  font-size: clamp(15px, 1.45vw, 18px);
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: clamp(16px, 1.55vw, 20px);
   line-height: 1.3;
-  font-weight: 700;
+  font-weight: var(--font-weight-demi);
   letter-spacing: -0.006em;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
   text-rendering: optimizeLegibility;
 }
 
-/* SOPORTE PARA H2 ANTERIORES */
+/* Párrafos */
+.guia-revera-block-paragraph,
+.guia-revera-body p {
+  margin: 0 0 18px;
 
-.guia-revera-body h2:not(.guia-revera-block-title) {
-  margin: 38px 0 16px;
-
-  color: #6f60aa;
-
-  font-size: clamp(21px, 2.4vw, 28px);
-  line-height: 1.22;
-  font-weight: 800;
-  letter-spacing: -0.015em;
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 16px;
+  line-height: 1.76;
+  font-weight: var(--font-weight-regular);
 }
 
-/* LINKS INTERNOS */
-
+/* Links dentro del artículo */
 .guia-revera-inline-link {
   color: #6f60aa;
-  font-weight: 800;
-  text-decoration: underline;
-  text-decoration-thickness: 1.5px;
-  text-underline-offset: 4px;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-medium);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(111, 96, 170, 0.35);
 
   transition:
     color 0.2s ease,
-    text-decoration-color 0.2s ease;
+    border-color 0.2s ease;
 }
 
 .guia-revera-inline-link:hover {
-  color: #8d82c2;
-  text-decoration-color: #8d82c2;
+  color: #120742;
+  border-color: #120742;
 }
 
-/* LISTAS */
-
+/* Listas */
 .guia-revera-list {
-  margin: 0 0 28px;
-  padding-left: 24px;
+  margin: 0 0 22px;
+  padding-left: 22px;
 
   color: #00001b;
-
-  font-size: 16px;
-  line-height: 1.72;
+  font-family: var(--font-primary);
 }
 
 .guia-revera-list li {
-  margin-bottom: 10px;
+  margin: 0 0 10px;
   padding-left: 4px;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 16px;
+  line-height: 1.68;
+  font-weight: var(--font-weight-regular);
 }
 
 .guia-revera-list li::marker {
   color: #6f60aa;
 }
 
-/* CTA / CUADRO DESTACADO */
-
+/* CTA interno */
 .guia-revera-cta {
-  margin: 38px 0 8px;
-  padding: 28px 30px;
+  margin: 32px 0;
+  padding: 24px 26px;
 
-  border-radius: 18px;
-
-  background: linear-gradient(
-    135deg,
-    rgba(141, 130, 194, 0.18) 0%,
-    rgba(111, 96, 170, 0.1) 100%
-  );
-
+  border-radius: 22px;
+  background: #ffffff;
   border: 1px solid rgba(111, 96, 170, 0.18);
 
-  color: #120742;
-
+  color: #00001b;
+  font-family: var(--font-primary);
   font-size: 16px;
-  line-height: 1.7;
-  font-weight: 500;
+  line-height: 1.65;
+  font-weight: var(--font-weight-regular);
+
+  box-shadow: 0 18px 40px rgba(18, 7, 66, 0.08);
 }
 
-/* FIGURA / DIAGRAMA */
+/* =========================================================
+   IMÁGENES / DIAGRAMAS / CAPTIONS
+========================================================= */
 
 .guia-revera-figure {
   width: 100%;
   max-width: 100%;
   margin: 42px auto;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   text-align: center;
 }
 
 .guia-revera-figure-image {
   width: 100%;
   max-width: 100%;
+
   margin-left: auto;
   margin-right: auto;
-  border-radius: 14px;
-  background: rgba(141, 130, 194, 0.12);
+
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(147, 149, 152, 0.18);
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 0;
   overflow: hidden;
+
+  box-shadow: 0 18px 42px rgba(18, 7, 66, 0.08);
 }
 
 .guia-revera-figure-image img {
   width: 100%;
   max-width: 100%;
   height: auto;
+
   display: block;
   object-fit: contain;
   object-position: center center;
+
   margin-left: auto;
   margin-right: auto;
-  border-radius: 14px;
-  transform: translateX(8px);
 }
 
+/* Frases como: "Diagrama del proceso completo..." */
+.guia-revera-figure-caption,
 .guia-revera-figure figcaption {
   width: 100%;
   margin-top: 12px;
-  color: #939598;
-  font-size: 13px;
-  line-height: 1.4;
+  padding: 0 4px;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 13.5px;
+  line-height: 1.45;
+  font-weight: var(--font-weight-light);
   text-align: center;
 }
 
-/* RELACIONADOS */
+/* =========================================================
+   ARTÍCULOS RELACIONADOS
+   Mismo ancho visual que .guia-revera-article y .guia-revera-body
+========================================================= */
 
 .guia-revera-related {
-  margin-top: 34px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  margin: 52px auto 0;
   padding: 36px 48px 42px;
+
+  background: #ffffff;
+  border-radius: 30px;
+  border: 1px solid rgba(147, 149, 152, 0.18);
+
+  box-shadow: 0 24px 56px rgba(18, 7, 66, 0.08);
 }
 
+/* Título "Artículos Relacionados" */
 .guia-revera-related h2 {
   margin: 0 0 34px;
 
   color: #00001b;
-
-  font-size: 24px;
-  line-height: 1.2;
-  font-weight: 700;
-  letter-spacing: -0.015em;
+  font-family: var(--font-primary);
+  font-size: clamp(23px, 2.4vw, 32px);
+  line-height: 1.15;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.018em;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
   text-rendering: optimizeLegibility;
 }
 
 .guia-revera-related-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 44px;
+  gap: 28px;
 }
 
 .guia-revera-related-item {
   display: grid;
-  grid-template-columns: 96px 1fr;
+  grid-template-columns: 104px 1fr;
   gap: 18px;
 
   align-items: center;
 
+  min-height: 128px;
   padding: 14px;
 
-  border-radius: 16px;
+  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(147, 149, 152, 0.18);
 
   text-decoration: none;
+
+  box-shadow: 0 14px 32px rgba(18, 7, 66, 0.06);
 
   transition:
     background 0.22s ease,
     box-shadow 0.22s ease,
-    transform 0.22s ease;
+    transform 0.22s ease,
+    border-color 0.22s ease;
 }
 
 .guia-revera-related-item:hover {
-  background: rgba(141, 130, 194, 0.1);
-  box-shadow: 0 12px 24px rgba(18, 7, 66, 0.1);
+  background: rgba(111, 96, 170, 0.06);
+  border-color: rgba(111, 96, 170, 0.34);
+  box-shadow: 0 18px 40px rgba(18, 7, 66, 0.1);
   transform: translateY(-3px);
 }
 
 .guia-revera-related-image {
-  width: 96px;
-  height: 96px;
+  width: 104px;
+  height: 104px;
 
-  border-radius: 12px;
+  border-radius: 16px;
 
-  background: linear-gradient(
-    135deg,
-    #7361ad 0%,
-    #120742 100%
-  );
+  background:
+    radial-gradient(circle at 28% 24%, rgba(255, 255, 255, 0.22) 0%, transparent 36%),
+    linear-gradient(135deg, #120742 0%, #6f60aa 58%, #8d7bc2 100%);
+}
+
+.guia-revera-related-content {
+  min-width: 0;
 }
 
 .guia-revera-related-item h3 {
-  margin: 0;
+  margin: 0 0 10px;
 
   color: #00001b;
-
+  font-family: var(--font-primary);
   font-size: 15px;
   line-height: 1.38;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.01em;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
   text-rendering: optimizeLegibility;
 
   transition: color 0.2s ease;
 }
 
 .guia-revera-related-item:hover h3 {
-  color: #8d82c2;
+  color: #6f60aa;
 }
 
+.guia-revera-related-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Fechas y tiempos en relacionados: "February, 2026" / "5 min" */
+.guia-revera-related-meta span,
 .guia-revera-related-item p {
-  margin: 12px 0 0;
+  margin: 0;
 
-  color: #939598;
-
-  font-size: 14px;
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: var(--font-weight-regular);
 }
 
-/* PLACEHOLDER */
-
-.guia-placeholder-card {
-  padding: 56px 48px;
-}
-
-.guia-placeholder-card p {
-  max-width: 620px;
-
-  margin: 18px 0 0;
-
-  color: #939598;
-
-  font-size: 16px;
-  line-height: 1.65;
-}
-
-/* TABLET */
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
 
 @media (max-width: 768px) {
   .guia-revera-main {
     width: min(100% - 28px, 680px);
-    margin-top: 28px;
+    padding: 28px 0 56px;
   }
 
   .guia-revera-cover {
-    height: 280px;
+    min-height: 280px;
   }
 
   .guia-revera-logo-text img {
@@ -528,7 +620,7 @@
 
   .guia-revera-header h1,
   .guia-placeholder-card h1 {
-    font-size: 29px;
+    font-size: 27px;
   }
 
   .guia-revera-block-paragraph,
@@ -539,16 +631,18 @@
 
   .guia-revera-block-title,
   .guia-revera-body h2:not(.guia-revera-related h2) {
-    margin-top: 34px;
-    font-size: 23px;
+    margin-top: 30px;
+    font-size: 22px;
+    color: #6f60aa;
+    font-weight: var(--font-weight-bold);
   }
 
   .guia-revera-block-subtitle,
   .guia-revera-body h3 {
-    margin-top: 22px;
+    margin-top: 20px;
     font-size: 16px;
-    color: #2f2f46;
-    font-weight: 700;
+    color: #00001b;
+    font-weight: var(--font-weight-demi);
   }
 
   .guia-revera-list,
@@ -563,7 +657,7 @@
   .guia-revera-figure-image {
     width: 100%;
     max-width: 100%;
-    border-radius: 12px;
+    border-radius: 14px;
   }
 
   .guia-revera-figure-image img {
@@ -571,7 +665,6 @@
     height: auto;
     object-fit: contain;
     object-position: center center;
-    border-radius: 12px;
   }
 
   .guia-revera-related-grid {
@@ -580,15 +673,22 @@
   }
 }
 
-/* MOBILE */
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
 
 @media (max-width: 480px) {
   .guia-revera-main {
     width: calc(100% - 22px);
+    padding: 22px 0 48px;
+  }
+
+  .guia-revera-article {
+    border-radius: 24px;
   }
 
   .guia-revera-cover {
-    height: 210px;
+    min-height: 210px;
   }
 
   .guia-revera-logo-text img {
@@ -597,9 +697,27 @@
     transform: scale(0.62);
   }
 
+  .guia-revera-header,
+  .guia-revera-body,
+  .guia-revera-related,
+  .guia-placeholder-card {
+    padding: 28px 20px;
+    border-radius: 24px;
+  }
+
   .guia-revera-header h1,
   .guia-placeholder-card h1 {
-    font-size: 25px;
+    font-size: 24px;
+    line-height: 1.12;
+  }
+
+  .guia-revera-meta {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .guia-revera-share {
+    width: 100%;
   }
 
   .guia-revera-block-paragraph,
@@ -610,57 +728,39 @@
 
   .guia-revera-block-title,
   .guia-revera-body h2:not(.guia-revera-related h2) {
-    margin: 30px 0 14px;
-    font-size: 21px;
+    margin: 28px 0 12px;
+    font-size: 20px;
+    color: #6f60aa;
+    font-weight: var(--font-weight-bold);
   }
 
   .guia-revera-block-subtitle,
   .guia-revera-body h3 {
-    margin: 20px 0 8px;
-    font-size: 15.5px;
-    color: #2f2f46;
-    font-weight: 700;
-  }
-
-  .guia-revera-list {
-    padding-left: 20px;
+    margin: 18px 0 8px;
     font-size: 15px;
+    color: #00001b;
+    font-weight: var(--font-weight-demi);
   }
 
   .guia-revera-cta {
-    padding: 24px 22px;
-    font-size: 15px;
-  }
-
-  .guia-revera-figure {
-    margin: 30px auto;
+    padding: 20px;
+    border-radius: 20px;
   }
 
   .guia-revera-figure-image {
-    width: 100%;
-    max-width: 100%;
-    border-radius: 10px;
+    border-radius: 16px;
   }
 
-  .guia-revera-figure-image img {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
-    object-position: center center;
-    border-radius: 10px;
-  }
-
-  .guia-revera-figure figcaption {
-    font-size: 12px;
+  .guia-revera-related h2 {
+    font-size: 22px;
   }
 
   .guia-revera-related-item {
-    grid-template-columns: 74px 1fr;
-    gap: 14px;
+    grid-template-columns: 1fr;
   }
 
   .guia-revera-related-image {
-    width: 74px;
-    height: 74px;
+    width: 100%;
+    height: 150px;
   }
 }

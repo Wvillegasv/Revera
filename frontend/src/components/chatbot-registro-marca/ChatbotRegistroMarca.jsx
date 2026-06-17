@@ -66,7 +66,12 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
 
     const contactSteps = buildContactoFinalSteps(validators);
 
-    const flujoBase = [...baseSteps, ...middleSteps, ...ownerSteps, ...contactSteps];
+    const flujoBase = [
+      ...baseSteps,
+      ...middleSteps,
+      ...ownerSteps,
+      ...contactSteps,
+    ];
 
     return insertarPasosOtroPais(flujoBase, formData, validators);
   }, [formData, validators]);
@@ -396,7 +401,10 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
 
               <div className="crm-input-panel">
                 {!modoConfirmacionFinal && currentStep?.type === "phone" && (
-                  <form onSubmit={handlePhoneSubmit} className="crm-form-inline crm-phone-inline">
+                  <form
+                    onSubmit={handlePhoneSubmit}
+                    className="crm-form-inline crm-phone-inline"
+                  >
                     <input
                       type="text"
                       inputMode="numeric"
@@ -442,7 +450,8 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
                       className="crm-send-btn"
                       disabled={isSubmitting}
                     >
-                      <Send size={18} />
+                      <Send size={18} strokeWidth={2.2} />
+                      <span>Enviar</span>
                     </button>
                   </form>
                 )}
@@ -457,15 +466,19 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
                         setInputValue(e.target.value);
                         if (errorActual) setErrorActual("");
                       }}
-                      placeholder={currentStep.placeholder || "Escribe tu respuesta"}
+                      placeholder={
+                        currentStep.placeholder || "Escribe tu respuesta"
+                      }
                       disabled={isSubmitting}
                     />
+
                     <button
                       type="submit"
                       className="crm-send-btn"
                       disabled={isSubmitting}
                     >
-                      <Send size={18} />
+                      <Send size={18} strokeWidth={2.2} />
+                      <span>Enviar</span>
                     </button>
                   </form>
                 )}
@@ -479,10 +492,13 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
                         setInputValue(e.target.value);
                         if (errorActual) setErrorActual("");
                       }}
-                      placeholder={currentStep.placeholder || "Escribe tu respuesta"}
+                      placeholder={
+                        currentStep.placeholder || "Escribe tu respuesta"
+                      }
                       rows={5}
                       disabled={isSubmitting}
                     />
+
                     <button
                       type="submit"
                       className="crm-primary-btn"

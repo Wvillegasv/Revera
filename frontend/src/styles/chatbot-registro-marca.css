@@ -1,77 +1,146 @@
+/* =========================================================
+   REVERA - CHATBOT REGISTRO DE MARCA
+========================================================= */
+
 .crm-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.42);
+  z-index: 9999;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   padding: 24px;
-  z-index: 9999;
+
+  background: rgba(15, 23, 42, 0.42);
 }
+
+/* =========================================================
+   MODAL
+========================================================= */
 
 .crm-modal {
   width: 100%;
   max-width: 980px;
   max-height: 92vh;
-  background: #ffffff;
-  border-radius: 28px;
-  overflow: hidden;
-  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.18);
+
   display: flex;
   flex-direction: column;
+
+  overflow: hidden;
+
+  background: #ffffff;
+  border: 1px solid rgba(147, 149, 152, 0.18);
+  border-radius: 28px;
+
+  box-shadow: 0 30px 80px rgba(18, 7, 66, 0.18);
 }
+
+/* =========================================================
+   HEADER
+========================================================= */
 
 .crm-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding: 24px 28px 18px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.22);
-  background: linear-gradient(180deg, #f7f4ff 0%, #ffffff 100%);
+
+  padding: 26px 30px 20px;
+
+  background: #ffffff;
+  border-bottom: 1px solid rgba(147, 149, 152, 0.18);
 }
 
 .crm-header h2 {
   margin: 0;
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #1a154c;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: clamp(25px, 2.4vw, 34px);
+  line-height: 1.12;
+  font-weight: var(--font-weight-heavy);
+  letter-spacing: -0.018em;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .crm-header p {
-  margin: 6px 0 0;
-  color: #5b6480;
-  font-size: 0.98rem;
+  margin: 7px 0 0;
+
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  font-size: 14.5px;
+  line-height: 1.45;
+  font-weight: var(--font-weight-demi);
 }
 
+/* =========================================================
+   BOTÓN CERRAR
+========================================================= */
+
 .crm-close-btn {
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 12px;
-  background: #f1f5f9;
-  color: #334155;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+
+  border: 1px solid rgba(147, 149, 152, 0.28);
+  border-radius: 50%;
+  background: #ffffff;
+
+  color: #120742;
+
   cursor: pointer;
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
+  box-shadow: 0 6px 16px rgba(18, 7, 66, 0.12);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.crm-close-btn svg {
+  color: currentColor;
+  stroke: currentColor;
 }
 
 .crm-close-btn:hover {
-  background: #e2e8f0;
+  background: #6f60aa;
+  border-color: #6f60aa;
+  color: #ffffff;
+  transform: scale(1.05);
+  box-shadow: 0 8px 18px rgba(111, 96, 170, 0.24);
 }
 
+/* =========================================================
+   BODY / CHAT
+========================================================= */
+
 .crm-body {
-  padding: 22px 28px 28px;
+  padding: 24px 30px 30px;
   overflow-y: auto;
+  background: #ffffff;
 }
 
 .crm-chat-window {
   display: flex;
   flex-direction: column;
   gap: 14px;
+
   min-height: 360px;
   padding-bottom: 18px;
+
+  background: #ffffff;
 }
 
 .crm-chat-message {
@@ -86,28 +155,58 @@
   justify-content: flex-end;
 }
 
+/* =========================================================
+   BURBUJAS / ÓVALOS DE TEXTO
+========================================================= */
+
 .crm-chat-bubble {
   max-width: 78%;
-  border-radius: 18px;
   padding: 14px 16px;
-  line-height: 1.5;
-  font-size: 0.97rem;
+
+  border-radius: 18px;
+
+  font-family: var(--font-primary);
+  font-size: 15px;
+  line-height: 1.55;
+  font-weight: var(--font-weight-regular);
+
   white-space: pre-wrap;
 }
 
+/* Preguntas del sistema */
 .crm-chat-message--system .crm-chat-bubble {
-  background: #f5f3ff;
-  color: #2b2458;
+  color: #00001b;
+
+  background: #e6e7e8;
+  border: 1px solid rgba(147, 149, 152, 0.18);
+
+  box-shadow: none;
+
+  border-bottom-left-radius: 6px;
 }
 
+/* Respuestas del usuario */
 .crm-chat-message--user .crm-chat-bubble {
-  background: #1a154c;
-  color: #ffffff;
+  color: #00001b;
+
+  background: #e6e7e8;
+  border: 1px solid rgba(147, 149, 152, 0.18);
+
+  box-shadow: none;
+
+  border-bottom-right-radius: 6px;
 }
+
+/* =========================================================
+   INPUT PANEL
+========================================================= */
 
 .crm-input-panel {
-  border-top: 1px solid rgba(148, 163, 184, 0.22);
   padding-top: 18px;
+
+  border-top: 1px solid rgba(147, 149, 152, 0.18);
+
+  background: #ffffff;
 }
 
 .crm-form-inline {
@@ -121,21 +220,45 @@
   gap: 12px;
 }
 
+/* =========================================================
+   INPUTS / TEXTAREA
+========================================================= */
+
 .crm-input,
 .crm-textarea {
   width: 100%;
-  border: 1px solid #d7dbea;
-  border-radius: 16px;
+
   padding: 14px 16px;
-  font-size: 0.98rem;
+
+  border: 1px solid rgba(147, 149, 152, 0.34);
+  border-radius: 16px;
+  background: #ffffff;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 15px;
+  line-height: 1.45;
+  font-weight: var(--font-weight-regular);
+
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.crm-input::placeholder,
+.crm-textarea::placeholder {
+  color: #939598;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-regular);
+  opacity: 1;
 }
 
 .crm-input:focus,
 .crm-textarea:focus {
-  border-color: #8d7bc2;
-  box-shadow: 0 0 0 4px rgba(141, 123, 194, 0.12);
+  border-color: #6f60aa;
+  box-shadow: 0 0 0 4px rgba(111, 96, 170, 0.14);
 }
 
 .crm-textarea {
@@ -143,48 +266,185 @@
   min-height: 120px;
 }
 
+/* =========================================================
+   TELÉFONO
+========================================================= */
+
+.crm-phone-inline {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.crm-phone-code {
+  text-align: center;
+}
+
+.crm-phone-number {
+  min-width: 0;
+}
+
+/* =========================================================
+   BOTONES BASE
+========================================================= */
+
 .crm-send-btn,
 .crm-primary-btn,
 .crm-secondary-btn,
 .crm-option-btn {
   border: none;
   cursor: pointer;
-  transition: 0.2s ease;
+
+  font-family: var(--font-primary);
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
+/* =========================================================
+   BOTÓN ENVIAR - ÓVALO
+========================================================= */
+
 .crm-send-btn {
-  width: 52px;
-  min-width: 52px;
-  border-radius: 16px;
-  background: #1a154c;
+  width: auto;
+  min-width: 124px;
+  height: 52px;
+
+  padding: 0 24px 0 20px;
+
+  border-radius: 999px;
+  background: #6f60aa;
+
   color: #ffffff;
+
+  font-family: var(--font-primary);
+  font-size: 15px;
+  line-height: 1;
+  font-weight: var(--font-weight-bold);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 9px;
+
+  box-shadow: none;
 }
 
-.crm-send-btn:hover,
-.crm-primary-btn:hover {
-  transform: translateY(-1px);
-  opacity: 0.96;
+.crm-send-btn svg {
+  width: 19px;
+  height: 19px;
+
+  color: #ffffff;
+  stroke: #ffffff;
+
+  flex-shrink: 0;
 }
+
+.crm-send-btn span {
+  color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 15px;
+  line-height: 1;
+  font-weight: var(--font-weight-bold);
+}
+
+.crm-send-btn:hover {
+  background: #120742;
+  color: #ffffff;
+  transform: translateY(-1px);
+  opacity: 1;
+  box-shadow: none;
+}
+
+.crm-send-btn:hover svg,
+.crm-send-btn:hover span {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+/* =========================================================
+   BOTÓN PRINCIPAL / CONTINUAR
+========================================================= */
 
 .crm-primary-btn {
   align-self: flex-start;
-  background: #1a154c;
+
+  min-height: 44px;
+  padding: 0 22px;
+
+  border-radius: 999px;
+
+  background: #6f60aa;
   color: #ffffff;
-  border-radius: 14px;
-  padding: 12px 20px;
-  font-weight: 600;
+
+  font-family: var(--font-primary);
+  font-size: 15px;
+  line-height: 1;
+  font-weight: var(--font-weight-bold);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: none;
 }
 
-.crm-secondary-btn {
-  background: #eef2ff;
-  color: #312e81;
-  border-radius: 14px;
-  padding: 12px 18px;
-  font-weight: 600;
+.crm-primary-btn svg {
+  color: #ffffff;
+  stroke: #ffffff;
 }
+
+.crm-primary-btn:hover {
+  background: #120742;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: none;
+}
+
+.crm-primary-btn:hover svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+/* =========================================================
+   BOTÓN SECUNDARIO
+========================================================= */
+
+.crm-secondary-btn {
+  min-height: 44px;
+  padding: 0 20px;
+
+  border-radius: 999px;
+
+  background: #e6e7e8;
+  color: #00001b;
+
+  font-family: var(--font-primary);
+  font-size: 15px;
+  line-height: 1;
+  font-weight: var(--font-weight-regular);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: none;
+}
+
+.crm-secondary-btn:hover {
+  background: #d8d8df;
+  color: #6f60aa;
+}
+
+/* =========================================================
+   OPCIONES
+========================================================= */
 
 .crm-options-grid {
   display: flex;
@@ -193,19 +453,33 @@
 }
 
 .crm-option-btn {
-  background: #f8fafc;
-  color: #1e293b;
-  border: 1px solid #dbe2f0;
-  border-radius: 14px;
   padding: 12px 16px;
-  font-weight: 500;
+
+  border: 1px solid rgba(147, 149, 152, 0.28);
+  border-radius: 14px;
+
+  background: #e6e7e8;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 14.5px;
+  line-height: 1.25;
+  font-weight: var(--font-weight-regular);
+
+  box-shadow: none;
 }
 
 .crm-option-btn:hover {
-  background: #f3e8ff;
-  border-color: #c4b5fd;
-  color: #3b0764;
+  background: #6f60aa;
+  border-color: #6f60aa;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(111, 96, 170, 0.22);
 }
+
+/* =========================================================
+   ARCHIVOS
+========================================================= */
 
 .crm-file-box {
   display: flex;
@@ -218,20 +492,49 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: #f8fafc;
-  border: 1px dashed #94a3b8;
-  padding: 12px 16px;
-  border-radius: 14px;
+
+  min-height: 44px;
+  padding: 0 18px;
+
+  border: 1px dashed rgba(147, 149, 152, 0.72);
+  border-radius: 999px;
+  background: #e6e7e8;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 14.5px;
+  font-weight: var(--font-weight-regular);
+
   cursor: pointer;
-  color: #334155;
-  font-weight: 500;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
 }
+
+.crm-file-label svg {
+  color: currentColor;
+  stroke: currentColor;
+}
+
+.crm-file-label:hover {
+  border-color: #6f60aa;
+  background: rgba(111, 96, 170, 0.08);
+  color: #6f60aa;
+}
+
+/* =========================================================
+   ÉXITO
+========================================================= */
 
 .crm-success {
   display: flex;
   flex-direction: column;
   gap: 16px;
   align-items: flex-start;
+
+  background: #ffffff;
 }
 
 .crm-success svg {
@@ -240,75 +543,59 @@
 
 .crm-success h3 {
   margin: 0;
-  color: #1a154c;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 22px;
+  font-weight: var(--font-weight-bold);
 }
 
 .crm-success p {
   margin: 0;
-  color: #5b6480;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 15px;
   line-height: 1.6;
+  font-weight: var(--font-weight-regular);
+}
+
+/* =========================================================
+   RESUMEN
+========================================================= */
+
+.crm-summary-box,
+.crm-summary-bubble {
+  width: 100%;
+}
+
+.crm-summary-bubble {
+  color: #00001b;
+
+  background: #e6e7e8;
+  border: 1px solid rgba(147, 149, 152, 0.18);
+
+  box-shadow: none;
 }
 
 .crm-summary-box {
-  width: 100%;
-  background: #0f172a;
-  color: #e2e8f0;
   padding: 16px;
+
   border-radius: 16px;
+  background: #e6e7e8;
+  border: 1px solid rgba(147, 149, 152, 0.18);
+
+  color: #00001b;
+
   overflow-x: auto;
   white-space: pre-wrap;
-  font-size: 0.92rem;
+
+  font-family: var(--font-primary);
+  font-size: 14px;
   line-height: 1.55;
-}
+  font-weight: var(--font-weight-regular);
 
-.crm-actions {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-@media (max-width: 768px) {
-  .crm-overlay {
-    padding: 12px;
-  }
-
-  .crm-modal {
-    max-height: 96vh;
-    border-radius: 22px;
-  }
-
-  .crm-header,
-  .crm-body {
-    padding-left: 18px;
-    padding-right: 18px;
-  }
-
-  .crm-chat-bubble {
-    max-width: 92%;
-  }
-
-  .crm-form-inline {
-    flex-direction: column;
-  }
-
-  .crm-send-btn {
-    width: 100%;
-    min-width: 100%;
-    height: 48px;
-    border-radius: 14px;
-  }
-}
-
-.crm-error-text {
-  margin: 12px 0 0;
-  color: #b91c1c;
-  font-size: 0.92rem;
-  font-weight: 500;
-}
-
-
-.crm-summary-bubble {
-  width: 100%;
+  box-shadow: none;
 }
 
 .crm-summary-list {
@@ -323,10 +610,142 @@
 }
 
 .crm-summary-label {
-  font-weight: 700;
-  color: #1f2937;
+  color: #00001b;
+  font-weight: var(--font-weight-bold);
 }
 
 .crm-summary-value {
   color: inherit;
+}
+
+.crm-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* =========================================================
+   ERRORES
+========================================================= */
+
+.crm-error-text {
+  margin: 12px 0 0;
+
+  color: #b91c1c;
+  font-family: var(--font-primary);
+  font-size: 0.92rem;
+  line-height: 1.4;
+  font-weight: var(--font-weight-medium);
+}
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 768px) {
+  .crm-overlay {
+    padding: 12px;
+  }
+
+  .crm-modal {
+    max-height: 96vh;
+    border-radius: 22px;
+  }
+
+  .crm-header {
+    padding: 22px 18px 18px;
+  }
+
+  .crm-body {
+    padding: 20px 18px 24px;
+  }
+
+  .crm-header h2 {
+    font-size: 25px;
+  }
+
+  .crm-header p {
+    font-size: 13.5px;
+  }
+
+  .crm-close-btn {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+  }
+
+  .crm-chat-bubble {
+    max-width: 92%;
+    font-size: 14.5px;
+  }
+
+  .crm-form-inline {
+    flex-direction: column;
+  }
+
+  .crm-phone-inline {
+    grid-template-columns: 100px 1fr;
+  }
+
+  .crm-phone-inline .crm-send-btn {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .crm-send-btn {
+    width: auto;
+    min-width: 124px;
+    height: 50px;
+    border-radius: 999px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  .crm-header h2 {
+    font-size: 23px;
+  }
+
+  .crm-header p {
+    font-size: 13px;
+  }
+
+  .crm-body {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .crm-chat-bubble {
+    max-width: 96%;
+    font-size: 14px;
+  }
+
+  .crm-options-grid {
+    flex-direction: column;
+  }
+
+  .crm-option-btn {
+    width: 100%;
+  }
+
+  .crm-file-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .crm-file-label,
+  .crm-primary-btn,
+  .crm-secondary-btn,
+  .crm-send-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .crm-phone-inline {
+    grid-template-columns: 88px 1fr;
+    gap: 10px;
+  }
 }

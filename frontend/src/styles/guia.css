@@ -1,3 +1,7 @@
+/* =========================================================
+   REVERA - GUÍA
+========================================================= */
+
 .guia-page {
   min-height: 100vh;
   background: #f6f6f8;
@@ -9,6 +13,10 @@
   margin: 0 auto;
 }
 
+/* =========================================================
+   HERO GUÍA
+========================================================= */
+
 .guia-hero {
   text-align: center;
   padding: 0 16px;
@@ -17,11 +25,14 @@
 
 .guia-hero h1 {
   margin: 0;
+
   color: #00001b;
-  font-size: clamp(34px, 4.3vw, 52px);
+  font-family: var(--font-primary);
+  font-size: clamp(30px, 3.8vw, 46px);
   line-height: 1.02;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.015em;
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -29,37 +40,47 @@
 
 .guia-hero p {
   margin: 14px 0 0;
-  color: #8d82c2;
+
+  color: #00001b;
+  font-family: var(--font-primary);
   font-size: 14px;
   line-height: 1.42;
-  font-weight: 500;
+  font-weight: var(--font-weight-demi);
   letter-spacing: 0.01em;
 }
 
-/* DESTACADO REVERA */
+/* =========================================================
+   DESTACADO REVERA
+========================================================= */
 
 .guia-feature-card {
   width: 100%;
   min-height: 264px;
+
   border-radius: 14px;
   background: linear-gradient(110deg, #7361ad 0%, #120742 100%);
   box-shadow: 0 16px 34px rgba(18, 7, 66, 0.18);
   overflow: hidden;
+
   display: grid;
   grid-template-columns: 390px 1fr;
   align-items: center;
   gap: 70px;
+
   padding: 32px 72px 32px 118px;
 }
 
 .guia-feature-logo {
   width: 200px;
   height: 200px;
+
   border-radius: 50%;
   background: #ffffff;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   box-shadow: 0 12px 26px rgba(18, 7, 66, 0.16);
 }
 
@@ -94,62 +115,130 @@
   color: #ffffff;
 }
 
-.guia-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 28px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.28);
+/* Antes era .guia-badge con óvalo.
+   Ahora queda como texto simple, sin óvalo. */
+.guia-feature-category {
+  display: inline-block;
+
+  margin: 0;
+
   color: #ffffff;
+  font-family: var(--font-primary);
   font-size: 13px;
-  font-weight: 700;
+  line-height: 1.35;
+  font-weight: var(--font-weight-bold);
 }
 
 .guia-feature-content h2 {
   margin: 20px 0 0;
+
   color: #ffffff;
+  font-family: var(--font-primary);
   font-size: 30px;
   line-height: 1.2;
-  font-weight: 800;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.02em;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .guia-feature-content p {
   max-width: 760px;
   margin: 18px 0 0;
-  color: rgba(255, 255, 255, 0.92);
+
+  color: #ffffff;
+  font-family: var(--font-primary);
   font-size: 18px;
   line-height: 1.55;
+  font-weight: var(--font-weight-demi);
 }
 
+/* Enlace base */
 .guia-feature-link {
   margin: 24px 0 0;
-  padding: 0;
-  border: none;
-  background: transparent;
+
   color: #ffffff;
-  font-family: inherit;
+  font-family: var(--font-primary);
   font-size: 15px;
-  font-weight: 800;
+  line-height: 1;
+  font-weight: var(--font-weight-demi);
   text-decoration: none;
+
   cursor: pointer;
+
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  transition: opacity 0.2s ease, transform 0.2s ease;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Nuevo óvalo en “Conocer más sobre REVERA” */
+.guia-feature-link-pill {
+  min-height: 34px;
+  padding: 0 18px;
+
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  color: #ffffff;
+}
+
+.guia-feature-link-pill svg {
+  color: #ffffff;
+  stroke: #ffffff;
 }
 
 .guia-feature-link:hover {
-  opacity: 0.86;
+  opacity: 0.94;
   transform: translateX(2px);
 }
 
-/* GRID DE ARTÍCULOS */
+.guia-feature-link-pill:hover {
+  background: #ffffff;
+  color: #6f60aa;
+  box-shadow: 0 8px 18px rgba(18, 7, 66, 0.16);
+}
+
+.guia-feature-link-pill:hover svg {
+  color: #6f60aa;
+  stroke: #6f60aa;
+}
+
+/* Compatibilidad: si alguna tarjeta todavía usa .guia-badge */
+.guia-badge {
+  display: inline-block;
+
+  margin: 0;
+
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  min-height: unset;
+
+  color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  line-height: 1.35;
+  font-weight: var(--font-weight-bold);
+}
+
+/* =========================================================
+   GRID DE ARTÍCULOS
+========================================================= */
 
 .guia-grid {
   margin-top: 48px;
+
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
@@ -158,15 +247,21 @@
 
 .guia-article-card {
   min-height: 452px;
+
   border-radius: 12px;
   background: #ffffff;
   overflow: hidden;
   box-shadow: 0 12px 28px rgba(18, 7, 66, 0.12);
+
   text-decoration: none;
   color: inherit;
+
   display: flex;
   flex-direction: column;
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .guia-article-card:hover {
@@ -177,7 +272,9 @@
 .guia-article-image {
   height: 192px;
   flex: 0 0 auto;
+
   background: linear-gradient(135deg, #8d82c2 0%, #120742 100%);
+
   transition: filter 0.25s ease;
 }
 
@@ -187,6 +284,7 @@
 
 .guia-article-content {
   padding: 24px 24px 20px;
+
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -196,52 +294,69 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   width: fit-content;
   min-height: 28px;
   padding: 0 13px;
+
   border-radius: 999px;
   background: #e6e7e8;
+
   color: #00001b;
+  font-family: var(--font-primary);
   font-size: 13px;
   line-height: 1;
-  font-weight: 700;
+  font-weight: var(--font-weight-bold);
 }
 
 .guia-article-content h3 {
   min-height: 66px;
   margin: 16px 0 0;
+
   color: #00001b;
+  font-family: var(--font-primary);
   font-size: 20px;
   line-height: 1.38;
-  font-weight: 800;
+  font-weight: var(--font-weight-bold);
   letter-spacing: -0.015em;
-  transition: color 0.22s ease, transform 0.22s ease;
+
+  transition:
+    color 0.22s ease,
+    transform 0.22s ease;
+
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
 .guia-article-card:hover .guia-article-content h3 {
-  color: #8d82c2;
+  color: #6f60aa;
 }
 
 .guia-article-content p {
   min-height: 84px;
   margin: 14px 0 0;
+
   color: #939598;
+  font-family: var(--font-primary);
   font-size: 16px;
   line-height: 1.5;
+  font-weight: var(--font-weight-regular);
 }
 
 .guia-article-meta {
   margin-top: auto;
   padding-top: 20px;
+
   display: flex;
   align-items: center;
   gap: 14px;
   flex-wrap: wrap;
+
   color: #939598;
+  font-family: var(--font-primary);
   font-size: 13px;
+  font-weight: var(--font-weight-regular);
 }
 
 .guia-article-meta span {
@@ -250,21 +365,28 @@
   gap: 5px;
 }
 
-/* ESTADOS */
+/* =========================================================
+   ESTADOS
+========================================================= */
 
 .guia-status {
   margin: 40px 0;
+
   text-align: center;
-  color: #8d82c2;
+
+  color: #6f60aa;
+  font-family: var(--font-primary);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: var(--font-weight-demi);
 }
 
 .guia-status-error {
   color: #b42318;
 }
 
-/* TABLET GRANDE */
+/* =========================================================
+   RESPONSIVE - TABLET GRANDE
+========================================================= */
 
 @media (max-width: 1100px) {
   .guia-feature-card {
@@ -292,7 +414,9 @@
   }
 }
 
-/* TABLET / MOBILE */
+/* =========================================================
+   RESPONSIVE - TABLET / MOBILE
+========================================================= */
 
 @media (max-width: 768px) {
   .guia-main {
@@ -305,7 +429,7 @@
   }
 
   .guia-hero h1 {
-    font-size: 34px;
+    font-size: 32px;
   }
 
   .guia-hero p {
@@ -315,7 +439,9 @@
   .guia-feature-card {
     grid-template-columns: 1fr;
     gap: 26px;
+
     padding: 34px 26px;
+
     text-align: center;
     justify-items: center;
   }
@@ -330,6 +456,11 @@
 
   .guia-feature-content p {
     font-size: 16px;
+  }
+
+  .guia-feature-link-pill {
+    min-height: 34px;
+    padding: 0 16px;
   }
 
   .guia-grid {
@@ -351,7 +482,9 @@
   }
 }
 
-/* MOBILE PEQUEÑO */
+/* =========================================================
+   RESPONSIVE - MOBILE PEQUEÑO
+========================================================= */
 
 @media (max-width: 480px) {
   .guia-page {
@@ -363,7 +496,7 @@
   }
 
   .guia-hero h1 {
-    font-size: 28px;
+    font-size: 26px;
   }
 
   .guia-feature-logo {
@@ -379,6 +512,23 @@
   .guia-feature-card {
     border-radius: 14px;
     padding: 30px 20px;
+  }
+
+  .guia-feature-content h2 {
+    font-size: 23px;
+  }
+
+  .guia-feature-content p {
+    font-size: 15px;
+  }
+
+  .guia-feature-link {
+    font-size: 14px;
+  }
+
+  .guia-feature-link-pill {
+    min-height: 32px;
+    padding: 0 14px;
   }
 
   .guia-article-image {

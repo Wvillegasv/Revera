@@ -1,3 +1,8 @@
+/* =========================================================
+   REVERA - AGENDA FORM
+   Formulario Agenda una Cita + Modal
+========================================================= */
+
 .agenda-form-shell {
   position: relative;
   width: 100%;
@@ -7,57 +12,304 @@
   display: none;
 }
 
+/* =========================================================
+   MODAL
+========================================================= */
+
+.contacto-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+
+  padding: 96px 24px 40px;
+  overflow-y: auto;
+
+  background: transparent;
+}
+
+.contacto-modal-container {
+  position: relative;
+  top: 0;
+
+  width: min(1140px, 96%);
+  padding: 34px 30px 28px;
+
+  background: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 22px 48px rgba(18, 7, 66, 0.16);
+
+  animation: modalFadeIn 0.22s ease;
+}
+
+/* Header del modal */
+.contacto-modal-header {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 0 48px;
+}
+
+.contacto-modal-header h2 {
+  margin: 0;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.1;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.015em;
+}
+
+.contacto-modal-header p {
+  margin: 8px 0 0;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: var(--font-weight-demi);
+}
+
+/* Botón cerrar */
+.contacto-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 10;
+
+  width: 38px;
+  height: 38px;
+
+  border: 1px solid rgba(147, 149, 152, 0.28);
+  border-radius: 50%;
+  background: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #120742;
+  cursor: pointer;
+
+  box-shadow: 0 6px 16px rgba(18, 7, 66, 0.12);
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.contacto-modal-close:hover {
+  background: #6f60aa;
+  border-color: #6f60aa;
+  color: #ffffff;
+  transform: scale(1.05);
+  box-shadow: 0 8px 18px rgba(111, 96, 170, 0.24);
+}
+
+/* =========================================================
+   LAYOUT PRINCIPAL DEL FORMULARIO
+========================================================= */
+
+.agenda-layout-card {
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  align-items: stretch;
+
+  border-radius: 24px;
+  overflow: hidden;
+
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  box-shadow: 0 16px 34px rgba(18, 7, 66, 0.14);
+
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* =========================================================
+   COLUMNA IZQUIERDA - INFORMACIÓN DE CONTACTO
+========================================================= */
+
+.agenda-contact-info {
+  min-height: 100%;
+  padding: 42px 32px;
+
+  background: linear-gradient(
+    180deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
+
+  color: #ffffff;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.agenda-contact-info h3 {
+  margin: 0 0 30px;
+
+  color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: clamp(1.9rem, 2.5vw, 2.5rem);
+  line-height: 1.15;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: -0.02em;
+}
+
+.contact-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+
+  margin-bottom: 28px;
+}
+
+.contact-info-icon {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.contact-info-icon svg {
+  color: #ffffff;
+  stroke: #ffffff;
+}
+
+.contact-info-item h4 {
+  margin: 0 0 6px;
+
+  color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 1.12rem;
+  line-height: 1.25;
+  font-weight: var(--font-weight-demi);
+}
+
+.contact-info-item p {
+  margin: 0 0 4px;
+
+  color: #ffffff;
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: var(--font-weight-regular);
+}
+
+/* =========================================================
+   TARJETA DEL FORMULARIO
+========================================================= */
+
 .agenda-form-card {
   width: 100%;
-  background: var(--color-white);
-  border-radius: 24px;
+  margin: 0;
   padding: 32px;
-  box-shadow: 0 20px 45px rgba(18, 7, 66, 0.08);
-  border: 1px solid rgba(147, 149, 152, 0.20);
+
+  background: rgba(255, 255, 255, 0.34);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
+
+/* =========================================================
+   GRUPOS Y LABELS
+========================================================= */
 
 .agenda-form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
-.agenda-form-group label {
+.agenda-form-group label,
+.agenda-form-group > label {
   display: flex;
   align-items: center;
   gap: 10px;
+
   margin-bottom: 10px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 15px;
+  line-height: 1.35;
+  font-weight: var(--font-weight-demi);
 }
+
+.agenda-form-group label svg,
+.agenda-form-group > label svg {
+  color: #00001b;
+  stroke: #00001b;
+}
+
+/* =========================================================
+   INPUTS CON ÍCONOS
+========================================================= */
 
 .input-group {
   position: relative;
+
   display: flex;
   align-items: center;
+
+  width: 100%;
 }
 
 .input-group svg {
   position: absolute;
   left: 14px;
-  color: var(--color-primary);
-  pointer-events: none;
   z-index: 2;
+
+  color: #939598;
+  stroke: #939598;
+
+  pointer-events: none;
+
+  transition:
+    color 0.2s ease,
+    stroke 0.2s ease;
+}
+
+.input-group:focus-within svg {
+  color: #6f60aa;
+  stroke: #6f60aa;
 }
 
 .input-group input,
 .input-group select,
 .agenda-form-group textarea {
   width: 100%;
+
   border: 1px solid var(--color-border);
   border-radius: 14px;
-  background: var(--color-white);
-  font-size: 0.95rem;
-  color: var(--color-text-primary);
-  transition: all 0.2s ease;
+  background: #ffffff;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 15px;
+  font-weight: var(--font-weight-regular);
+
   outline: none;
   box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 
 .input-group input,
@@ -66,48 +318,60 @@
   padding: 0 14px 0 44px;
 }
 
-.agenda-form-group textarea {
-  min-height: 120px;
-  resize: vertical;
-  padding: 14px 16px;
-  line-height: 1.5;
-}
-
 .input-group input::placeholder,
-.agenda-form-group textarea::placeholder {
-  color: var(--color-text-secondary);
+.agenda-form-group textarea::placeholder,
+.react-datepicker__input-container input::placeholder {
+  color: #939598;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-regular);
+  opacity: 1;
 }
 
 .input-group input:focus,
 .input-group select:focus,
 .agenda-form-group textarea:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(111, 96, 170, 0.20);
+  border-color: #6f60aa;
+  box-shadow: 0 0 0 4px rgba(111, 96, 170, 0.18);
 }
 
+/* Select */
 .input-group select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
+
   cursor: pointer;
-  background-image: linear-gradient(45deg, transparent 50%, var(--color-text-secondary) 50%),
-    linear-gradient(135deg, var(--color-text-secondary) 50%, transparent 50%);
-  background-position: calc(100% - 20px) calc(50% - 3px),
+  color: #939598;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, #939598 50%),
+    linear-gradient(135deg, #939598 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) calc(50% - 3px),
     calc(100% - 14px) calc(50% - 3px);
   background-size: 6px 6px, 6px 6px;
   background-repeat: no-repeat;
+
   padding-right: 42px;
+}
+
+.input-group select:valid {
+  color: #00001b;
 }
 
 .input-group select:disabled {
   cursor: not-allowed;
   background-color: #f7f7f8;
-  color: var(--color-text-secondary);
+  color: #939598;
 }
+
+/* =========================================================
+   TELÉFONO
+========================================================= */
 
 .telefono-row {
   display: grid;
-  grid-template-columns: 220px 1fr;
+  grid-template-columns: 220px minmax(0, 1fr);
   gap: 12px;
   align-items: start;
 }
@@ -115,25 +379,41 @@
 .country-code-group select {
   width: 100%;
   height: 52px;
+  padding: 0 14px;
+
   border: 1px solid var(--color-border);
   border-radius: 14px;
-  background: var(--color-white);
-  padding: 0 14px;
-  font-size: 0.95rem;
-  color: var(--color-text-primary);
+  background: #ffffff;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 15px;
+  font-weight: var(--font-weight-regular);
+
   outline: none;
-  transition: all 0.2s ease;
   box-sizing: border-box;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .country-code-group select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px rgba(111, 96, 170, 0.20);
+  border-color: #6f60aa;
+  box-shadow: 0 0 0 4px rgba(111, 96, 170, 0.18);
+}
+
+.phone-input-group {
+  min-width: 0;
 }
 
 .phone-input-group input {
   padding-left: 44px;
 }
+
+/* =========================================================
+   FILAS DOBLES
+========================================================= */
 
 .agenda-form-row {
   display: grid;
@@ -141,60 +421,142 @@
   gap: 16px;
 }
 
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
+.agenda-form-group textarea {
+  min-height: 120px;
+  padding: 14px 16px;
+
+  resize: vertical;
+  line-height: 1.5;
+}
+
+#ac_descripcion_consulta,
+#ac_motivo_cita {
+  min-height: 130px;
+}
+
+/* =========================================================
+   DATEPICKER
+========================================================= */
+
+.react-datepicker-wrapper,
+.react-datepicker__input-container {
+  width: 100%;
+}
+
+.react-datepicker__input-container input {
+  width: 100%;
+  min-height: 50px;
+
+  border: none;
+  outline: none;
+  background: transparent;
+
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 15px;
+  font-weight: var(--font-weight-regular);
+}
+
+.react-datepicker-popper {
+  z-index: 99999;
+}
+
+/* =========================================================
+   MENSAJES DE AYUDA / ERROR / ÉXITO
+========================================================= */
+
 .help-message {
   margin-top: 8px;
   padding: 10px 12px;
+
   border-radius: 12px;
   background: rgba(111, 96, 170, 0.08);
   border: 1px solid rgba(111, 96, 170, 0.18);
-  color: var(--color-primary);
+
+  color: #6f60aa;
+  font-family: var(--font-primary);
   font-size: 0.88rem;
   line-height: 1.45;
+  font-weight: var(--font-weight-regular);
 }
 
 .error {
   margin-top: 8px;
-  font-size: 0.85rem;
+
   color: var(--color-error-text);
-  font-weight: 500;
+  font-family: var(--font-primary);
+  font-size: 0.85rem;
+  line-height: 1.4;
+  font-weight: var(--font-weight-medium);
 }
 
 .mensaje-exito {
   margin-top: 8px;
   margin-bottom: 18px;
   padding: 14px 16px;
+
   border-radius: 14px;
   background: var(--color-success-bg);
   border: 1px solid rgba(31, 107, 67, 0.18);
+
   color: var(--color-success-text);
+  font-family: var(--font-primary);
   font-size: 0.93rem;
   line-height: 1.45;
+  font-weight: var(--font-weight-demi);
 }
 
 .mensaje-error {
   margin-top: 8px;
   margin-bottom: 18px;
   padding: 14px 16px;
+
   border-radius: 14px;
   background: var(--color-error-bg);
   border: 1px solid rgba(198, 40, 57, 0.18);
+
   color: var(--color-error-text);
+  font-family: var(--font-primary);
   font-size: 0.93rem;
   line-height: 1.45;
+  font-weight: var(--font-weight-demi);
 }
+
+/* =========================================================
+   BOTÓN ENVIAR
+========================================================= */
 
 .agenda-submit-btn {
   width: 100%;
   height: 54px;
+
   border: none;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
-  color: var(--color-white);
+
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-secondary)
+  );
+
+  color: #ffffff;
+  font-family: var(--font-primary);
   font-size: 1rem;
-  font-weight: 700;
+  line-height: 1.2;
+  font-weight: var(--font-weight-bold);
+
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+
   box-shadow: 0 16px 30px rgba(18, 7, 66, 0.22);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .agenda-submit-btn:hover {
@@ -213,99 +575,58 @@
   box-shadow: none;
 }
 
+/* =========================================================
+   TIPOGRAFÍA NATIVA
+========================================================= */
+
 .agenda-form-group input[type="text"],
 .agenda-form-group input[type="email"],
-.agenda-form-group input[type="date"] {
-  font-family: inherit;
+.agenda-form-group input[type="date"],
+.agenda-form-group input[type="tel"],
+.agenda-form-group select,
+.agenda-form-group textarea {
+  font-family: var(--font-primary);
 }
 
-#ac_descripcion_consulta,
-#ac_motivo_cita {
-  min-height: 130px;
-}
-
-/* MODAL */
-.contacto-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: transparent;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 96px 24px 40px;
-  z-index: 9999;
-  overflow-y: auto;
-}
-
-.contacto-modal-container {
-  position: relative;
-  top: 0px;
-  width: min(1140px, 96%);
-  background: var(--color-white);
-  border-radius: 28px;
-  padding: 34px 30px 28px;
-  box-shadow: 0 22px 48px rgba(18, 7, 66, 0.16);
-  animation: modalFadeIn 0.22s ease;
-}
-
-.contacto-modal-header {
-  text-align: center;
-  margin-bottom: -10px;
-  padding-right: 28px;
-}
-
-.contacto-modal-header h2 {
-  margin: 0 0 8px;
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  margin-bottom: 0px;
-}
-
-.contacto-modal-header p {
-  margin-top: 2px;
-  font-size: 1rem;
-  color: var(--color-text-secondary);
-}
-
-.contacto-modal-close {
-  position: absolute;
-  top: 18px;
-  right: 18px;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--color-white);
-  color: var(--color-secondary);
-  border: none;
-  box-shadow: 0 6px 16px var(--color-shadow);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-}
-
-.contacto-modal-close:hover {
-  background: var(--color-primary);
-  color: var(--color-white);
-}
+/* =========================================================
+   ANIMACIÓN MODAL
+========================================================= */
 
 @keyframes modalFadeIn {
   from {
     opacity: 0;
     transform: translateY(-12px) scale(0.985);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
   }
 }
 
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 992px) {
+  .agenda-layout-card {
+    grid-template-columns: 1fr;
+    border-radius: 22px;
+  }
+
+  .agenda-contact-info {
+    border-radius: 22px 22px 0 0;
+    padding: 30px 22px;
+  }
+
+  .agenda-form-card {
+    border-radius: 0 0 22px 22px;
+  }
+}
+
 @media (max-width: 900px) {
   .agenda-form-card {
     padding: 24px;
-    border-radius: 20px;
   }
 
   .telefono-row {
@@ -327,35 +648,48 @@
     border-radius: 22px;
   }
 
+  .contacto-modal-header {
+    margin-bottom: 22px;
+    padding: 0 38px;
+  }
+
   .contacto-modal-header h2 {
-    font-size: 1.65rem;
+    font-size: 26px;
+  }
+
+  .contacto-modal-header p {
+    font-size: 13.5px;
   }
 }
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
 
 @media (max-width: 640px) {
   .agenda-form-card {
     padding: 20px 16px;
-    border-radius: 18px;
   }
 
   .agenda-form-group {
     margin-bottom: 18px;
   }
 
-  .agenda-form-group label {
-    font-size: 0.92rem;
+  .agenda-form-group label,
+  .agenda-form-group > label {
+    font-size: 14px;
   }
 
   .input-group input,
   .input-group select,
   .country-code-group select {
     height: 50px;
-    font-size: 0.94rem;
+    font-size: 14px;
   }
 
   .agenda-form-group textarea {
     min-height: 110px;
-    font-size: 0.94rem;
+    font-size: 14px;
   }
 
   .agenda-submit-btn {
@@ -375,14 +709,51 @@
 
   .contacto-modal-header {
     margin-bottom: 18px;
-    padding-right: 12px;
+    padding: 0 36px;
   }
 
   .contacto-modal-header h2 {
-    font-size: 1.45rem;
+    font-size: 24px;
   }
 
   .contacto-modal-header p {
-    font-size: 0.93rem;
+    font-size: 13px;
+  }
+
+  .contacto-modal-close {
+    top: 14px;
+    right: 14px;
+
+    width: 34px;
+    height: 34px;
+  }
+}
+
+@media (max-width: 480px) {
+  .agenda-contact-info {
+    padding: 28px 16px;
+  }
+
+  .agenda-contact-info h3 {
+    font-size: 1.55rem;
+  }
+
+  .contact-info-item {
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .contact-info-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+  }
+
+  .contact-info-item h4 {
+    font-size: 1rem;
+  }
+
+  .contact-info-item p {
+    font-size: 0.95rem;
   }
 }

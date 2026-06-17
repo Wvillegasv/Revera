@@ -1,129 +1,228 @@
-.footer {
-  width: 100%;
-  max-width: 1240px;
-  margin: 72px auto 24px;
+/* =========================================================
+   REVERA - FOOTER
+========================================================= */
 
-  padding: 0 14px;
+.footer {
+  position: relative;
+  z-index: 4;
+
+  width: 100%;
+  max-width: var(--layout-max-width);
+  margin: 34px auto 0;
+  padding: 18px 22px 10px;
 
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
 
-  color: #9b9ba3;
+  color: #939598;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-regular);
 }
+
+/* =========================================================
+   TEXTO IZQUIERDO
+========================================================= */
 
 .footer-left {
   display: flex;
   align-items: center;
-  gap: 18px;
+  justify-content: flex-start;
+  gap: 12px;
 
-  font-size: 15px;
+  min-width: 0;
+
+  color: #939598;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-regular);
+}
+
+.footer-privacy-link {
+  color: #939598;
+  font-family: var(--font-primary);
+  font-size: 13px;
   line-height: 1.4;
-  flex-wrap: wrap;
+  font-weight: var(--font-weight-regular);
+  text-decoration: none;
+  white-space: nowrap;
+
+  transition: color 0.22s ease;
 }
 
-.footer-divider {
-  width: 1px;
-  height: 18px;
-  background: rgba(155, 155, 163, 0.35);
+.footer-privacy-link:hover {
+  color: #6f60aa;
 }
 
-.footer-right {
+.footer-privacy-link:focus-visible {
+  outline: 2px solid rgba(111, 96, 170, 0.32);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.footer-separator {
+  color: #939598;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: var(--font-weight-regular);
+  opacity: 0.75;
+}
+
+.footer-copy {
+  margin: 0;
+
+  color: #939598;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
+}
+
+/* =========================================================
+   REDES SOCIALES
+========================================================= */
+
+.footer-social {
   display: flex;
   align-items: center;
-  gap: 18px;
+  justify-content: flex-end;
+  gap: 10px;
+
+  color: #939598;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: var(--font-weight-regular);
+  white-space: nowrap;
 }
 
 .footer-social-label {
-  font-size: 15px;
-  color: #8f8f98;
+  color: #939598;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: var(--font-weight-regular);
+  margin-right: 4px;
 }
 
-.footer-socials {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
+.footer-social-link {
+  width: 34px;
+  height: 34px;
 
-.footer-socials a {
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
 
-  background: rgba(255, 255, 255, 0.92);
-
-  border: 1px solid rgba(18, 7, 66, 0.06);
-
-  color: #00001b;
-
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 
+  color: #00001b;
   text-decoration: none;
 
+  box-shadow: 0 4px 12px rgba(18, 7, 66, 0.08);
+
   transition:
-    transform 0.22s ease,
-    background 0.22s ease,
     color 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease,
     box-shadow 0.22s ease;
 }
 
-.footer-socials a:hover {
-  transform: translateY(-2px);
-
-  background: #8d82c2;
-
-  color: #ffffff;
-
-  box-shadow: 0 10px 18px rgba(141, 130, 194, 0.22);
+.footer-social-link svg {
+  color: #00001b;
+  stroke: #00001b;
+  transition:
+    color 0.22s ease,
+    stroke 0.22s ease;
 }
 
-/* TABLET */
+.footer-social-link:hover {
+  color: #00001b;
+  background: #6f60aa;
+  transform: translateY(-2px);
+  box-shadow: 0 7px 16px rgba(111, 96, 170, 0.22);
+}
+
+.footer-social-link:hover svg {
+  color: #00001b;
+  stroke: #00001b;
+}
+
+.footer-social-link:focus-visible {
+  outline: 2px solid rgba(111, 96, 170, 0.32);
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
 @media (max-width: 768px) {
   .footer {
-    margin-top: 56px;
+    margin-top: 30px;
+    padding: 18px 14px 10px;
+    gap: 16px;
+  }
 
+  .footer-left {
+    gap: 8px;
+  }
+
+  .footer-privacy-link,
+  .footer-copy,
+  .footer-social,
+  .footer-social-label {
+    font-size: 12.5px;
+  }
+
+  .footer-social-link {
+    width: 31px;
+    height: 31px;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 620px) {
+  .footer {
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-
+    gap: 12px;
     text-align: center;
   }
 
   .footer-left {
     justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 4px;
   }
 
-  .footer-right {
-    flex-direction: column;
-    gap: 16px;
+  .footer-copy {
+    white-space: normal;
   }
 
-  .footer-socials a {
-    width: 48px;
-    height: 48px;
+  .footer-social {
+    justify-content: center;
   }
 }
 
-/* MOBILE */
 @media (max-width: 480px) {
-  .footer-left {
-    gap: 12px;
-    font-size: 13px;
+  .footer {
+    margin-top: 26px;
+    padding: 16px 10px 8px;
   }
 
+  .footer-privacy-link,
+  .footer-copy,
+  .footer-social,
   .footer-social-label {
-    font-size: 14px;
+    font-size: 12px;
   }
 
-  .footer-socials {
-    gap: 10px;
-  }
-
-  .footer-socials a {
-    width: 44px;
-    height: 44px;
+  .footer-social-link {
+    width: 30px;
+    height: 30px;
   }
 }

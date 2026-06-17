@@ -5,11 +5,11 @@ function ServiceCard({ icon, title, subtitle, description }) {
     <article className="service-card">
       <div className="service-card-icon">{icon}</div>
 
-      <h3>{title}</h3>
+      <h3 className="service-card-title">{title}</h3>
 
-      {subtitle && <h4>{subtitle}</h4>}
+      {subtitle && <h4 className="service-card-subtitle">{subtitle}</h4>}
 
-      <p>{description}</p>
+      <p className="service-card-description">{description}</p>
     </article>
   );
 }

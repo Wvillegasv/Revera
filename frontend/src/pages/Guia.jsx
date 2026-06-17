@@ -114,7 +114,7 @@ function Guia() {
             </div>
 
             <div className="guia-feature-content">
-              <span className="guia-badge">
+              <span className="guia-feature-category">
                 {destacado.categoria || "Información de la marca"}
               </span>
 
@@ -124,7 +124,7 @@ function Guia() {
 
               <Link
                 to={`/guia/${destacado.slug}`}
-                className="guia-feature-link"
+                className="guia-feature-link guia-feature-link-pill"
               >
                 Conocer más sobre REVERA
                 <ArrowRight size={18} strokeWidth={2.2} />

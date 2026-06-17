@@ -57,13 +57,9 @@ function ArticuloDetalle() {
           <>
             <article className="guia-revera-article">
               <section className="guia-revera-cover">
-
-
                 <div className="guia-revera-logo-text" aria-hidden="true">
-                <img src={reveraLogo} alt="" />
+                  <img src={reveraLogo} alt="" />
                 </div>
-
-
               </section>
 
               <section className="guia-revera-header">
@@ -109,9 +105,18 @@ function ArticuloDetalle() {
                     >
                       <div className="guia-revera-related-image" />
 
-                      <div>
+                      <div className="guia-revera-related-content">
                         <h3>{relacionado.titulo}</h3>
-                        <p>{relacionado.fechaPublicacion}</p>
+
+                        <div className="guia-revera-related-meta">
+                          {relacionado.fechaPublicacion && (
+                            <span>{relacionado.fechaPublicacion}</span>
+                          )}
+
+                          {relacionado.tiempoLectura && (
+                            <span>{relacionado.tiempoLectura}</span>
+                          )}
+                        </div>
                       </div>
                     </Link>
                   ))}

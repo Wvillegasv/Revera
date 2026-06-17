@@ -11,6 +11,8 @@ import FloatingHelpButton from "../components/FloatingHelpButton";
 import ChatbotRegistroMarca from "../components/chatbot-registro-marca/ChatbotRegistroMarca";
 import ChatbotRadiografiaMarca from "../components/chatbot-radiografia-marca/ChatbotRadiografiaMarca";
 
+import homeMainBg from "../assets/home-main-bg.png";
+
 import "../styles/revera.css";
 import "../styles/hero.css";
 import "../styles/agenda.css";
@@ -107,78 +109,60 @@ function Home() {
   };
 
   return (
-    <div id="home-top" className="home-page">
-      <Navbar onContactoClick={abrirContacto} />
+    <div id="home-top" className="home-page revera-page-shell">
+      <div
+        className="home-main-background-image"
+        style={{ backgroundImage: `url(${homeMainBg})` }}
+        aria-hidden="true"
+      />
 
-      <main className="hero-section">
-        <div className="hero-background-shape" aria-hidden="true"></div>
+      <div
+        className="home-background-glow home-background-glow-left"
+        aria-hidden="true"
+      />
 
-        <section className="hero-content">
-          <div className="hero-brand-mark" aria-hidden="true">
-            <div className="hero-logo-circle">
-              <svg
-                viewBox="0 0 100 100"
-                className="hero-logo-svg"
-                xmlns="http://www.w3.org/2000/svg"
+      <div
+        className="home-background-glow home-background-glow-right"
+        aria-hidden="true"
+      />
+
+      <div className="revera-content-layer">
+        <Navbar onContactoClick={abrirContacto} />
+
+        <main className="hero-section">
+          <section className="hero-content">
+            <h1>Un sistema claro para tomar decisiones sobre tu marca</h1>
+
+            <h2>
+              Analiza, registra o resuelve tus dudas con criterio jurídico en
+              cada etapa del proceso.
+            </h2>
+
+            <p>Selecciona el camino que mejor se adapte a tu caso</p>
+          </section>
+
+          <section className="services-section">
+            {servicios.map((service) => (
+              <div
+                key={service.id}
+                onClick={service.action}
+                style={{ cursor: service.action ? "pointer" : "default" }}
               >
-                <circle cx="50" cy="50" r="44" className="hero-logo-ring" />
+                <ServiceCard
+                  icon={service.icon}
+                  title={service.title}
+                  subtitle={service.subtitle}
+                  description={service.description}
+                />
+              </div>
+            ))}
+          </section>
+        </main>
 
-                <g transform="translate(-2, 3)">
-                  <path
-                    d="M40 25 H58 C80 25, 80 52, 58 52 H40"
-                    className="hero-logo-stroke"
-                  />
+        <Footer />
 
-                  <circle cx="40" cy="52" r="3.5" className="hero-logo-fill" />
-
-                  <path
-                    d="M32 65 H39 L43.5 52 H36.5 L32 65 Z"
-                    className="hero-logo-fill"
-                  />
-
-                  <path
-                    d="M58 52 C65 52, 72 58, 72 65"
-                    className="hero-logo-stroke"
-                  />
-                </g>
-              </svg>
-            </div>
-
-            <div className="hero-dots">
-              <span></span>
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-
-          <h1>Un sistema claro para tomar decisiones sobre tu marca</h1>
-
-          <h2>
-            Analiza, registra o resuelve tus dudas con criterio jurídico en cada
-            etapa del proceso.
-          </h2>
-
-          <p>Selecciona el camino que mejor se adapte a tu caso</p>
-        </section>
-
-        <section className="services-section">
-          {servicios.map((service) => (
-            <div
-              key={service.id}
-              onClick={service.action}
-              style={{ cursor: service.action ? "pointer" : "default" }}
-            >
-              <ServiceCard
-                icon={service.icon}
-                title={service.title}
-                subtitle={service.subtitle}
-                description={service.description}
-              />
-            </div>
-          ))}
-        </section>
-      </main>
+        <FloatingHelpButton />
+      </div>
 
       {mostrarContacto && (
         <div className="contacto-modal-overlay" onClick={cerrarContacto}>
@@ -214,10 +198,6 @@ function Home() {
         abierto={mostrarRadiografiaMarca}
         onClose={cerrarRadiografiaMarca}
       />
-
-      <Footer />
-
-      <FloatingHelpButton />
     </div>
   );
 }
