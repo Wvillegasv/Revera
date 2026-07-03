@@ -339,22 +339,12 @@ function AgendaForm({ onSuccess }) {
 
             <div className="contact-info-item">
               <div className="contact-info-icon">
-                <Phone size={20} />
-              </div>
-              <div>
-                <h4>Teléfono</h4>
-                <p>+52 55 1234 5678</p>
-              </div>
-            </div>
-
-            <div className="contact-info-item">
-              <div className="contact-info-icon">
                 <Clock size={20} />
               </div>
               <div>
                 <h4>Horario</h4>
-                <p>Lun - Vie: 9:00 - 18:00</p>
-                <p>Sáb: 10:00 - 14:00 p.m.</p>
+                <p>Lun - Vie: 9 am - 6 pm</p>
+                <p>Sáb: 10 am - 2 pm</p>
               </div>
             </div>
 
@@ -559,7 +549,7 @@ function AgendaForm({ onSuccess }) {
               <div className="agenda-form-group">
                 <label htmlFor="ac_hora_cita">
                   <Clock size={18} />
-                  <span>Hora Preferida</span>
+                  <span>Hora Preferida (CST)</span>
                 </label>
 
                 <div className="input-group">

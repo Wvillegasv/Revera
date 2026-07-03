@@ -6,6 +6,7 @@ export const OPCIONES_TIPO_MARCA = [
   "Marca de fábrica y comercio",
   "Marca de fábrica y servicios",
   "Marca de servicios",
+  "No sé",
 ];
 
 export const OPCIONES_QUE_REGISTRA = ["Nombre", "Logo", "Nombre + Logo"];
@@ -49,7 +50,7 @@ export const OPCIONES_TIPO_IDENTIFICACION = [
 ];
 
 export const OPCIONES_CLASES_NIZA = [
-  ...Array.from({ length: 45 }, (_, i) => `Clase ${i + 1}`),
+  ...Array.from({ length: 45 }, (_, index) => `Clase ${index + 1}`),
   "No sé",
 ];
 
@@ -63,7 +64,7 @@ export const INITIAL_FORM = {
   logoArchivo: null,
   productosServiciosTipo: "",
   detalleProductosServicios: "",
-  claseNiza: "",
+  claseNiza: [],
   paisOrigen: "",
   paisOrigenOtro: "",
   direccionEstablecimiento: "",
@@ -87,7 +88,6 @@ export const INITIAL_FORM = {
   personaTelefono: "",
   personaTelefonoCodigoPais: "506",
   personaTelefonoNumero: "",
-  personaInformacionAdicional: "",
 
   empresaNombre: "",
   empresaIdentificacion: "",
@@ -125,11 +125,19 @@ export function buildBaseSteps(validators) {
       placeholder: "Escribe tu correo electrónico",
       validate: validators.validateCorreo,
     },
+
+
     {
       key: "nombreMarca",
       type: "text",
       question:
         "Necesitamos conocer los detalles de tu marca o nombre comercial. ¿Cuál es tu marca o nombre comercial?",
+      links: [
+        {
+          text: "Diferencias entre tipos de marca y nombres comerciales en Costa Rica",
+          href: "/guia/diferencias-marca-nombre-comercial-costa-rica",
+        },
+      ],
       placeholder: "Escribe tu marca o nombre comercial",
       validate: (value) =>
         validators.validateTexto(
@@ -138,13 +146,24 @@ export function buildBaseSteps(validators) {
           "Debes indicar tu marca o nombre comercial."
         ),
     },
+
+
     {
       key: "tipoTramite",
       type: "options",
       question: "¿Qué tipo de signo quieres registrar?",
+      links: [
+        {
+          text: "Diferencias entre tipos de marca y nombres comerciales en Costa Rica",
+          href: "/guia/diferencias-marca-nombre-comercial-costa-rica",
+        },
+      ],
       options: OPCIONES_TIPO_TRAMITE,
       validate: validators.validateRequiredOption,
     },
+
+
+
   ];
 }
 
@@ -155,6 +174,12 @@ export function buildMarcaSteps(validators) {
       type: "options",
       question:
         "¿Qué tipo de marca quieres registrar? Si no sabes la respuesta, no pasa nada, nosotros lo definimos.",
+      links: [
+        {
+          text: "Diferencias entre tipos de marca y nombres comerciales en Costa Rica",
+          href: "/guia/diferencias-marca-nombre-comercial-costa-rica",
+        },
+      ],
       options: OPCIONES_TIPO_MARCA,
       validate: validators.validateRequiredOption,
     },
@@ -184,7 +209,7 @@ export function buildMarcaSteps(validators) {
       key: "detalleProductosServicios",
       type: "textarea",
       question:
-        "Cuéntanos con detalle los productos, servicios o productos y servicios que se venden bajo tu marca. No te guardes nada.",
+        "Cuéntanos con detalle los productos, servicios o productos y servicios que se venden bajo tu marca.",
       placeholder: "Describe con detalle",
       validate: (value) =>
         validators.validateTexto(
@@ -195,9 +220,15 @@ export function buildMarcaSteps(validators) {
     },
     {
       key: "claseNiza",
-      type: "options",
+      type: "multi-options",
       question:
         "Si sabes en cuál Clase de Niza quieres registrar tu marca, selecciónala. Si no sabes, puedes elegir 'No sé'.",
+      links: [
+        {
+          text: "¿Cómo clasificar un producto según Niza?",
+          href: "/guia/como-clasificar-un-producto-segun-niza",
+        },
+      ],
       options: OPCIONES_CLASES_NIZA,
       validate: validators.validateRequiredOption,
     },
@@ -224,7 +255,7 @@ export function buildMarcaSteps(validators) {
     {
       key: "informacionAdicional",
       type: "textarea",
-      question: "¿Quieres contarnos algo más sobre tu marca? El micrófono es tuyo.",
+      question: "¿Quieres contarnos algo más sobre tu marca?",
       placeholder: "Información adicional",
       validate: () => "",
     },
@@ -268,10 +299,14 @@ export function buildNombreComercialSteps(validators) {
       key: "detalleProductosServicios",
       type: "textarea",
       question:
-        "Cuéntanos con detalle los productos, servicios o productos y servicios que se brindan en tu negocio. No te guardes nada.",
+        "Cuéntanos con detalle los productos, servicios o productos y servicios que se brindan en tu negocio.",
       placeholder: "Describe con detalle",
       validate: (value) =>
-        validators.validateTexto(value, 10, "Brinda más detalle sobre tu negocio."),
+        validators.validateTexto(
+          value,
+          10,
+          "Brinda más detalle sobre tu negocio."
+        ),
     },
     {
       key: "queDeseaRegistrar",
@@ -312,7 +347,7 @@ export function buildNombreComercialSteps(validators) {
       key: "informacionAdicional",
       type: "textarea",
       question:
-        "¿Quieres contarnos algo más sobre tu nombre comercial o tu negocio? El micrófono es tuyo.",
+        "¿Quieres contarnos algo más sobre tu nombre comercial o tu negocio?",
       placeholder: "Información adicional",
       validate: () => "",
     },
@@ -343,7 +378,11 @@ export function buildPersonaSteps(validators) {
         "¡Ya casi terminamos! Ahora cuéntanos sobre la persona dueña de la marca o nombre comercial. ¿Quién será la persona dueña? Incluye todos los nombres y apellidos.",
       placeholder: "Nombre completo",
       validate: (value) =>
-        validators.validateTexto(value, 8, "Ingresa el nombre completo del titular."),
+        validators.validateTexto(
+          value,
+          8,
+          "Ingresa el nombre completo del titular."
+        ),
     },
     {
       key: "personaEstadoCivil",
@@ -382,8 +421,8 @@ export function buildPersonaSteps(validators) {
     {
       key: "personaDireccion",
       type: "textarea",
-      question: "Dirección exacta",
-      placeholder: "Dirección exacta",
+      question: "Dirección exacta del dueño de la marca",
+      placeholder: "Dirección exacta del dueño de la marca",
       validate: (value) =>
         validators.validateTexto(
           value,
@@ -417,14 +456,6 @@ export function buildPersonaSteps(validators) {
         completo: "personaTelefono",
       },
       validate: validators.validateTelefono,
-    },
-    {
-      key: "personaInformacionAdicional",
-      type: "textarea",
-      question:
-        "¿Quieres contarnos algo más sobre la persona dueña de la marca o nombre comercial? El micrófono es tuyo.",
-      placeholder: "Información adicional",
-      validate: () => "",
     },
   ];
 }
@@ -564,8 +595,7 @@ export function buildEmpresaSteps(validators) {
     {
       key: "empresaInformacionAdicional",
       type: "textarea",
-      question:
-        "¿Quieres contarnos algo más sobre la empresa dueña de la marca o nombre comercial?",
+      question: "¿Quieres contarnos algo más sobre la empresa dueña de la marca o nombre comercial?",
       placeholder: "Información adicional",
       validate: () => "",
     },
@@ -577,8 +607,7 @@ export function buildContactoFinalSteps(validators) {
     {
       key: "nombreCompleto",
       type: "text",
-      question:
-        "Finalmente, indícanos tu nombre completo para contactarte.",
+      question: "Finalmente, indícanos tu nombre completo para contactarte.",
       placeholder: "Nombre completo",
       validate: (value) =>
         validators.validateTexto(value, 8, "Ingresa tu nombre completo."),
@@ -595,11 +624,6 @@ export function buildContactoFinalSteps(validators) {
         completo: "telefono",
       },
       validate: validators.validateTelefono,
-    },
-    {
-      key: "confirmacionFinal",
-      type: "confirmation",
-      question: "¿Desea enviar la información?",
     },
   ];
 }
@@ -705,3 +729,4 @@ export function insertarPasosOtroPais(flujoBase, formData, validators) {
 
   return resultado;
 }
+

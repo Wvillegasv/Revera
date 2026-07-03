@@ -1,9 +1,12 @@
 const fs = require("fs");
+
 const {
   registrarEstudioRegistrabilidad,
 } = require("../services/estudioRegistrabilidadService");
+
 const {
   enviarEstudioRegistrabilidad,
+  enviarConfirmacionRadiografiaMarcaUsuario,
 } = require("../services/emailService");
 
 function limpiarArchivosSubidos(files = []) {
@@ -13,9 +16,23 @@ function limpiarArchivosSubidos(files = []) {
         fs.unlinkSync(file.path);
       }
     } catch (error) {
-      console.error("No se pudo eliminar archivo temporal:", file?.path, error.message);
+      console.error(
+        "No se pudo eliminar archivo temporal:",
+        file?.path,
+        error.message
+      );
     }
   }
+}
+
+function obtenerDestinatariosRadiografia() {
+  const valorConfigurado =
+    process.env.REVERA_ESTUDIO_DESTINATARIOS || process.env.SMTP_TO || "";
+
+  return valorConfigurado
+    .split(",")
+    .map((correo) => correo.trim())
+    .filter(Boolean);
 }
 
 async function crearEstudioRegistrabilidad(req, res) {
@@ -25,19 +42,12 @@ async function crearEstudioRegistrabilidad(req, res) {
       files: req.files || [],
     });
 
-    let correoEnviado = false;
+    let correoInternoEnviado = false;
+    let correoClienteEnviado = false;
     let detalleCorreo = null;
 
     try {
-      const destinatarios = process.env.REVERA_ESTUDIO_DESTINATARIOS
-        ? process.env.REVERA_ESTUDIO_DESTINATARIOS.split(",")
-            .map((x) => x.trim())
-            .filter(Boolean)
-        : process.env.SMTP_TO
-        ? process.env.SMTP_TO.split(",")
-            .map((x) => x.trim())
-            .filter(Boolean)
-        : [];
+      const destinatarios = obtenerDestinatariosRadiografia();
 
       if (destinatarios.length === 0) {
         throw new Error(
@@ -51,23 +61,39 @@ async function crearEstudioRegistrabilidad(req, res) {
         correo: resultado.correo,
         telefono: `${resultado.codigoPais} ${resultado.telefono}`,
         nombreMarca: resultado.nombreMarca,
-        descripcionProductoServicio: resultado.descripcionProductoServicio,
+        descripcionProductoServicio:
+          resultado.descripcionProductoServicio,
         sectorClase: resultado.sectorClase,
         files: resultado.files || [],
       });
 
-      correoEnviado = true;
+      correoInternoEnviado = true;
+
+      await enviarConfirmacionRadiografiaMarcaUsuario({
+        correoUsuario: resultado.correo,
+      });
+
+      correoClienteEnviado = true;
     } catch (errorCorreo) {
       detalleCorreo = errorCorreo.message;
-      console.error("Error enviando correo de estudio de registrabilidad:", errorCorreo);
+
+      console.error(
+        "Error enviando correos de Radiografía de Marca:",
+        errorCorreo
+      );
     }
+
+    const correosEnviadosCorrectamente =
+      correoInternoEnviado && correoClienteEnviado;
 
     return res.status(201).json({
       ok: true,
-      correoEnviado,
-      message: correoEnviado
-        ? "Gracias por solicitar el estudio de registrabilidad. Revisaremos la información y nos comunicaremos contigo pronto."
-        : "La solicitud fue registrada correctamente, pero ocurrió un problema al enviar el correo al abogado.",
+      correoEnviado: correosEnviadosCorrectamente,
+      correoInternoEnviado,
+      correoClienteEnviado,
+      message: correosEnviadosCorrectamente
+        ? "Gracias por solicitar la Radiografía de Marca. Revisaremos la información y nos comunicaremos contigo pronto."
+        : "La solicitud fue registrada correctamente, pero ocurrió un problema al enviar uno o ambos correos.",
       data: {
         estudioId: resultado.estudioId,
         personaId: resultado.personaId,
@@ -79,7 +105,7 @@ async function crearEstudioRegistrabilidad(req, res) {
   } catch (error) {
     limpiarArchivosSubidos(req.files || []);
 
-    console.error("Error en crearSolicitudRegistroMarca:", {
+    console.error("Error en crearEstudioRegistrabilidad:", {
       message: error.message,
       statusCode: error.statusCode || 500,
     });
@@ -88,7 +114,7 @@ async function crearEstudioRegistrabilidad(req, res) {
       ok: false,
       message:
         error.message ||
-        "Ocurrió un error al registrar la solicitud de estudio de registrabilidad.",
+        "Ocurrió un error al registrar la solicitud de Radiografía de Marca.",
     });
   }
 }

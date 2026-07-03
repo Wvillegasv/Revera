@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { X, Send, Upload } from "lucide-react";
 import {
   RADIOGRAFIA_FLOW,
@@ -13,12 +13,30 @@ import {
 } from "./radiografiaHelpers";
 import { enviarRadiografiaMarca } from "../../services/radiografiaMarcaApi";
 import "../../styles/chatbotRadiografiaMarca.css";
+import { Link } from "react-router-dom";
+
+const DURACION_MENSAJE_EXITO_MS = 30000;
+
+const TEXTO_LINK_GUIA =
+  "En este análisis revisamos si ya existe algo parecido, si hay riesgo de conflicto y en qué categoría deberías registrarla para protegerla bien.";
+
 
 function crearMensajesIniciales(primerPaso) {
   return [
     ...RADIOGRAFIA_INTRO.map((mensaje) => ({
       tipo: "bot",
-      texto: mensaje,
+      texto:
+        typeof mensaje === "string"
+          ? mensaje
+          : mensaje.texto || "",
+      linkTexto:
+        typeof mensaje === "string"
+          ? ""
+          : mensaje.linkTexto || "",
+      linkUrl:
+        typeof mensaje === "string"
+          ? ""
+          : mensaje.linkUrl || "",
     })),
     {
       tipo: "bot",
@@ -29,6 +47,7 @@ function crearMensajesIniciales(primerPaso) {
     },
   ];
 }
+
 
 function construirPayloadRadiografia(respuestas) {
   const telefono = respuestas.telefonoContacto || {};
@@ -79,8 +98,13 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
   const [error, setError] = useState("");
   const [finalizado, setFinalizado] = useState(false);
   const [enviadoCorrectamente, setEnviadoCorrectamente] = useState(false);
+  const [enviandoInformacion, setEnviandoInformacion] = useState(false);
+
+  // Indica que se está editando desde el resumen final.
+  const [editandoDesdeResumen, setEditandoDesdeResumen] = useState(false);
 
   const chatRef = useRef(null);
+  const timeoutCierreRef = useRef(null);
 
   const pasoActual = useMemo(
     () => obtenerPasoPorId(RADIOGRAFIA_FLOW, pasoActualId),
@@ -93,11 +117,28 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
     }
   }, [mensajes, finalizado, enviadoCorrectamente]);
 
+  useEffect(() => {
+    return () => {
+      if (timeoutCierreRef.current) {
+        clearTimeout(timeoutCierreRef.current);
+      }
+    };
+  }, []);
+
   if (!abierto) {
     return null;
   }
 
+  const limpiarTemporizadorCierre = () => {
+    if (timeoutCierreRef.current) {
+      clearTimeout(timeoutCierreRef.current);
+      timeoutCierreRef.current = null;
+    }
+  };
+
   const reiniciarChat = () => {
+    limpiarTemporizadorCierre();
+
     setPasoActualId(primerPaso.id);
     setRespuestas({});
     setMensajes(crearMensajesIniciales(primerPaso));
@@ -106,6 +147,8 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
     setError("");
     setFinalizado(false);
     setEnviadoCorrectamente(false);
+    setEnviandoInformacion(false);
+    setEditandoDesdeResumen(false);
   };
 
   const cerrar = () => {
@@ -129,25 +172,26 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
     ]);
   };
 
-  const agregarPreguntaBot = (siguientePasoId) => {
-    const siguientePaso = obtenerPasoPorId(RADIOGRAFIA_FLOW, siguientePasoId);
+const agregarPreguntaBot = (siguientePasoId) => {
+  const siguientePaso = obtenerPasoPorId(RADIOGRAFIA_FLOW, siguientePasoId);
 
-    if (!siguientePaso) {
-      return;
-    }
+  if (!siguientePaso) {
+    return;
+  }
 
-    setMensajes((prev) => [
-      ...prev,
-      {
-        tipo: "bot",
-        texto: siguientePaso.label,
-        sectionTitle: siguientePaso.sectionTitle || "",
-        preguntaId: siguientePaso.id,
-        required: siguientePaso.required,
-        current: true,
-      },
-    ]);
-  };
+  setMensajes((prev) => [
+    ...prev,
+    {
+      tipo: "bot",
+      texto: siguientePaso.label,
+      sectionTitle: siguientePaso.sectionTitle || "",
+      preguntaId: siguientePaso.id,
+      required: siguientePaso.required,
+      current: true,
+    },
+  ]);
+};
+
 
   const obtenerTextoRespuesta = (paso, valor) => {
     if (paso.type === "file") {
@@ -189,19 +233,40 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
         valor: textoRespuesta,
         archivo: pasoActual.type === "file" ? archivoActual : null,
         telefonoCodigoPais:
-          pasoActual.type === "phone" ? respuestaFinal.codigoPais || "" : "",
+          pasoActual.type === "phone"
+            ? respuestaFinal.codigoPais || ""
+            : "",
         telefonoNumero:
-          pasoActual.type === "phone" ? respuestaFinal.numero || "" : "",
+          pasoActual.type === "phone"
+            ? respuestaFinal.numero || ""
+            : "",
       },
     };
 
     setRespuestas(nuevasRespuestas);
     agregarMensajeUsuario(textoRespuesta);
 
-    const siguientePaso = obtenerSiguientePaso(pasoActual, respuestaFinal);
-
     setValorActual("");
     setArchivoActual(null);
+
+    // Si la persona venía desde Editar, regresa al resumen.
+    if (editandoDesdeResumen) {
+      setEditandoDesdeResumen(false);
+      setFinalizado(true);
+
+      setMensajes((prev) => [
+        ...prev,
+        {
+          tipo: "bot",
+          texto:
+            "Respuesta actualizada. Revisa nuevamente tu información antes de enviarla.",
+        },
+      ]);
+
+      return;
+    }
+
+    const siguientePaso = obtenerSiguientePaso(pasoActual, respuestaFinal);
 
     if (siguientePaso === "resumen") {
       setFinalizado(true);
@@ -219,6 +284,61 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
 
     setPasoActualId(siguientePaso);
     agregarPreguntaBot(siguientePaso);
+  };
+
+  const editarRespuesta = (preguntaId) => {
+    const pasoAEditar = obtenerPasoPorId(RADIOGRAFIA_FLOW, preguntaId);
+    const respuestaAnterior = respuestas[preguntaId];
+
+    if (!pasoAEditar || !respuestaAnterior) {
+      return;
+    }
+
+    setError("");
+    setFinalizado(false);
+    setEnviadoCorrectamente(false);
+    setEditandoDesdeResumen(true);
+    setPasoActualId(preguntaId);
+
+    // Se añade el paso al final del chat para que la persona vea
+    // que está editando, sin eliminar las respuestas posteriores.
+    setMensajes((prev) => [
+      ...prev.map((mensaje) => ({
+        ...mensaje,
+        current: false,
+      })),
+      {
+        tipo: "bot",
+        texto: `Editando respuesta: ${pasoAEditar.label}`,
+        preguntaId,
+        required: pasoAEditar.required,
+        current: true,
+      },
+    ]);
+
+    if (pasoAEditar.type === "file") {
+      setArchivoActual(respuestaAnterior.archivo || null);
+      setValorActual("");
+      return;
+    }
+
+    if (pasoAEditar.type === "phone") {
+      setValorActual({
+        codigoPais: respuestaAnterior.telefonoCodigoPais || "506",
+        numero: respuestaAnterior.telefonoNumero || "",
+      });
+
+      setArchivoActual(null);
+      return;
+    }
+
+    setValorActual(
+      respuestaAnterior.valor === "No indicado"
+        ? ""
+        : respuestaAnterior.valor
+    );
+
+    setArchivoActual(null);
   };
 
   const manejarSubmit = (event) => {
@@ -273,7 +393,7 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
 
           <button type="submit">
             <Send size={17} strokeWidth={2.1} />
-            Enviar
+            Siguiente
           </button>
         </form>
       );
@@ -325,7 +445,7 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
 
           <button type="submit">
             <Send size={17} strokeWidth={2.1} />
-            Enviar
+            Siguiente
           </button>
         </form>
       );
@@ -337,6 +457,7 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
           <label className="radiografia-file-label">
             <Upload size={18} strokeWidth={2.1} />
             Seleccionar archivo
+
             <input
               type="file"
               accept={pasoActual.accept}
@@ -358,7 +479,7 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
             className="radiografia-file-submit"
             onClick={() => guardarRespuesta(archivoActual)}
           >
-            Continuar
+            Siguiente
           </button>
         </div>
       );
@@ -375,21 +496,33 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
 
         <button type="submit">
           <Send size={17} strokeWidth={2.1} />
-          Enviar
+          Siguiente
         </button>
       </form>
     );
   };
 
   const renderResumen = () => {
-    const lista = Object.entries(respuestas);
-
     return (
       <div className="radiografia-summary-card">
-        {lista.map(([key, item]) => (
+        <h3 className="radiografia-summary-title">
+          Revisa tu información antes de enviarla
+        </h3>
+
+        {Object.entries(respuestas).map(([key, item]) => (
           <div className="radiografia-summary-row" key={key}>
-            <strong>{item.pregunta}</strong>
-            <span>{item.valor}</span>
+            <div className="radiografia-summary-row-content">
+              <strong>{item.pregunta}</strong>
+              <span>{item.valor}</span>
+            </div>
+
+            <button
+              type="button"
+              className="radiografia-edit-btn"
+              onClick={() => editarRespuesta(key)}
+            >
+              Editar
+            </button>
           </div>
         ))}
       </div>
@@ -397,9 +530,18 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
   };
 
   const enviarInformacion = async () => {
-    try {
-      setError("");
+    if (enviandoInformacion) {
+      return;
+    }
 
+    setError("");
+    setEnviandoInformacion(true);
+
+    // Muestra el agradecimiento inmediatamente.
+    // Si el backend falla, se retorna al resumen y aparece el error.
+    setEnviadoCorrectamente(true);
+
+    try {
       const payload = construirPayloadRadiografia(respuestas);
       const formData = new FormData();
 
@@ -411,24 +553,30 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
         formData.append("archivoLogo", archivoLogo);
       }
 
-      const resultado = await enviarRadiografiaMarca(formData);
+      await enviarRadiografiaMarca(formData);
 
-      console.log("Respuesta backend Radiografía:", resultado);
+      limpiarTemporizadorCierre();
 
-      setEnviadoCorrectamente(true);
-
-      setTimeout(() => {
+      timeoutCierreRef.current = setTimeout(() => {
         cerrar();
-      }, 5000);
-    } catch (error) {
-      console.error("Error enviando Radiografía de Marca:", error);
+      }, DURACION_MENSAJE_EXITO_MS);
+    } catch (errorEnvio) {
+      console.error(
+        "Error enviando Radiografía de Marca:",
+        errorEnvio
+      );
+
+      setEnviadoCorrectamente(false);
+      setFinalizado(true);
 
       const mensaje =
-        error.response?.data?.mensaje ||
-        error.response?.data?.error ||
+        errorEnvio.response?.data?.mensaje ||
+        errorEnvio.response?.data?.error ||
         "No fue posible enviar la solicitud. Intente nuevamente.";
 
       setError(mensaje);
+    } finally {
+      setEnviandoInformacion(false);
     }
   };
 
@@ -449,10 +597,16 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
 
         <header className="radiografia-header">
           <span>Radiografía de Marca</span>
-          <h2>Vamos a hacer una radiografía de tu marca</h2>
+
           <p>
-            Responde unas preguntas rápidas para evaluar la viabilidad inicial de
-            tu marca.
+            Responde unas preguntas rápidas para evaluar la viabilidad inicial
+            de tu marca.{" "}
+            <Link
+              to="/guia/precios-servicios-revera"
+              className="radiografia-prices-link"
+            >
+              Conoce los precios de nuestros servicios.
+            </Link>
           </p>
         </header>
 
@@ -470,10 +624,27 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
                 </div>
               )}
 
-              <div>
-                {mensaje.texto}
-                {mensaje.required && <span className="required">*</span>}
-              </div>
+            <div>
+              {mensaje.texto}
+
+              {mensaje.linkTexto && mensaje.linkUrl && (
+                <>
+                  {" "}
+                  <a
+                    href={mensaje.linkUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="radiografia-guide-link"
+                  >
+                    {mensaje.linkTexto}
+                  </a>
+                </>
+              )}
+
+              {mensaje.required && (
+                <span className="required">*</span>
+              )}
+            </div>
             </div>
           ))}
 
@@ -483,9 +654,7 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
                 <div className="radiografia-success-layout">
                   <div className="radiografia-success-header">
                     <h2>Radiografía de Marca</h2>
-                    <p>
-                      Completa el flujo conversacional para iniciar tu solicitud.
-                    </p>
+                    <p>Solicitud enviada correctamente.</p>
                   </div>
 
                   <div className="radiografia-success-content">
@@ -493,11 +662,26 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
                       <span>✓</span>
                     </div>
 
-                    <h3>Solicitud enviada</h3>
+                    <h3>¡Gracias por compartir su información con nosotros!</h3>
+
+                    <p>Nos pondremos en contacto.</p>
+
+                    <p>La confidencialidad y protección de la información de
+                      nuestros clientes es una prioridad para nosotros.
+                      Tratamos sus datos personales de manera segura,
+                      responsable y conforme a nuestra Política de Privacidad.
+                    </p>
 
                     <p>
-                      Su solicitud de radiografía de marca ha sido enviada
-                      correctamente. Nos pondremos en contacto con usted.
+                      Si desea conocer más sobre cómo recopilamos, utilizamos y
+                      protegemos su información, por favor haga clic en el
+                      siguiente enlace:{" "}
+                      <Link
+                        to="/aviso-privacidad"
+                        className="radiografia-privacy-link"
+                      >
+                        Aviso de Privacidad
+                      </Link>
                     </p>
                   </div>
                 </div>
@@ -506,14 +690,21 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
                   {renderResumen()}
 
                   <div className="radiografia-summary-actions">
-                    <button type="button" onClick={enviarInformacion}>
-                      Enviar información
+                    <button
+                      type="button"
+                      onClick={enviarInformacion}
+                      disabled={enviandoInformacion}
+                    >
+                      {enviandoInformacion
+                        ? "Enviando información..."
+                        : "Enviar información"}
                     </button>
 
                     <button
                       type="button"
                       className="secondary"
                       onClick={reiniciarChat}
+                      disabled={enviandoInformacion}
                     >
                       Reiniciar
                     </button>

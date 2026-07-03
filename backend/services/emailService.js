@@ -29,6 +29,7 @@ function limpiarPayloadCorreo(payload) {
   Object.entries(payload || {}).forEach(([key, value]) => {
     if (value === null || value === undefined) return;
     if (typeof value === "string" && value.trim() === "") return;
+
     limpio[key] = value;
   });
 
@@ -51,9 +52,11 @@ function construirHtmlRegistroMarca(payload) {
   const bloques = [];
 
   function agregarLinea(etiqueta, valor) {
-    const limpioValor = String(valor ?? "").trim();
-    if (!limpioValor) return;
-    bloques.push(`<p><strong>${etiqueta}:</strong> ${limpioValor}</p>`);
+    const valorLimpio = String(valor ?? "").trim();
+
+    if (!valorLimpio) return;
+
+    bloques.push(`<p><strong>${etiqueta}:</strong> ${valorLimpio}</p>`);
   }
 
   agregarLinea("Correo", limpio.correo);
@@ -63,34 +66,67 @@ function construirHtmlRegistroMarca(payload) {
   if (limpio.tipoTramite === "Marca") {
     agregarLinea("Tipo de marca", limpio.tipoMarca);
     agregarLinea("Qué desea registrar", limpio.queDeseaRegistrar);
-    agregarLinea("Productos/servicios", limpio.productosServiciosTipo);
+    agregarLinea("Productos o servicios", limpio.productosServiciosTipo);
     agregarLinea("Detalle", limpio.detalleProductosServicios);
     agregarLinea("Clase Niza", limpio.claseNiza);
-    agregarLinea("País de origen", resolverValorPais(limpio, "paisOrigen"));
-    agregarLinea("Dirección del establecimiento", limpio.direccionEstablecimiento);
-    agregarLinea("Información adicional", limpio.informacionAdicional);
-    agregarLinea("Registro previo en otro país", limpio.registroPrevioOtroPais);
+    agregarLinea(
+      "País de origen",
+      resolverValorPais(limpio, "paisOrigen")
+    );
+    agregarLinea(
+      "Dirección del establecimiento",
+      limpio.direccionEstablecimiento
+    );
+    agregarLinea(
+      "Información adicional",
+      limpio.informacionAdicional
+    );
+    agregarLinea(
+      "Registro previo en otro país",
+      limpio.registroPrevioOtroPais
+    );
   }
 
   if (limpio.tipoTramite === "Nombre Comercial") {
     agregarLinea("Giro o actividad", limpio.giroActividad);
     agregarLinea("Qué desea registrar", limpio.queDeseaRegistrar);
-    agregarLinea("Productos/servicios", limpio.productosServiciosTipo);
+    agregarLinea("Productos o servicios", limpio.productosServiciosTipo);
     agregarLinea("Detalle", limpio.detalleProductosServicios);
-    agregarLinea("País de origen", resolverValorPais(limpio, "paisOrigen"));
-    agregarLinea("Dirección del establecimiento", limpio.direccionEstablecimiento);
-    agregarLinea("Información adicional", limpio.informacionAdicional);
-    agregarLinea("Registro previo en otro país", limpio.registroPrevioOtroPais);
+    agregarLinea(
+      "País de origen",
+      resolverValorPais(limpio, "paisOrigen")
+    );
+    agregarLinea(
+      "Dirección del establecimiento",
+      limpio.direccionEstablecimiento
+    );
+    agregarLinea(
+      "Información adicional",
+      limpio.informacionAdicional
+    );
+    agregarLinea(
+      "Registro previo en otro país",
+      limpio.registroPrevioOtroPais
+    );
   }
 
   agregarLinea("Titular", limpio.tipoTitular);
 
   if (limpio.tipoTitular === "Persona") {
     agregarLinea("Nombre titular", limpio.personaNombre);
-    agregarLinea("Estado civil titular", limpio.personaEstadoCivil);
+    agregarLinea(
+      "Estado civil titular",
+      limpio.personaEstadoCivil
+    );
     agregarLinea("Profesión titular", limpio.personaProfesion);
-    agregarLinea("Tipo identificación titular", limpio.personaTipoIdentificacion);
-    agregarLinea("Número identificación titular", limpio.personaNumeroIdentificacion);
+    agregarLinea(
+      "Tipo identificación titular",
+      limpio.personaTipoIdentificacion
+    );
+    agregarLinea(
+      "Número identificación titular",
+      limpio.personaNumeroIdentificacion
+    );
     agregarLinea("Dirección titular", limpio.personaDireccion);
     agregarLinea(
       "País nacionalidad titular",
@@ -101,20 +137,38 @@ function construirHtmlRegistroMarca(payload) {
       resolverValorPais(limpio, "personaPaisResidencia")
     );
     agregarLinea("Teléfono titular", limpio.personaTelefono);
-    agregarLinea("Información adicional titular", limpio.personaInformacionAdicional);
+    agregarLinea(
+      "Información adicional titular",
+      limpio.personaInformacionAdicional
+    );
   }
 
   if (limpio.tipoTitular === "Empresa") {
     agregarLinea("Empresa", limpio.empresaNombre);
-    agregarLinea("Identificación empresa", limpio.empresaIdentificacion);
+    agregarLinea(
+      "Identificación empresa",
+      limpio.empresaIdentificacion
+    );
     agregarLinea(
       "País constitución empresa",
       resolverValorPais(limpio, "empresaPaisConstitucion")
     );
-    agregarLinea("Domicilio social", limpio.empresaDomicilioSocial);
-    agregarLinea("Representante", limpio.representanteNombre);
-    agregarLinea("Estado civil representante", limpio.representanteEstadoCivil);
-    agregarLinea("Profesión representante", limpio.representanteProfesion);
+    agregarLinea(
+      "Domicilio social",
+      limpio.empresaDomicilioSocial
+    );
+    agregarLinea(
+      "Representante",
+      limpio.representanteNombre
+    );
+    agregarLinea(
+      "Estado civil representante",
+      limpio.representanteEstadoCivil
+    );
+    agregarLinea(
+      "Profesión representante",
+      limpio.representanteProfesion
+    );
     agregarLinea(
       "Tipo identificación representante",
       limpio.representanteTipoIdentificacion
@@ -131,27 +185,27 @@ function construirHtmlRegistroMarca(payload) {
       "País residencia representante",
       resolverValorPais(limpio, "representantePaisResidencia")
     );
-    agregarLinea("Dirección representante", limpio.representanteDireccion);
-    agregarLinea("Teléfono representante", limpio.representanteTelefono);
-    agregarLinea("Información adicional empresa", limpio.empresaInformacionAdicional);
+    agregarLinea(
+      "Dirección representante",
+      limpio.representanteDireccion
+    );
+    agregarLinea(
+      "Teléfono representante",
+      limpio.representanteTelefono
+    );
+    agregarLinea(
+      "Información adicional empresa",
+      limpio.empresaInformacionAdicional
+    );
   }
 
   agregarLinea("Solicitante", limpio.nombreCompleto);
   agregarLinea("Teléfono solicitante", limpio.telefono);
 
-  const indicoAdjunto = payload?.logoArchivo || payload?.tieneLogo || false;
-  /*agregarLinea("Adjuntó logo", indicoAdjunto ? "Sí" : filesLengthFromPayload(payload) ? "Sí" : ""); */
-
   return `
     <h2>Solicitud de Registro de Marca</h2>
     ${bloques.join("")}
   `;
-}
-
-function filesLengthFromPayload(payload) {
-  if (!payload) return 0;
-  if (Array.isArray(payload.files)) return payload.files.length;
-  return 0;
 }
 
 /* =======================================================
@@ -169,7 +223,9 @@ async function enviarAgendaCitaInterna({ destinatarios, data }) {
   `;
 
   return enviarCorreo({
-    to: Array.isArray(destinatarios) ? destinatarios.join(",") : destinatarios,
+    to: Array.isArray(destinatarios)
+      ? destinatarios.join(",")
+      : destinatarios,
     subject: `Nueva cita - ${data.ac_nombre}`,
     html,
   });
@@ -193,8 +249,8 @@ async function enviarConfirmacionAgendaUsuario({
     <p><strong>Hora:</strong> ${horaCita}</p>
     <p><strong>Asunto:</strong> ${asuntoConsulta}</p>
     <p>Nos pondremos en contacto contigo pronto.</p>
-    <br/>
-    <p>Saludos,<br/>REVERA</p>
+    <br />
+    <p>Saludos,<br />REVERA</p>
   `;
 
   return enviarCorreo({
@@ -205,7 +261,7 @@ async function enviarConfirmacionAgendaUsuario({
 }
 
 /* =======================================================
-   3. ESTUDIO DE REGISTRABILIDAD
+   3. RADIOGRAFÍA DE MARCA - CORREO ABOGADOS
 ======================================================= */
 async function enviarEstudioRegistrabilidad({
   destinatarios,
@@ -217,71 +273,223 @@ async function enviarEstudioRegistrabilidad({
   sectorClase,
   files = [],
 }) {
+  const attachments = files.map((file) => ({
+    filename: file.originalname,
+    path: file.path,
+    contentType: file.mimetype,
+  }));
+
   const html = `
-    <h2>Solicitud de Estudio de Registrabilidad</h2>
+    <p><strong>ATENCIÓN! Métase en la vara!</strong></p>
+
+    <p>
+      Tenemos una solicitud de Radiografía de Marca y tenemos que entrarle ya mismo.
+    </p>
+
+    <p>
+      <strong>Seguir Protocolo Atención Radiografía de Marca.</strong>
+    </p>
+
+    <p>Muchas gracias.</p>
+
+    <hr />
+
+    <h3>Datos de la solicitud</h3>
     <p><strong>Nombre completo:</strong> ${nombreCompleto}</p>
     <p><strong>Correo electrónico:</strong> ${correo}</p>
     <p><strong>Teléfono:</strong> ${telefono}</p>
     <p><strong>Nombre de la marca:</strong> ${nombreMarca}</p>
-    <p><strong>Descripción del producto o servicio:</strong> ${descripcionProductoServicio}</p>
-    <p><strong>Sector o clase:</strong> ${sectorClase || "No indicado"}</p>
-    <p><strong>Adjuntó imágenes:</strong> ${files.length > 0 ? "Sí" : "No"}</p>
+    <p>
+      <strong>Descripción del producto o servicio:</strong>
+      ${descripcionProductoServicio}
+    </p>
+    <p>
+      <strong>Sector o clase:</strong>
+      ${sectorClase || "No indicado"}
+    </p>
+    <p>
+      <strong>Adjuntó imágenes:</strong>
+      ${files.length > 0 ? "Sí" : "No"}
+    </p>
   `;
 
-  const attachments = files.map((file) => ({
-    filename: file.originalname,
-    path: file.path,
-    contentType: file.mimetype,
-  }));
-
   return enviarCorreo({
-    to: Array.isArray(destinatarios) ? destinatarios.join(",") : destinatarios,
-    subject: `Solicitud de Estudio de Registrabilidad – ${nombreCompleto}`,
+    to: Array.isArray(destinatarios)
+      ? destinatarios.join(",")
+      : destinatarios,
+    subject: "CALLESE LOS OJOS! UNA NUEVA SOLICITUD RADIOGRAFÍA DE MARCA",
     html,
     attachments,
   });
 }
 
 /* =======================================================
-   4. REGISTRO DE MARCA - CORREO INTERNO
+   4. RADIOGRAFÍA DE MARCA - CONFIRMACIÓN CLIENTE
 ======================================================= */
-async function enviarSolicitudRegistroMarca({ destinatarios, payload, files = [] }) {
-  const html = construirHtmlRegistroMarca(payload);
-
-  const attachments = files.map((file) => ({
-    filename: file.originalname,
-    path: file.path,
-    contentType: file.mimetype,
-  }));
-
-  return enviarCorreo({
-    to: Array.isArray(destinatarios) ? destinatarios.join(",") : destinatarios,
-    subject: `Solicitud de Registro de Marca – ${payload.nombreCompleto || "Solicitante"}`,
-    html,
-    attachments,
-  });
-}
-
-/* =======================================================
-   5. REGISTRO DE MARCA - CONFIRMACIÓN USUARIO
-======================================================= */
-async function enviarConfirmacionRegistroMarcaUsuario({
+async function enviarConfirmacionRadiografiaMarcaUsuario({
   correoUsuario,
-  nombreCompleto,
-  nombreMarca,
 }) {
   const html = `
-    <h2>Hemos recibido tu solicitud</h2>
-    <p>Hola ${nombreCompleto},</p>
-    <p>Tu solicitud de registro de marca para <strong>${nombreMarca}</strong> fue recibida correctamente.</p>
-    <p>Revisaremos la información y nos pondremos en contacto contigo pronto.</p>
-    <br/>
-    <p>Saludos,<br/>REVERA</p>
+    <p>Hola,</p>
+
+    <p>
+      ¡Gracias por completar el formulario de Radiografía de Marca!
+    </p>
+
+    <p>
+      Ya recibimos tu solicitud y la información inicial sobre tu marca.
+      Nuestro equipo estará revisando los datos para poder iniciar el análisis
+      correspondiente.
+    </p>
+
+    <p>
+      La Radiografía de Marca es un servicio diseñado para ayudarte a entender
+      mejor el punto de partida de tu marca antes de registrarla. Con este
+      análisis revisamos aspectos clave como la categoría o clase aplicable,
+      posibles riesgos iniciales y elementos que conviene tomar en cuenta antes
+      de avanzar con una solicitud de registro.
+    </p>
+
+    <p>
+      Para que podamos activar el servicio e iniciar formalmente la revisión,
+      es necesario completar el pago correspondiente:
+    </p>
+
+    <p>
+      <strong>Radiografía de Marca:</strong> ₡50.000 + IVA
+    </p>
+
+    <p>
+      En breve te estaremos enviando las instrucciones de pago y, una vez
+      confirmado, continuaremos con el análisis de tu solicitud.
+    </p>
+
+    <p>
+      Nuestro objetivo es que tengas mayor claridad antes de tomar decisiones
+      sobre tu marca, con un proceso ágil, transparente y acompañado de
+      principio a fin.
+    </p>
+
+    <p>
+      Si tienes alguna duda mientras avanzamos, puedes responder directamente
+      a este correo y con gusto te ayudamos.
+    </p>
+
+    <p>
+      Saludos,<br />
+      <strong>Equipo Revera</strong>
+    </p>
   `;
 
   return enviarCorreo({
     to: correoUsuario,
-    subject: `Confirmación de solicitud de Registro de Marca – ${nombreMarca}`,
+    subject: "Recibimos tu solicitud de Radiografía de Marca",
+    html,
+  });
+}
+
+/* =======================================================
+   5. REGISTRO ESTRATÉGICO DE MARCA - CORREO ABOGADOS
+======================================================= */
+async function enviarSolicitudRegistroMarca({
+  destinatarios,
+  payload,
+  files = [],
+}) {
+  const attachments = files.map((file) => ({
+    filename: file.originalname,
+    path: file.path,
+    contentType: file.mimetype,
+  }));
+
+  const html = `
+    <p><strong>ATENCIÓN! Métase en la vara!</strong></p>
+
+    <p>
+      Tenemos una solicitud de Registro Estratégico de Marca y tenemos que
+      entrarle ya mismo.
+    </p>
+
+    <p>
+      <strong>Seguir Protocolo Atención Registro Estratégico de Marca.</strong>
+    </p>
+
+    <p>Muchas gracias.</p>
+  `;
+
+  return enviarCorreo({
+    to: Array.isArray(destinatarios)
+      ? destinatarios.join(",")
+      : destinatarios,
+    subject: "NOOOOOO! UN NUEVO Registro Estratégico de Marca",
+    html,
+    attachments,
+  });
+}
+
+/* =======================================================
+   6. REGISTRO ESTRATÉGICO DE MARCA - CONFIRMACIÓN CLIENTE
+======================================================= */
+async function enviarConfirmacionRegistroMarcaUsuario({
+  correoUsuario,
+  nombreCompleto,
+}) {
+  const html = `
+    <p>Hola${nombreCompleto ? ` ${nombreCompleto}` : ""},</p>
+
+    <p>
+      ¡Gracias por completar el formulario de Registro Estratégico de Marca!
+    </p>
+
+    <p>
+      Ya recibimos la información inicial sobre tu marca y estaremos revisando
+      los datos para preparar los siguientes pasos del proceso.
+    </p>
+
+    <p>
+      El Registro Estratégico de Marca es nuestro servicio diseñado para
+      acompañarte en la preparación y gestión de la solicitud de registro de tu
+      marca. La idea es que el trámite avance de forma clara, ordenada y
+      estratégica, cuidando aspectos importantes como la clasificación correcta,
+      la descripción de productos o servicios y la presentación adecuada de la
+      solicitud ante el Registro.
+    </p>
+
+    <p>
+      Para activar el servicio e iniciar formalmente la gestión, es necesario
+      completar el pago correspondiente:
+    </p>
+
+    <p>
+      <strong>Registro Estratégico de Marca:</strong> ₡100.000 + IVA<br />
+      <strong>Gastos del proceso:</strong> ₡50.000
+    </p>
+
+    <p>
+      En breve te estaremos enviando las instrucciones de pago. Una vez
+      confirmado, continuaremos con la revisión de la información y la
+      preparación de la solicitud.
+    </p>
+
+    <p>
+      Nuestro objetivo es que tengas un proceso ágil, transparente y acompañado,
+      con claridad sobre cada etapa y sobre lo que va ocurriendo con tu marca.
+    </p>
+
+    <p>
+      Si tienes alguna duda mientras avanzamos, puedes responder directamente
+      a este correo y con gusto te ayudamos.
+    </p>
+
+    <p>
+      Saludos,<br />
+      <strong>Equipo Revera</strong>
+    </p>
+  `;
+
+  return enviarCorreo({
+    to: correoUsuario,
+    subject: "Recibimos tu solicitud de Registro Estratégico de Marca",
     html,
   });
 }
@@ -290,6 +498,7 @@ module.exports = {
   enviarAgendaCitaInterna,
   enviarConfirmacionAgendaUsuario,
   enviarEstudioRegistrabilidad,
+  enviarConfirmacionRadiografiaMarcaUsuario,
   enviarSolicitudRegistroMarca,
   enviarConfirmacionRegistroMarcaUsuario,
 };

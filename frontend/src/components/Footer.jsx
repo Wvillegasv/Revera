@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-import { Instagram, Facebook, Linkedin, Twitter } from "lucide-react";
+/*import { Instagram, Facebook, Linkedin, Twitter } from "lucide-react"; */
+import { Instagram, Facebook } from "lucide-react";
 import "../styles/footer.css";
 
 function Footer() {
@@ -39,26 +40,7 @@ function Footer() {
         >
           <Facebook size={16} strokeWidth={2} />
         </a>
-
-        <a
-          href="https://www.linkedin.com/"
-          className="footer-social-link"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="LinkedIn"
-        >
-          <Linkedin size={16} strokeWidth={2} />
-        </a>
-
-        <a
-          href="https://x.com/"
-          className="footer-social-link"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="X"
-        >
-          <Twitter size={16} strokeWidth={2} />
-        </a>
+          
       </div>
     </footer>
   );

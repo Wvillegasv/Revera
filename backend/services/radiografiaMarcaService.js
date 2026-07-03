@@ -1,850 +1,425 @@
-const nodemailer = require("nodemailer");
-const pool = require("../config/db");
+const path = require("path");
+const pool = require("../config/db").promise();
 
 const DB_USER = process.env.DB_USER || "WEBUSER";
 
-/* =========================================================
-   HELPERS GENERALES
-========================================================= */
-
-function normalizarTexto(valor) {
-  return valor ? String(valor).trim() : "";
+function crearError(message, statusCode = 400) {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
 }
 
-function escaparHtml(valor) {
-  return String(valor || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function generarTelefonoContacto(codigoPais, numero) {
-  const codigo = normalizarTexto(codigoPais);
-  const tel = normalizarTexto(numero);
-
-  if (!codigo || !tel) {
+function sanitizarTexto(valor) {
+  if (valor === undefined || valor === null) {
     return "";
   }
 
-  return `${codigo}${tel}`;
+  return String(valor).trim().replace(/\s+/g, " ");
 }
 
-function normalizarPayload(data = {}) {
-  const telefonoCodigoPais = normalizarTexto(
-    data.telefonoCodigoPais || data.codigoPaisTelefono
-  );
-
-  const telefonoNumero = normalizarTexto(
-    data.telefonoNumero || data.numeroTelefono
-  );
-
-  const telefonoContacto =
-    generarTelefonoContacto(telefonoCodigoPais, telefonoNumero) ||
-    normalizarTexto(data.telefonoContacto || data.telefono);
-
-  return {
-    nombreCompleto: normalizarTexto(
-      data.nombreCompletoContacto || data.nombreCompleto || data.nombre
-    ),
-
-    correoContacto: normalizarTexto(data.correoContacto || data.email),
-
-    telefonoCodigoPais,
-    telefonoNumero,
-    telefonoContacto,
-
-    nombreMarca: normalizarTexto(data.nombreMarca),
-    estadoUso: normalizarTexto(data.estadoUso),
-    tipoProductoServicio: normalizarTexto(data.tipoProductoServicio),
-    fraseSimple: normalizarTexto(data.fraseSimple),
-
-    alcanceUso: normalizarTexto(data.alcanceUso),
-    alcanceUsoOtro: normalizarTexto(data.alcanceUsoOtro),
-
-    existenMarcasSimilares: normalizarTexto(
-      data.existenMarcasSimilares || data.marcasSimilares
-    ),
-
-    marcasSimilaresDetalle: normalizarTexto(
-      data.marcasSimilaresDetalle || data.cualesMarcasSimilares
-    ),
-
-    diferenciador: normalizarTexto(data.diferenciador),
-    tipoMarcaVisual: normalizarTexto(data.tipoMarcaVisual),
-    haVendido: normalizarTexto(data.haVendido),
-
-    desdeCuandoUso: normalizarTexto(data.desdeCuandoUso || data.desdeCuando),
-
-    preguntaClave: normalizarTexto(data.preguntaClave),
-
-    resumen: data,
-  };
-}
-
-function separarNombreCompleto(nombreCompleto = "") {
-  const partes = normalizarTexto(nombreCompleto).split(/\s+/).filter(Boolean);
-
-  return {
-    nombre: partes[0] || "N/A",
-    apellido1: partes[1] || "N/A",
-    apellido2: partes.slice(2).join(" ") || "",
-  };
-}
-
-function generarIdentificacionTecnica() {
-  const ahora = new Date();
-
-  const yyyy = ahora.getFullYear();
-  const mm = String(ahora.getMonth() + 1).padStart(2, "0");
-  const dd = String(ahora.getDate()).padStart(2, "0");
-  const hh = String(ahora.getHours()).padStart(2, "0");
-  const mi = String(ahora.getMinutes()).padStart(2, "0");
-  const ss = String(ahora.getSeconds()).padStart(2, "0");
-  const random = Math.round(Math.random() * 9999);
-
-  return `RM-${yyyy}${mm}${dd}${hh}${mi}${ss}${random}`;
-}
-
-function validarEmail(correo) {
+function validarCorreo(correo) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo);
 }
 
-async function obtenerSiguienteId(connection, tableName, idColumn) {
-  const sql = `
-    SELECT IFNULL(MAX(${idColumn}), 0) + 1 AS siguiente_id
-    FROM ${tableName}
-  `;
+function validarTelefono(telefono) {
+  return /^[0-9+\-\s()]{8,20}$/.test(telefono);
+}
 
-  const [rows] = await connection.execute(sql);
+function dividirNombreCompleto(nombreCompleto) {
+  const limpio = sanitizarTexto(nombreCompleto);
+  const partes = limpio.split(" ").filter(Boolean);
+
+  if (partes.length === 0) {
+    return {
+      nombre: "",
+      apellido1: "",
+      apellido2: "",
+    };
+  }
+
+  if (partes.length === 1) {
+    return {
+      nombre: partes[0],
+      apellido1: "N/A",
+      apellido2: "",
+    };
+  }
+
+  if (partes.length === 2) {
+    return {
+      nombre: partes[0],
+      apellido1: partes[1],
+      apellido2: "",
+    };
+  }
+
+  return {
+    nombre: partes.slice(0, -2).join(" "),
+    apellido1: partes[partes.length - 2],
+    apellido2: partes[partes.length - 1],
+  };
+}
+
+function normalizarArchivo(file) {
+  if (!file) {
+    return null;
+  }
+
+  return Array.isArray(file) ? file[0] || null : file;
+}
+
+function construirDescripcionRadiografia(data) {
+  const lineas = [
+    ["Producto o servicio", data.tipoProductoServicio],
+    ["Descripción simple", data.fraseSimple],
+    ["Alcance de uso", data.alcanceUso],
+    ["Otro alcance", data.alcanceUsoOtro],
+    ["Marcas similares", data.existenMarcasSimilares],
+    ["Detalle de marcas similares", data.marcasSimilaresDetalle],
+    ["Diferenciador", data.diferenciador],
+    ["Tipo de marca visual", data.tipoMarcaVisual],
+    ["Uso o ventas previas", data.haVendido],
+    ["Desde cuándo la usa", data.desdeCuandoUso],
+    ["Consulta específica", data.preguntaClave],
+  ]
+    .map(([etiqueta, valor]) => {
+      const valorLimpio = sanitizarTexto(valor);
+      return valorLimpio ? `${etiqueta}: ${valorLimpio}` : "";
+    })
+    .filter(Boolean);
+
+  return lineas.join("\n");
+}
+
+async function buscarPersonaPorCorreo(connection, correo) {
+  const [rows] = await connection.execute(
+    `
+      SELECT p.pe_persona_id
+      FROM re_persona p
+      INNER JOIN re_correo_electronico c
+        ON p.pe_persona_id = c.co_persona_id
+      WHERE c.co_correo = ?
+        AND c.co_estado = 'A'
+      LIMIT 1
+    `,
+    [correo]
+  );
+
+  return rows.length ? rows[0].pe_persona_id : null;
+}
+
+async function obtenerSiguienteId(connection, tabla, campo) {
+  const [rows] = await connection.query(
+    `SELECT IFNULL(MAX(\`${campo}\`), 0) + 1 AS siguiente_id FROM \`${tabla}\``
+  );
 
   return rows[0].siguiente_id;
 }
 
-/* =========================================================
-   TELÉFONO
-========================================================= */
-
-function obtenerTelefonoNormalizado(data) {
-  const codigoPais = normalizarTexto(data.telefonoCodigoPais);
-  const numero = normalizarTexto(data.telefonoNumero);
-  const telefonoContacto = normalizarTexto(data.telefonoContacto);
-
-  if (!codigoPais && !numero && !telefonoContacto) {
-    return {
-      codigoPais: null,
-      numero: null,
-      telefonoCompleto: null,
-    };
-  }
-
-  if (codigoPais || numero) {
-    if (!codigoPais || !numero) {
-      throw new Error("Debe indicar código de país y número de teléfono.");
-    }
-
-    if (!/^\d+$/.test(codigoPais)) {
-      throw new Error(
-        "El código de país debe contener solo números. Ejemplo: 506"
-      );
-    }
-
-    if (!/^\d+$/.test(numero)) {
-      throw new Error(
-        "El número de teléfono debe contener solo números. Ejemplo: 88887777"
-      );
-    }
-
-    if (codigoPais === "506" && numero.length !== 8) {
-      throw new Error(
-        "Para Costa Rica, el número debe tener 8 dígitos. Ejemplo: 88887777"
-      );
-    }
-
-    return {
-      codigoPais,
-      numero,
-      telefonoCompleto: `${codigoPais}${numero}`,
-    };
-  }
-
-  if (!/^\d+$/.test(telefonoContacto)) {
-    throw new Error(
-      "El teléfono debe contener solo números. Ejemplo: código país 506 y número 88887777"
-    );
-  }
-
-  if (telefonoContacto.startsWith("506") && telefonoContacto.length === 11) {
-    return {
-      codigoPais: "506",
-      numero: telefonoContacto.substring(3),
-      telefonoCompleto: telefonoContacto,
-    };
-  }
-
-  throw new Error(
-    "El teléfono debe enviarse separado como código país y número. Ejemplo: código país 506 y número 88887777"
-  );
-}
-
-function validarPayloadRadiografia(data) {
-  const camposObligatorios = [
-    ["nombreMarca", "Nombre de la marca"],
-    ["estadoUso", "Estado de uso"],
-    ["tipoProductoServicio", "Producto o servicio"],
-    ["fraseSimple", "Frase simple"],
-    ["alcanceUso", "Alcance de uso"],
-    ["existenMarcasSimilares", "Marcas similares"],
-    ["diferenciador", "Diferenciador"],
-    ["tipoMarcaVisual", "Tipo de marca visual"],
-    ["haVendido", "Uso comercial"],
-    ["preguntaClave", "Pregunta clave"],
-    ["nombreCompleto", "Nombre completo"],
-    ["correoContacto", "Correo de contacto"],
-  ];
-
-  for (const [campo, etiqueta] of camposObligatorios) {
-    if (!data[campo]) {
-      throw new Error(`El campo ${etiqueta} es obligatorio.`);
-    }
-  }
-
-  if (!validarEmail(data.correoContacto)) {
-    throw new Error("El correo electrónico no tiene un formato válido.");
-  }
-
-  obtenerTelefonoNormalizado(data);
-}
-
-/* =========================================================
-   PERSONA / CLIENTE
-========================================================= */
-
-async function obtenerPersonaPorCorreo(connection, correo) {
-  const sql = `
-    SELECT
-      p.pe_persona_id,
-      ce.co_correo_id
-    FROM re_correo_electronico ce
-    INNER JOIN re_persona p
-      ON ce.co_persona_id = p.pe_persona_id
-    WHERE LOWER(ce.co_correo) = LOWER(?)
-      AND ce.co_estado = 'A'
-      AND p.pe_estado = 'A'
-    LIMIT 1
-  `;
-
-  const [rows] = await connection.execute(sql, [correo]);
-
-  return rows[0] || null;
-}
-
-async function obtenerSiguientePersonaId(connection) {
-  return obtenerSiguienteId(connection, "re_persona", "pe_persona_id");
-}
-
-async function insertarPersona(connection, data) {
-  const personaId = await obtenerSiguientePersonaId(connection);
-
-  const { nombre, apellido1, apellido2 } = separarNombreCompleto(
-    data.nombreCompleto
+async function insertarPersona(connection, { nombre, apellido1, apellido2 }) {
+  const personaId = await obtenerSiguienteId(
+    connection,
+    "re_persona",
+    "pe_persona_id"
   );
 
-  const sql = `
-    INSERT INTO re_persona (
-      pe_persona_id,
-      pe_identificacion,
-      pe_tipo_persona,
-      pe_nombre,
-      pe_apellido1,
-      pe_apellido2,
-      pe_clasificacion_persona,
-      pe_estado,
-      pe_usuario_crea
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  const valores = [
-    personaId,
-    generarIdentificacionTecnica(),
-    "F",
-    nombre,
-    apellido1,
-    apellido2,
-    "C",
-    "A",
-    DB_USER,
-  ];
-
-  await connection.execute(sql, valores);
+  await connection.execute(
+    `
+      INSERT INTO re_persona (
+        pe_persona_id,
+        pe_identificacion,
+        pe_tipo_persona,
+        pe_nombre,
+        pe_apellido1,
+        pe_apellido2,
+        pe_clasificacion_persona,
+        pe_estado,
+        pe_usuario_crea
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      personaId,
+      "N/A",
+      "F",
+      nombre,
+      apellido1,
+      apellido2,
+      "C",
+      "A",
+      DB_USER,
+    ]
+  );
 
   return personaId;
 }
 
-async function obtenerOCrearPersona(connection, data) {
-  const personaExistente = await obtenerPersonaPorCorreo(
-    connection,
-    data.correoContacto
+async function existeCorreoActivo(connection, personaId, correo) {
+  const [rows] = await connection.execute(
+    `
+      SELECT co_correo_id
+      FROM re_correo_electronico
+      WHERE co_persona_id = ?
+        AND co_correo = ?
+        AND co_estado = 'A'
+      LIMIT 1
+    `,
+    [personaId, correo]
   );
 
-  if (personaExistente) {
-    return {
-      personaId: personaExistente.pe_persona_id,
-      correoId: personaExistente.co_correo_id,
-    };
-  }
-
-  const personaId = await insertarPersona(connection, data);
-
-  return {
-    personaId,
-    correoId: null,
-  };
+  return rows.length > 0;
 }
 
-/* =========================================================
-   CORREO
-========================================================= */
-
-async function obtenerCorreo(connection, personaId, correo) {
-  const sql = `
-    SELECT co_correo_id
-    FROM re_correo_electronico
-    WHERE co_persona_id = ?
-      AND LOWER(co_correo) = LOWER(?)
-      AND co_estado = 'A'
-    LIMIT 1
-  `;
-
-  const [rows] = await connection.execute(sql, [personaId, correo]);
-
-  return rows[0] || null;
-}
-
-async function insertarCorreo(connection, personaId, correo) {
+async function insertarCorreo(connection, { personaId, correo }) {
   const correoId = await obtenerSiguienteId(
     connection,
     "re_correo_electronico",
     "co_correo_id"
   );
 
-  const sql = `
-    INSERT INTO re_correo_electronico (
-      co_correo_id,
-      co_persona_id,
-      co_correo,
-      co_principal,
-      co_tipo_correo,
-      co_estado,
-      co_usuario_crea
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  await connection.execute(sql, [
-    correoId,
-    personaId,
-    correo,
-    "S",
-    "P",
-    "A",
-    DB_USER,
-  ]);
-
-  return correoId;
+  await connection.execute(
+    `
+      INSERT INTO re_correo_electronico (
+        co_correo_id,
+        co_persona_id,
+        co_correo,
+        co_principal,
+        co_tipo_correo,
+        co_estado,
+        co_usuario_crea
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `,
+    [correoId, personaId, correo, "S", "P", "A", DB_USER]
+  );
 }
 
-async function obtenerOCrearCorreo(connection, personaId, correo) {
-  const correoExistente = await obtenerCorreo(connection, personaId, correo);
-
-  if (correoExistente) {
-    return correoExistente.co_correo_id;
-  }
-
-  return insertarCorreo(connection, personaId, correo);
-}
-
-/* =========================================================
-   TELÉFONO DB
-========================================================= */
-
-async function obtenerTelefono(connection, personaId, telefonoData) {
-  if (!telefonoData.numero) {
-    return null;
-  }
-
-  const sql = `
-    SELECT te_telefono_id
-    FROM re_telefono
-    WHERE te_persona_id = ?
-      AND te_codigo_pais = ?
-      AND te_telefono = ?
-      AND te_estado = 'A'
-    LIMIT 1
-  `;
-
-  const [rows] = await connection.execute(sql, [
-    personaId,
-    telefonoData.codigoPais,
-    telefonoData.numero,
-  ]);
-
-  return rows[0] || null;
-}
-
-async function obtenerSiguienteTelefonoId(connection) {
-  return obtenerSiguienteId(connection, "re_telefono", "te_telefono_id");
-}
-
-async function insertarTelefono(connection, personaId, telefonoData) {
-  if (!telefonoData.numero) {
-    return null;
-  }
-
-  const telefonoId = await obtenerSiguienteTelefonoId(connection);
-
-  const sql = `
-    INSERT INTO re_telefono (
-      te_telefono_id,
-      te_persona_id,
-      te_codigo_pais,
-      te_telefono,
-      te_tipo,
-      te_principal,
-      te_estado,
-      te_usuario_crea
-    )
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-
-  await connection.execute(sql, [
-    telefonoId,
-    personaId,
-    telefonoData.codigoPais,
-    telefonoData.numero,
-    "M",
-    "S",
-    "A",
-    DB_USER,
-  ]);
-
-  return telefonoId;
-}
-
-async function obtenerOCrearTelefono(connection, personaId, data) {
-  const telefonoData = obtenerTelefonoNormalizado(data);
-
-  if (!telefonoData.numero) {
-    return null;
-  }
-
-  const telefonoExistente = await obtenerTelefono(
-    connection,
-    personaId,
-    telefonoData
+async function existeTelefonoActivo(connection, personaId, telefono) {
+  const [rows] = await connection.execute(
+    `
+      SELECT te_telefono_id
+      FROM re_telefono
+      WHERE te_persona_id = ?
+        AND te_telefono = ?
+        AND te_estado = 'A'
+      LIMIT 1
+    `,
+    [personaId, telefono]
   );
 
-  if (telefonoExistente) {
-    return telefonoExistente.te_telefono_id;
-  }
-
-  return insertarTelefono(connection, personaId, telefonoData);
+  return rows.length > 0;
 }
 
-/* =========================================================
-   RADIOGRAFÍA
-========================================================= */
+async function insertarTelefono(connection, { personaId, codigoPais, telefono }) {
+  const telefonoId = await obtenerSiguienteId(
+    connection,
+    "re_telefono",
+    "te_telefono_id"
+  );
 
-async function insertarRadiografiaMarca(connection, data) {
-  const telefonoData = obtenerTelefonoNormalizado(data);
+  await connection.execute(
+    `
+      INSERT INTO re_telefono (
+        te_telefono_id,
+        te_persona_id,
+        te_codigo_pais,
+        te_telefono,
+        te_principal,
+        te_tipo,
+        te_estado,
+        te_usuario_crea
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+    [telefonoId, personaId, codigoPais, telefono, "S", "M", "A", DB_USER]
+  );
+}
 
-  const sql = `
-    INSERT INTO re_radiografia_marca (
-      rm_persona_id,
-      rm_correo_id,
-      rm_telefono_id,
-
-      rm_nombre_completo,
-      rm_correo_contacto,
-      rm_telefono_contacto,
-
-      rm_nombre_marca,
-      rm_estado_uso,
-      rm_tipo_producto_servicio,
-      rm_frase_simple,
-
-      rm_alcance_uso,
-      rm_alcance_uso_otro,
-
-      rm_existen_marcas_similares,
-      rm_marcas_similares_detalle,
-      rm_diferenciador,
-
-      rm_tipo_marca_visual,
-      rm_adjunta_logo,
-
-      rm_ha_vendido,
-      rm_desde_cuando_uso,
-
-      rm_pregunta_clave,
-      rm_resumen_json,
-
-      rm_estado,
-      rm_estado_solicitud,
-      rm_usuario_crea
-    )
-    VALUES (
-      ?, ?, ?,
-      ?, ?, ?,
-      ?, ?, ?, ?,
-      ?, ?,
-      ?, ?, ?,
-      ?, ?,
-      ?, ?,
-      ?, ?,
-      'A', 'PENDIENTE', ?
-    )
-  `;
-
-  const valores = [
-    data.personaId,
-    data.correoId,
-    data.telefonoId,
-
-    data.nombreCompleto,
-    data.correoContacto,
-    telefonoData.telefonoCompleto || null,
-
-    data.nombreMarca,
-    data.estadoUso,
-    data.tipoProductoServicio,
-    data.fraseSimple,
-
-    data.alcanceUso,
-    data.alcanceUsoOtro || null,
-
-    data.existenMarcasSimilares,
-    data.marcasSimilaresDetalle || null,
-    data.diferenciador,
-
-    data.tipoMarcaVisual,
-    data.adjuntaLogo ? "S" : "N",
-
-    data.haVendido,
-    data.desdeCuandoUso || null,
-
-    data.preguntaClave,
-    JSON.stringify(data.resumen || {}),
-
-    DB_USER,
-  ];
-
-  const [result] = await connection.execute(sql, valores);
+async function insertarRadiografia(connection, data) {
+  const [result] = await connection.execute(
+    `
+      INSERT INTO re_estudio_registrabilidad (
+        er_persona_id,
+        er_nombre_marca,
+        er_descripcion_producto_servicio,
+        er_sector_clase,
+        er_tiene_imagenes,
+        er_estado,
+        er_usuario_crea
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      data.personaId,
+      data.nombreMarca,
+      data.descripcionProductoServicio,
+      data.sectorClase || null,
+      data.tieneImagenes,
+      "P",
+      DB_USER,
+    ]
+  );
 
   return result.insertId;
 }
 
-async function insertarAdjuntoRadiografia(connection, radiografiaId, file) {
-  if (!file) {
-    return null;
-  }
+async function insertarImagen(connection, { estudioId, file }) {
+  const rutaRelativa = path
+    .join("uploads", "estudios", file.filename)
+    .replace(/\\/g, "/");
 
-  const rutaArchivo = `/uploads/radiografia-marca/${file.filename}`;
-
-  const sql = `
-    INSERT INTO re_radiografia_marca_adjunto (
-      ra_radiografia_id,
-      ra_nombre_original,
-      ra_nombre_archivo,
-      ra_ruta_archivo,
-      ra_mime_type,
-      ra_peso_bytes,
-      ra_estado,
-      ra_usuario_crea
-    )
-    VALUES (?, ?, ?, ?, ?, ?, 'A', ?)
-  `;
-
-  const [result] = await connection.execute(sql, [
-    radiografiaId,
-    file.originalname,
-    file.filename,
-    rutaArchivo,
-    file.mimetype,
-    file.size,
-    DB_USER,
-  ]);
-
-  return {
-    adjuntoId: result.insertId,
-    rutaArchivo,
-  };
+  await connection.execute(
+    `
+      INSERT INTO re_estudio_registrabilidad_imagen (
+        ei_estudio_id,
+        ei_nombre_original,
+        ei_nombre_archivo,
+        ei_ruta_archivo,
+        ei_mime_type,
+        ei_peso_bytes,
+        ei_estado,
+        ei_usuario_crea
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      estudioId,
+      file.originalname,
+      file.filename,
+      rutaRelativa,
+      file.mimetype,
+      file.size,
+      "A",
+      DB_USER,
+    ]
+  );
 }
 
-/* =========================================================
-   CORREOS
-========================================================= */
+function validarPayload(data) {
+  const nombreCompleto = sanitizarTexto(data.nombreCompletoContacto);
+  const correo = sanitizarTexto(data.correoContacto).toLowerCase();
+  const nombreMarca = sanitizarTexto(data.nombreMarca);
+  const tipoProductoServicio = sanitizarTexto(data.tipoProductoServicio);
 
-async function obtenerDestinatariosInternos(connection) {
-  const sql = `
-    SELECT DISTINCT ce.co_correo
-    FROM re_usuario u
-    INNER JOIN re_correo_electronico ce
-      ON u.us_persona_id = ce.co_persona_id
-    WHERE u.us_estado = 'A'
-      AND u.us_atiende_clientes = 'S'
-      AND ce.co_principal = 'S'
-      AND ce.co_estado = 'A'
-      AND ce.co_correo IS NOT NULL
-      AND ce.co_correo <> ''
-  `;
-
-  const [rows] = await connection.execute(sql);
-
-  const correos = rows.map((row) => row.co_correo);
-
-  if (correos.length > 0) {
-    return correos;
+  if (nombreCompleto.length < 3) {
+    throw crearError("El nombre completo es obligatorio.");
   }
 
-  if (process.env.REVERA_ESTUDIO_DESTINATARIOS) {
-    return process.env.REVERA_ESTUDIO_DESTINATARIOS
-      .split(",")
-      .map((correo) => correo.trim())
-      .filter(Boolean);
+  if (!validarCorreo(correo)) {
+    throw crearError("El correo electrónico no es válido.");
   }
 
-  if (process.env.SMTP_TO) {
-    return [process.env.SMTP_TO];
+  if (nombreMarca.length < 2) {
+    throw crearError("El nombre de la marca es obligatorio.");
   }
 
-  return [];
-}
-
-function crearTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT || 587),
-    secure: Number(process.env.SMTP_PORT) === 465,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-}
-
-function construirResumenHtml(data) {
-  const telefonoData = obtenerTelefonoNormalizado(data);
-
-  return `
-    <div style="font-family: Arial, sans-serif; color: #120742; line-height: 1.55;">
-      <h2>Solicitud de Radiografía de Marca</h2>
-
-      <h3>Datos de contacto</h3>
-      <p><strong>Nombre completo:</strong> ${escaparHtml(data.nombreCompleto)}</p>
-      <p><strong>Correo:</strong> ${escaparHtml(data.correoContacto)}</p>
-      <p><strong>Teléfono:</strong> ${
-        telefonoData.telefonoCompleto
-          ? `+${escaparHtml(telefonoData.codigoPais)} ${escaparHtml(
-              telefonoData.numero
-            )}`
-          : "No indicado"
-      }</p>
-
-      <h3>Datos de la marca</h3>
-      <p><strong>Nombre de la marca:</strong> ${escaparHtml(data.nombreMarca)}</p>
-      <p><strong>Estado de uso:</strong> ${escaparHtml(data.estadoUso)}</p>
-      <p><strong>Producto o servicio:</strong> ${escaparHtml(
-        data.tipoProductoServicio
-      )}</p>
-      <p><strong>Frase simple:</strong> ${escaparHtml(data.fraseSimple)}</p>
-
-      <h3>Alcance</h3>
-      <p><strong>Alcance de uso:</strong> ${escaparHtml(data.alcanceUso)}</p>
-      ${
-        data.alcanceUsoOtro
-          ? `<p><strong>Detalle de alcance:</strong> ${escaparHtml(
-              data.alcanceUsoOtro
-            )}</p>`
-          : ""
-      }
-
-      <h3>Marcas similares</h3>
-      <p><strong>¿Existen marcas similares?:</strong> ${escaparHtml(
-        data.existenMarcasSimilares
-      )}</p>
-      ${
-        data.marcasSimilaresDetalle
-          ? `<p><strong>Detalle marcas similares:</strong> ${escaparHtml(
-              data.marcasSimilaresDetalle
-            )}</p>`
-          : ""
-      }
-      <p><strong>Diferenciador:</strong> ${escaparHtml(data.diferenciador)}</p>
-
-      <h3>Logo / diseño</h3>
-      <p><strong>Tipo de marca visual:</strong> ${escaparHtml(
-        data.tipoMarcaVisual
-      )}</p>
-      <p><strong>Adjuntó logo/diseño:</strong> ${
-        data.adjuntaLogo ? "Sí" : "No"
-      }</p>
-
-      <h3>Uso comercial</h3>
-      <p><strong>¿Ha vendido?:</strong> ${escaparHtml(data.haVendido)}</p>
-      ${
-        data.desdeCuandoUso
-          ? `<p><strong>Desde cuándo:</strong> ${escaparHtml(
-              data.desdeCuandoUso
-            )}</p>`
-          : ""
-      }
-
-      <h3>Pregunta clave</h3>
-      <p>${escaparHtml(data.preguntaClave)}</p>
-    </div>
-  `;
-}
-
-async function actualizarEstadoCorreo(
-  connection,
-  radiografiaId,
-  enviado,
-  error = null
-) {
-  const sql = `
-    UPDATE re_radiografia_marca
-    SET
-      rm_correo_enviado = ?,
-      rm_fecha_envio_correo = CASE WHEN ? = 'S' THEN NOW() ELSE rm_fecha_envio_correo END,
-      rm_error_correo = ?,
-      rm_usuario_modifica = ?,
-      rm_fecha_modifica = NOW()
-    WHERE rm_radiografia_id = ?
-  `;
-
-  await connection.execute(sql, [
-    enviado,
-    enviado,
-    error,
-    DB_USER,
-    radiografiaId,
-  ]);
-}
-
-async function enviarCorreosRadiografia(connection, radiografiaId, data, file) {
-  const transporter = crearTransporter();
-
-  const destinatariosInternos = await obtenerDestinatariosInternos(connection);
-
-  const asuntoInterno = `Solicitud de Radiografía de Marca - ${data.nombreMarca}`;
-  const asuntoCliente = "Recibimos tu solicitud de Radiografía de Marca";
-
-  const htmlResumen = construirResumenHtml(data);
-
-  const attachments = [];
-
-  if (file) {
-    attachments.push({
-      filename: file.originalname,
-      path: file.path,
-    });
+  if (tipoProductoServicio.length < 10) {
+    throw crearError(
+      "La descripción del producto o servicio debe tener al menos 10 caracteres."
+    );
   }
+}
+
+async function registrarRadiografiaMarca(data = {}, file = null) {
+  validarPayload(data);
+
+  const nombreCompleto = sanitizarTexto(data.nombreCompletoContacto);
+  const correo = sanitizarTexto(data.correoContacto).toLowerCase();
+  const codigoPais = sanitizarTexto(
+    data.telefonoCodigoPais || data.codigoPais || "506"
+  );
+  const telefono = sanitizarTexto(
+    data.telefonoNumero || data.telefonoContacto || data.telefono
+  );
+  const nombreMarca = sanitizarTexto(data.nombreMarca);
+  const descripcionProductoServicio = construirDescripcionRadiografia(data);
+  const sectorClase = sanitizarTexto(data.sectorClase);
+  const archivo = normalizarArchivo(file);
+  const tieneImagenes = archivo ? "S" : "N";
+
+  if (telefono && !validarTelefono(telefono)) {
+    throw crearError("El número de teléfono no es válido.");
+  }
+
+  const { nombre, apellido1, apellido2 } = dividirNombreCompleto(nombreCompleto);
+  let connection;
 
   try {
-    if (destinatariosInternos.length > 0) {
-      await transporter.sendMail({
-        from: process.env.SMTP_FROM,
-        to: destinatariosInternos.join(","),
-        subject: asuntoInterno,
-        html: htmlResumen,
-        attachments,
+    connection = await pool.getConnection();
+    await connection.beginTransaction();
+
+    let personaId = await buscarPersonaPorCorreo(connection, correo);
+
+    if (!personaId) {
+      personaId = await insertarPersona(connection, {
+        nombre,
+        apellido1,
+        apellido2,
       });
     }
 
-    await transporter.sendMail({
-      from: process.env.SMTP_FROM,
-      to: data.correoContacto,
-      subject: asuntoCliente,
-      html: `
-        <div style="font-family: Arial, sans-serif; color: #120742; line-height: 1.55;">
-          <h2>Radiografía de Marca</h2>
-          <p>Su solicitud de radiografía de marca ha sido enviada correctamente.</p>
-          <p>Nos pondremos en contacto con usted.</p>
-        </div>
-      `,
+    const correoExiste = await existeCorreoActivo(connection, personaId, correo);
+    if (!correoExiste) {
+      await insertarCorreo(connection, { personaId, correo });
+    }
+
+    if (telefono) {
+      const telefonoExiste = await existeTelefonoActivo(
+        connection,
+        personaId,
+        telefono
+      );
+
+      if (!telefonoExiste) {
+        await insertarTelefono(connection, {
+          personaId,
+          codigoPais,
+          telefono,
+        });
+      }
+    }
+
+    const estudioId = await insertarRadiografia(connection, {
+      personaId,
+      nombreMarca,
+      descripcionProductoServicio,
+      sectorClase,
+      tieneImagenes,
     });
 
-    await actualizarEstadoCorreo(connection, radiografiaId, "S", null);
-  } catch (error) {
-    await actualizarEstadoCorreo(connection, radiografiaId, "N", error.message);
-    throw error;
-  }
-}
-
-/* =========================================================
-   FUNCIÓN PRINCIPAL
-========================================================= */
-
-async function registrarRadiografiaMarca(payload, file) {
-  const data = normalizarPayload(payload);
-
-  validarPayloadRadiografia(data);
-
-  const connection = await pool.promise().getConnection();
-
-  try {
-    await connection.beginTransaction();
-
-    const personaInfo = await obtenerOCrearPersona(connection, data);
-
-    const correoId = await obtenerOCrearCorreo(
-      connection,
-      personaInfo.personaId,
-      data.correoContacto
-    );
-
-    const telefonoId = await obtenerOCrearTelefono(
-      connection,
-      personaInfo.personaId,
-      data
-    );
-
-    const radiografiaId = await insertarRadiografiaMarca(connection, {
-      ...data,
-      personaId: personaInfo.personaId,
-      correoId,
-      telefonoId,
-      adjuntaLogo: Boolean(file),
-    });
-
-    await insertarAdjuntoRadiografia(connection, radiografiaId, file);
-
-    await enviarCorreosRadiografia(
-      connection,
-      radiografiaId,
-      {
-        ...data,
-        adjuntaLogo: Boolean(file),
-      },
-      file
-    );
+    if (archivo) {
+      await insertarImagen(connection, {
+        estudioId,
+        file: archivo,
+      });
+    }
 
     await connection.commit();
 
     return {
-      radiografiaId,
-      personaId: personaInfo.personaId,
-      correoId,
-      telefonoId,
+      estudioId,
+      personaId,
+      nombreCompleto,
+      correo,
+      telefono,
+      codigoPais,
+      nombreMarca,
+      descripcionProductoServicio,
+      sectorClase,
+      tieneImagenes,
+      totalImagenes: archivo ? 1 : 0,
+      files: archivo ? [archivo] : [],
     };
   } catch (error) {
-    await connection.rollback();
+    if (connection) {
+      await connection.rollback();
+    }
+
     throw error;
   } finally {
-    connection.release();
+    if (connection) {
+      connection.release();
+    }
   }
 }
 

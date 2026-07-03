@@ -1,429 +1,452 @@
-export function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+function limpiarTexto(valor) {
+  return String(valor ?? "").trim();
 }
 
-export function hasMinLength(value, min) {
-  return String(value || "").trim().length >= min;
+function tieneValor(valor) {
+  if (Array.isArray(valor)) {
+    return valor.length > 0;
+  }
+
+  return limpiarTexto(valor) !== "";
 }
 
 export function validateRequiredOption(value) {
-  if (!value) return "Selecciona una opción.";
-  return "";
+  return tieneValor(value) ? "" : "Selecciona una opción para continuar.";
 }
 
 export function validateCorreo(value) {
-  if (!hasMinLength(value, 5)) return "El correo electrónico es obligatorio.";
-  if (!isValidEmail(value)) return "Ingresa un correo electrónico válido.";
+  const correo = limpiarTexto(value).toLowerCase();
+  const patron = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!correo) {
+    return "Ingresa tu correo electrónico.";
+  }
+
+  if (!patron.test(correo)) {
+    return "El correo electrónico no parece válido. Revísalo e intenta de nuevo.";
+  }
+
   return "";
 }
 
 export function validateTelefono(value) {
-  if (!value) {
-    return "Debe indicar el código de país y el número de teléfono.";
-  }
-
-  if (typeof value === "string") {
-    const limpio = value.trim();
-
-    if (!/^\d+$/.test(limpio)) {
-      return "El teléfono debe contener solo números.";
-    }
-
-    if (limpio.startsWith("506") && limpio.length === 11) {
-      return "";
-    }
-
-    return "Use el formato código país + número. Ejemplo: 50688887777";
-  }
-
-  const codigoPais = String(value.codigoPais || "").trim();
-  const numero = String(value.numero || "").trim();
+  const codigoPais = limpiarTexto(value?.codigoPais).replace(/\D/g, "");
+  const numero = limpiarTexto(value?.numero).replace(/\D/g, "");
 
   if (!codigoPais || !numero) {
-    return "Debe indicar el código de país y el número de teléfono.";
-  }
-
-  if (!/^\d+$/.test(codigoPais)) {
-    return "El código de país debe contener solo números. Ejemplo: 506";
-  }
-
-  if (!/^\d+$/.test(numero)) {
-    return "El número de teléfono debe contener solo números. Ejemplo: 88887777";
-  }
-
-  if (codigoPais.length < 1 || codigoPais.length > 4) {
-    return "El código de país debe tener entre 1 y 4 dígitos.";
+    return "Ingresa el código de país y el número de teléfono.";
   }
 
   if (codigoPais === "506" && numero.length !== 8) {
-    return "Para Costa Rica, el número debe tener 8 dígitos. Ejemplo: 88887777";
+    return "Para Costa Rica, el número de teléfono debe tener 8 dígitos.";
   }
 
   if (numero.length < 6) {
-    return "El número de teléfono parece incompleto.";
+    return "Ingresa un número de teléfono válido.";
   }
 
   return "";
 }
 
-export function validateTexto(value, min, message) {
-  if (!hasMinLength(value, min)) return message;
+export function validateTexto(value, minLength = 1, mensaje = "Completa este campo.") {
+  const texto = limpiarTexto(value);
+
+  if (texto.length < minLength) {
+    return mensaje;
+  }
+
   return "";
 }
 
-export function resolverValorPais(valor, valorOtro) {
-  if (valor === "Otro") return valorOtro || "";
-  return valor || "";
-}
+export function formatearTelefonoVisual({ codigoPais, numero } = {}) {
+  const codigo = limpiarTexto(codigoPais);
+  const telefono = limpiarTexto(numero);
 
-export function formatearTelefonoSeparado(value) {
-  if (!value) return "";
-
-  if (typeof value === "string") {
-    return value;
+  if (!codigo && !telefono) {
+    return "No indicado";
   }
 
-  const codigoPais = String(value.codigoPais || "").trim();
-  const numero = String(value.numero || "").trim();
+  if (!codigo) {
+    return telefono;
+  }
 
-  if (!codigoPais && !numero) return "";
+  if (!telefono) {
+    return `+${codigo}`;
+  }
 
-  return `${codigoPais}${numero}`;
+  return `+${codigo} ${telefono}`;
 }
 
-export function formatearTelefonoVisual(value) {
-  if (!value) return "";
+function formatearValorResumen(valor) {
+  if (Array.isArray(valor)) {
+    return valor.length ? valor.join(", ") : "";
+  }
 
-  if (typeof value === "string") {
-    if (!value.trim()) return "";
+  if (valor instanceof File) {
+    return valor.name;
+  }
 
-    if (value.startsWith("506") && value.length === 11) {
-      return `+506 ${value.substring(3)}`;
+  return limpiarTexto(valor);
+}
+
+function agregarResumen(items, key, etiqueta, valor) {
+  const texto = formatearValorResumen(valor);
+
+  if (!texto) {
+    return;
+  }
+
+  items.push({ key, etiqueta, valor: texto });
+}
+
+function resolverPais(valor, valorOtro) {
+  if (valor === "Otro") {
+    return limpiarTexto(valorOtro) || "Otro";
+  }
+
+  return limpiarTexto(valor);
+}
+
+export function buildResumenItems(formData) {
+  const items = [];
+
+  agregarResumen(items, "correo", "Correo electrónico", formData.correo);
+  agregarResumen(
+    items,
+    "nombreMarca",
+    "Marca o nombre comercial",
+    formData.nombreMarca
+  );
+  agregarResumen(items, "tipoTramite", "Tipo de trámite", formData.tipoTramite);
+
+  if (formData.tipoTramite === "Marca") {
+    agregarResumen(items, "tipoMarca", "Tipo de marca", formData.tipoMarca);
+    agregarResumen(
+      items,
+      "queDeseaRegistrar",
+      "Qué desea registrar",
+      formData.queDeseaRegistrar
+    );
+    agregarResumen(
+      items,
+      "logoArchivo",
+      "Archivo de logo",
+      formData.logoArchivo?.name || ""
+    );
+    agregarResumen(
+      items,
+      "productosServiciosTipo",
+      "Productos o servicios",
+      formData.productosServiciosTipo
+    );
+    agregarResumen(
+      items,
+      "detalleProductosServicios",
+      "Detalle de productos o servicios",
+      formData.detalleProductosServicios
+    );
+    agregarResumen(items, "claseNiza", "Clases de Niza", formData.claseNiza);
+    agregarResumen(
+      items,
+      "paisOrigen",
+      "País de origen",
+      resolverPais(formData.paisOrigen, formData.paisOrigenOtro)
+    );
+    if (formData.paisOrigen === "Otro") {
+      agregarResumen(items, "paisOrigenOtro", "Otro país de origen", formData.paisOrigenOtro);
     }
-
-    return value;
+    agregarResumen(
+      items,
+      "direccionEstablecimiento",
+      "Dirección del establecimiento",
+      formData.direccionEstablecimiento
+    );
+    agregarResumen(
+      items,
+      "informacionAdicional",
+      "Información adicional sobre la marca",
+      formData.informacionAdicional
+    );
+    agregarResumen(
+      items,
+      "registroPrevioOtroPais",
+      "Registro previo en otro país",
+      formData.registroPrevioOtroPais
+    );
   }
 
-  const codigoPais = String(value.codigoPais || "").trim();
-  const numero = String(value.numero || "").trim();
-
-  if (!codigoPais && !numero) return "";
-
-  return `+${codigoPais} ${numero}`;
-}
-
-function agregarLinea(lineas, etiqueta, valor) {
-  const limpio = String(valor ?? "").trim();
-  if (!limpio) return;
-  lineas.push(`${etiqueta}: ${limpio}`);
-}
-
-function agregarItemSeguro(items, etiqueta, valor) {
-  const limpio = String(valor ?? "").trim();
-  if (!limpio) return;
-  items.push({ etiqueta, valor: limpio });
-}
-
-export function buildResumen(data) {
-  const lineas = [];
-
-  agregarLinea(lineas, "Correo", data.correo);
-  agregarLinea(lineas, "Marca o nombre comercial", data.nombreMarca);
-  agregarLinea(lineas, "Tipo de trámite", data.tipoTramite);
-
-  if (data.tipoTramite === "Marca") {
-    agregarLinea(lineas, "Tipo de marca", data.tipoMarca);
-    agregarLinea(lineas, "Qué desea registrar", data.queDeseaRegistrar);
-    agregarLinea(lineas, "Productos/servicios", data.productosServiciosTipo);
-    agregarLinea(lineas, "Detalle", data.detalleProductosServicios);
-    agregarLinea(lineas, "Clase Niza", data.claseNiza);
-    agregarLinea(
-      lineas,
+  if (formData.tipoTramite === "Nombre Comercial") {
+    agregarResumen(items, "giroActividad", "Giro o actividad", formData.giroActividad);
+    agregarResumen(
+      items,
+      "productosServiciosTipo",
+      "Productos o servicios",
+      formData.productosServiciosTipo
+    );
+    agregarResumen(
+      items,
+      "detalleProductosServicios",
+      "Detalle de productos o servicios",
+      formData.detalleProductosServicios
+    );
+    agregarResumen(
+      items,
+      "queDeseaRegistrar",
+      "Qué desea registrar",
+      formData.queDeseaRegistrar
+    );
+    agregarResumen(
+      items,
+      "logoArchivo",
+      "Archivo de logo",
+      formData.logoArchivo?.name || ""
+    );
+    agregarResumen(
+      items,
+      "paisOrigen",
       "País de origen",
-      resolverValorPais(data.paisOrigen, data.paisOrigenOtro)
+      resolverPais(formData.paisOrigen, formData.paisOrigenOtro)
     );
-    agregarLinea(lineas, "Dirección", data.direccionEstablecimiento);
-    agregarLinea(lineas, "Registro previo en otro país", data.registroPrevioOtroPais);
-    agregarLinea(lineas, "Información adicional", data.informacionAdicional);
+    if (formData.paisOrigen === "Otro") {
+      agregarResumen(items, "paisOrigenOtro", "Otro país de origen", formData.paisOrigenOtro);
+    }
+    agregarResumen(
+      items,
+      "direccionEstablecimiento",
+      "Dirección del establecimiento",
+      formData.direccionEstablecimiento
+    );
+    agregarResumen(
+      items,
+      "informacionAdicional",
+      "Información adicional sobre el negocio",
+      formData.informacionAdicional
+    );
+    agregarResumen(
+      items,
+      "registroPrevioOtroPais",
+      "Registro previo en otro país",
+      formData.registroPrevioOtroPais
+    );
   }
 
-  if (data.tipoTramite === "Nombre Comercial") {
-    agregarLinea(lineas, "Giro o actividad", data.giroActividad);
-    agregarLinea(lineas, "Qué desea registrar", data.queDeseaRegistrar);
-    agregarLinea(lineas, "Productos/servicios", data.productosServiciosTipo);
-    agregarLinea(lineas, "Detalle", data.detalleProductosServicios);
-    agregarLinea(
-      lineas,
-      "País de origen",
-      resolverValorPais(data.paisOrigen, data.paisOrigenOtro)
+  agregarResumen(items, "tipoTitular", "Titular", formData.tipoTitular);
+
+  if (formData.tipoTitular === "Persona") {
+    agregarResumen(items, "personaNombre", "Nombre del titular", formData.personaNombre);
+    agregarResumen(items, "personaEstadoCivil", "Estado civil", formData.personaEstadoCivil);
+    agregarResumen(items, "personaProfesion", "Profesión u ocupación", formData.personaProfesion);
+    agregarResumen(
+      items,
+      "personaTipoIdentificacion",
+      "Tipo de identificación",
+      formData.personaTipoIdentificacion
     );
-    agregarLinea(lineas, "Dirección", data.direccionEstablecimiento);
-    agregarLinea(lineas, "Registro previo en otro país", data.registroPrevioOtroPais);
-    agregarLinea(lineas, "Información adicional", data.informacionAdicional);
+    agregarResumen(
+      items,
+      "personaNumeroIdentificacion",
+      "Número de identificación",
+      formData.personaNumeroIdentificacion
+    );
+    agregarResumen(
+      items,
+      "personaDireccion",
+      "Dirección exacta del dueño de la marca",
+      formData.personaDireccion
+    );
+    agregarResumen(
+      items,
+      "personaPaisNacionalidad",
+      "País de nacionalidad",
+      resolverPais(
+        formData.personaPaisNacionalidad,
+        formData.personaPaisNacionalidadOtro
+      )
+    );
+    if (formData.personaPaisNacionalidad === "Otro") {
+      agregarResumen(
+        items,
+        "personaPaisNacionalidadOtro",
+        "Otro país de nacionalidad",
+        formData.personaPaisNacionalidadOtro
+      );
+    }
+    agregarResumen(
+      items,
+      "personaPaisResidencia",
+      "País de residencia",
+      resolverPais(formData.personaPaisResidencia, formData.personaPaisResidenciaOtro)
+    );
+    if (formData.personaPaisResidencia === "Otro") {
+      agregarResumen(
+        items,
+        "personaPaisResidenciaOtro",
+        "Otro país de residencia",
+        formData.personaPaisResidenciaOtro
+      );
+    }
+    agregarResumen(
+      items,
+      "personaTelefono",
+      "Teléfono del titular",
+      formatearTelefonoVisual({
+        codigoPais: formData.personaTelefonoCodigoPais,
+        numero: formData.personaTelefonoNumero,
+      })
+    );
   }
 
-  agregarLinea(lineas, "Titular", data.tipoTitular);
-
-  if (data.tipoTitular === "Persona") {
-    agregarLinea(lineas, "Nombre titular", data.personaNombre);
-    agregarLinea(lineas, "Estado civil titular", data.personaEstadoCivil);
-    agregarLinea(lineas, "Profesión titular", data.personaProfesion);
-    agregarLinea(lineas, "Tipo identificación titular", data.personaTipoIdentificacion);
-    agregarLinea(lineas, "Número identificación titular", data.personaNumeroIdentificacion);
-    agregarLinea(lineas, "Dirección titular", data.personaDireccion);
-    agregarLinea(
-      lineas,
-      "País nacionalidad titular",
-      resolverValorPais(
-        data.personaPaisNacionalidad,
-        data.personaPaisNacionalidadOtro
+  if (formData.tipoTitular === "Empresa") {
+    agregarResumen(items, "empresaNombre", "Nombre de la empresa", formData.empresaNombre);
+    agregarResumen(
+      items,
+      "empresaIdentificacion",
+      "Identificación de la empresa",
+      formData.empresaIdentificacion
+    );
+    agregarResumen(
+      items,
+      "empresaPaisConstitucion",
+      "País de constitución",
+      resolverPais(
+        formData.empresaPaisConstitucion,
+        formData.empresaPaisConstitucionOtro
       )
     );
-    agregarLinea(
-      lineas,
-      "País residencia titular",
-      resolverValorPais(
-        data.personaPaisResidencia,
-        data.personaPaisResidenciaOtro
+    if (formData.empresaPaisConstitucion === "Otro") {
+      agregarResumen(
+        items,
+        "empresaPaisConstitucionOtro",
+        "Otro país de constitución",
+        formData.empresaPaisConstitucionOtro
+      );
+    }
+    agregarResumen(
+      items,
+      "empresaDomicilioSocial",
+      "Domicilio social",
+      formData.empresaDomicilioSocial
+    );
+    agregarResumen(
+      items,
+      "representanteNombre",
+      "Nombre del representante",
+      formData.representanteNombre
+    );
+    agregarResumen(
+      items,
+      "representanteEstadoCivil",
+      "Estado civil del representante",
+      formData.representanteEstadoCivil
+    );
+    agregarResumen(
+      items,
+      "representanteProfesion",
+      "Profesión u ocupación del representante",
+      formData.representanteProfesion
+    );
+    agregarResumen(
+      items,
+      "representanteTipoIdentificacion",
+      "Tipo de identificación del representante",
+      formData.representanteTipoIdentificacion
+    );
+    agregarResumen(
+      items,
+      "representanteNumeroIdentificacion",
+      "Número de identificación del representante",
+      formData.representanteNumeroIdentificacion
+    );
+    agregarResumen(
+      items,
+      "representantePaisNacionalidad",
+      "País de nacionalidad del representante",
+      resolverPais(
+        formData.representantePaisNacionalidad,
+        formData.representantePaisNacionalidadOtro
       )
     );
-    agregarLinea(
-      lineas,
-      "Teléfono titular",
-      data.personaTelefonoCodigoPais && data.personaTelefonoNumero
-        ? `+${data.personaTelefonoCodigoPais} ${data.personaTelefonoNumero}`
-        : data.personaTelefono
+    if (formData.representantePaisNacionalidad === "Otro") {
+      agregarResumen(
+        items,
+        "representantePaisNacionalidadOtro",
+        "Otro país de nacionalidad del representante",
+        formData.representantePaisNacionalidadOtro
+      );
+    }
+    agregarResumen(
+      items,
+      "representantePaisResidencia",
+      "País de residencia del representante",
+      resolverPais(
+        formData.representantePaisResidencia,
+        formData.representantePaisResidenciaOtro
+      )
     );
-    agregarLinea(lineas, "Información adicional titular", data.personaInformacionAdicional);
+    if (formData.representantePaisResidencia === "Otro") {
+      agregarResumen(
+        items,
+        "representantePaisResidenciaOtro",
+        "Otro país de residencia del representante",
+        formData.representantePaisResidenciaOtro
+      );
+    }
+    agregarResumen(
+      items,
+      "representanteDireccion",
+      "Dirección del representante",
+      formData.representanteDireccion
+    );
+    agregarResumen(
+      items,
+      "representanteTelefono",
+      "Teléfono del representante",
+      formatearTelefonoVisual({
+        codigoPais: formData.representanteTelefonoCodigoPais,
+        numero: formData.representanteTelefonoNumero,
+      })
+    );
+    agregarResumen(
+      items,
+      "empresaInformacionAdicional",
+      "Información adicional de la empresa",
+      formData.empresaInformacionAdicional
+    );
   }
 
-  if (data.tipoTitular === "Empresa") {
-    agregarLinea(lineas, "Empresa", data.empresaNombre);
-    agregarLinea(lineas, "Identificación empresa", data.empresaIdentificacion);
-    agregarLinea(
-      lineas,
-      "País constitución empresa",
-      resolverValorPais(
-        data.empresaPaisConstitucion,
-        data.empresaPaisConstitucionOtro
-      )
-    );
-    agregarLinea(lineas, "Domicilio social", data.empresaDomicilioSocial);
-    agregarLinea(lineas, "Representante", data.representanteNombre);
-    agregarLinea(lineas, "Estado civil representante", data.representanteEstadoCivil);
-    agregarLinea(lineas, "Profesión representante", data.representanteProfesion);
-    agregarLinea(
-      lineas,
-      "Tipo identificación representante",
-      data.representanteTipoIdentificacion
-    );
-    agregarLinea(
-      lineas,
-      "Número identificación representante",
-      data.representanteNumeroIdentificacion
-    );
-    agregarLinea(
-      lineas,
-      "País nacionalidad representante",
-      resolverValorPais(
-        data.representantePaisNacionalidad,
-        data.representantePaisNacionalidadOtro
-      )
-    );
-    agregarLinea(
-      lineas,
-      "País residencia representante",
-      resolverValorPais(
-        data.representantePaisResidencia,
-        data.representantePaisResidenciaOtro
-      )
-    );
-    agregarLinea(lineas, "Dirección representante", data.representanteDireccion);
-    agregarLinea(
-      lineas,
-      "Teléfono representante",
-      data.representanteTelefonoCodigoPais && data.representanteTelefonoNumero
-        ? `+${data.representanteTelefonoCodigoPais} ${data.representanteTelefonoNumero}`
-        : data.representanteTelefono
-    );
-    agregarLinea(lineas, "Información adicional empresa", data.empresaInformacionAdicional);
-  }
-
-  agregarLinea(lineas, "Solicitante", data.nombreCompleto);
-  agregarLinea(
-    lineas,
-    "Teléfono solicitante",
-    data.telefonoCodigoPais && data.telefonoNumero
-      ? `+${data.telefonoCodigoPais} ${data.telefonoNumero}`
-      : data.telefono
+  agregarResumen(items, "nombreCompleto", "Nombre de contacto", formData.nombreCompleto);
+  agregarResumen(
+    items,
+    "telefono",
+    "Teléfono de contacto",
+    formatearTelefonoVisual({
+      codigoPais: formData.telefonoCodigoPais,
+      numero: formData.telefonoNumero,
+    })
   );
 
-  if (data.logoArchivo?.name) {
-    lineas.push(`Logo adjunto: ${data.logoArchivo.name}`);
-  }
-
-  return lineas.join("\n");
+  return items;
 }
 
 export function buildRequestFormData(payload) {
   const form = new FormData();
 
   Object.entries(payload).forEach(([key, value]) => {
-    if (value === null || value === undefined || value === "") return;
-
-    if (key === "logoArchivo") {
-      if (value) {
-        form.append("logoArchivo", value);
-      }
+    if (key === "logoArchivo" || value === undefined || value === null) {
       return;
     }
 
-    form.append(key, value);
+    if (Array.isArray(value)) {
+      form.append(key, JSON.stringify(value));
+      return;
+    }
+
+    form.append(key, String(value));
   });
 
+  if (payload.logoArchivo instanceof File) {
+    form.append("logoArchivo", payload.logoArchivo);
+  }
+
   return form;
-}
-
-export function buildResumenItems(data) {
-  const items = [];
-
-  agregarItemSeguro(items, "Correo", data.correo);
-  agregarItemSeguro(items, "Marca o nombre comercial", data.nombreMarca);
-  agregarItemSeguro(items, "Tipo de trámite", data.tipoTramite);
-
-  if (data.tipoTramite === "Marca") {
-    agregarItemSeguro(items, "Tipo de marca", data.tipoMarca);
-    agregarItemSeguro(items, "Qué desea registrar", data.queDeseaRegistrar);
-    agregarItemSeguro(items, "Productos/servicios", data.productosServiciosTipo);
-    agregarItemSeguro(items, "Detalle", data.detalleProductosServicios);
-    agregarItemSeguro(items, "Clase Niza", data.claseNiza);
-    agregarItemSeguro(
-      items,
-      "País de origen",
-      resolverValorPais(data.paisOrigen, data.paisOrigenOtro)
-    );
-    agregarItemSeguro(items, "Dirección", data.direccionEstablecimiento);
-    agregarItemSeguro(items, "Registro previo en otro país", data.registroPrevioOtroPais);
-    agregarItemSeguro(items, "Información adicional", data.informacionAdicional);
-  }
-
-  if (data.tipoTramite === "Nombre Comercial") {
-    agregarItemSeguro(items, "Giro o actividad", data.giroActividad);
-    agregarItemSeguro(items, "Qué desea registrar", data.queDeseaRegistrar);
-    agregarItemSeguro(items, "Productos/servicios", data.productosServiciosTipo);
-    agregarItemSeguro(items, "Detalle", data.detalleProductosServicios);
-    agregarItemSeguro(
-      items,
-      "País de origen",
-      resolverValorPais(data.paisOrigen, data.paisOrigenOtro)
-    );
-    agregarItemSeguro(items, "Dirección", data.direccionEstablecimiento);
-    agregarItemSeguro(items, "Registro previo en otro país", data.registroPrevioOtroPais);
-    agregarItemSeguro(items, "Información adicional", data.informacionAdicional);
-  }
-
-  agregarItemSeguro(items, "Titular", data.tipoTitular);
-
-  if (data.tipoTitular === "Persona") {
-    agregarItemSeguro(items, "Nombre titular", data.personaNombre);
-    agregarItemSeguro(items, "Estado civil titular", data.personaEstadoCivil);
-    agregarItemSeguro(items, "Profesión titular", data.personaProfesion);
-    agregarItemSeguro(items, "Tipo identificación titular", data.personaTipoIdentificacion);
-    agregarItemSeguro(items, "Número identificación titular", data.personaNumeroIdentificacion);
-    agregarItemSeguro(items, "Dirección titular", data.personaDireccion);
-    agregarItemSeguro(
-      items,
-      "País nacionalidad titular",
-      resolverValorPais(
-        data.personaPaisNacionalidad,
-        data.personaPaisNacionalidadOtro
-      )
-    );
-    agregarItemSeguro(
-      items,
-      "País residencia titular",
-      resolverValorPais(
-        data.personaPaisResidencia,
-        data.personaPaisResidenciaOtro
-      )
-    );
-    agregarItemSeguro(
-      items,
-      "Teléfono titular",
-      data.personaTelefonoCodigoPais && data.personaTelefonoNumero
-        ? `+${data.personaTelefonoCodigoPais} ${data.personaTelefonoNumero}`
-        : data.personaTelefono
-    );
-    agregarItemSeguro(items, "Información adicional titular", data.personaInformacionAdicional);
-  }
-
-  if (data.tipoTitular === "Empresa") {
-    agregarItemSeguro(items, "Empresa", data.empresaNombre);
-    agregarItemSeguro(items, "Identificación empresa", data.empresaIdentificacion);
-    agregarItemSeguro(
-      items,
-      "País constitución empresa",
-      resolverValorPais(
-        data.empresaPaisConstitucion,
-        data.empresaPaisConstitucionOtro
-      )
-    );
-    agregarItemSeguro(items, "Domicilio social", data.empresaDomicilioSocial);
-    agregarItemSeguro(items, "Representante", data.representanteNombre);
-    agregarItemSeguro(items, "Estado civil representante", data.representanteEstadoCivil);
-    agregarItemSeguro(items, "Profesión representante", data.representanteProfesion);
-    agregarItemSeguro(
-      items,
-      "Tipo identificación representante",
-      data.representanteTipoIdentificacion
-    );
-    agregarItemSeguro(
-      items,
-      "Número identificación representante",
-      data.representanteNumeroIdentificacion
-    );
-    agregarItemSeguro(
-      items,
-      "País nacionalidad representante",
-      resolverValorPais(
-        data.representantePaisNacionalidad,
-        data.representantePaisNacionalidadOtro
-      )
-    );
-    agregarItemSeguro(
-      items,
-      "País residencia representante",
-      resolverValorPais(
-        data.representantePaisResidencia,
-        data.representantePaisResidenciaOtro
-      )
-    );
-    agregarItemSeguro(items, "Dirección representante", data.representanteDireccion);
-    agregarItemSeguro(
-      items,
-      "Teléfono representante",
-      data.representanteTelefonoCodigoPais && data.representanteTelefonoNumero
-        ? `+${data.representanteTelefonoCodigoPais} ${data.representanteTelefonoNumero}`
-        : data.representanteTelefono
-    );
-    agregarItemSeguro(items, "Información adicional empresa", data.empresaInformacionAdicional);
-  }
-
-  agregarItemSeguro(items, "Solicitante", data.nombreCompleto);
-  agregarItemSeguro(
-    items,
-    "Teléfono solicitante",
-    data.telefonoCodigoPais && data.telefonoNumero
-      ? `+${data.telefonoCodigoPais} ${data.telefonoNumero}`
-      : data.telefono
-  );
-
-  if (data.logoArchivo?.name) {
-    items.push({
-      etiqueta: "Logo adjunto",
-      valor: data.logoArchivo.name,
-    });
-  }
-
-  return items;
 }

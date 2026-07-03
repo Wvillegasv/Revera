@@ -21,10 +21,13 @@ const PORT = process.env.PORT || 3000;
 ========================================= */
 
 const allowedOrigins = [
+  "http://localhost:1573",
+  "http://127.0.0.1:1573",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
   "https://revera-omega.vercel.app",
   "https://test.revera.com",
+  "https://decency-womb-pulsate.ngrok-free.dev",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 

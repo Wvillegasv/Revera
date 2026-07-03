@@ -757,3 +757,37 @@
     font-size: 0.95rem;
   }
 }
+
+/* =========================================================
+   ENLACES INFORMATIVOS - AGENDA UNA CITA
+========================================================= */
+.contacto-modal-title-link,
+.contacto-modal-subtitle-link {
+  color: #6f60aa;
+  font-family: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.contacto-modal-title-link:hover,
+.contacto-modal-subtitle-link:hover {
+  color: #120742;
+}
+
+.contacto-modal-title-link {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 0.58em;
+  font-weight: var(--font-weight-demi);
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.contacto-modal-subtitle-link {
+  display: inline;
+  font-weight: var(--font-weight-demi);
+}
+
+

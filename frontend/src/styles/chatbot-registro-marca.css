@@ -749,3 +749,168 @@
     gap: 10px;
   }
 }
+
+/* =========================================================
+   AJUSTES ESTÁNDAR - REGISTRO ESTRATÉGICO DE MARCA
+========================================================= */
+.crm-header-link,
+.crm-question-link,
+.crm-privacy-link {
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-demi);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.crm-header-link:hover,
+.crm-question-link:hover,
+.crm-privacy-link:hover {
+  color: #120742;
+}
+
+.crm-question-link {
+  display: inline-block;
+  margin: 8px 0 0;
+}
+
+.crm-editing-prefix {
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.crm-multi-options-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.crm-options-help {
+  margin: 0;
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: var(--font-weight-regular);
+}
+
+.crm-option-btn--selected,
+.crm-option-btn--selected:hover {
+  background: #6f60aa;
+  border-color: #6f60aa;
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(111, 96, 170, 0.2);
+}
+
+.crm-file-name {
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: var(--font-weight-regular);
+  overflow-wrap: anywhere;
+}
+
+.crm-summary-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(147, 149, 152, 0.26);
+}
+
+.crm-summary-row:last-child {
+  border-bottom: none;
+}
+
+.crm-summary-line {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.crm-edit-btn {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 1px solid rgba(111, 96, 170, 0.42);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: var(--font-weight-demi);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.crm-edit-btn:hover:not(:disabled) {
+  background: #6f60aa;
+  border-color: #6f60aa;
+  color: #ffffff;
+}
+
+.crm-edit-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.crm-summary-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(147, 149, 152, 0.18);
+}
+
+.crm-summary-actions .crm-primary-btn,
+.crm-summary-actions .crm-secondary-btn {
+  align-self: auto;
+}
+
+.crm-privacy-link {
+  padding: 10px 2px;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+.crm-success {
+  min-height: 360px;
+  justify-content: center;
+  padding: 34px 10px;
+}
+
+.crm-success svg {
+  color: #6f60aa;
+}
+
+.crm-primary-btn {
+  gap: 8px;
+}
+
+@media (max-width: 480px) {
+  .crm-summary-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .crm-summary-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .crm-summary-actions .crm-primary-btn,
+  .crm-summary-actions .crm-secondary-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .crm-privacy-link {
+    text-align: center;
+  }
+}

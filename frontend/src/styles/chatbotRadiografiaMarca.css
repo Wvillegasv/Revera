@@ -573,6 +573,7 @@
 
 .radiografia-success-message p,
 .radiografia-success-content p {
+  margin: 0 0 18px;
   color: #00001b;
   font-family: var(--font-primary);
   font-size: 15px;
@@ -612,6 +613,22 @@
   padding: 30px;
   background: #ffffff;
 }
+
+.radiografia-prices-link {
+  margin-left: 4px;
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-demi);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.radiografia-prices-link:hover {
+  color: #120742;
+}
+
+
 
 /* =========================================================
    RESPONSIVE - TABLET
@@ -774,3 +791,193 @@
   }
 }
 
+/* =========================================================
+   AJUSTES - EDICIÓN, ENLACES Y CONFIRMACIÓN FINAL
+========================================================= */
+.radiografia-guide-link,
+.radiografia-privacy-link {
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-demi);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.radiografia-guide-link:hover,
+.radiografia-privacy-link:hover {
+  color: #120742;
+}
+
+.radiografia-summary-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.radiografia-summary-title {
+  margin: 0 0 2px;
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 17px;
+  line-height: 1.35;
+  font-weight: var(--font-weight-bold);
+}
+
+.radiografia-summary-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(147, 149, 152, 0.28);
+}
+
+.radiografia-summary-row:last-child {
+  border-bottom: none;
+}
+
+.radiografia-summary-row-content {
+  min-width: 0;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.radiografia-summary-row strong {
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-demi);
+}
+
+.radiografia-summary-row span {
+  color: #00001b;
+  overflow-wrap: anywhere;
+}
+
+.radiografia-edit-btn {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 1px solid rgba(111, 96, 170, 0.4);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: var(--font-weight-demi);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.radiografia-edit-btn:hover {
+  background: #6f60aa;
+  border-color: #6f60aa;
+  color: #ffffff;
+}
+
+.radiografia-input-area button:disabled,
+.radiografia-summary-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+  transform: none;
+}
+
+.radiografia-file-label input {
+  display: none;
+}
+
+.radiografia-file-name {
+  margin: 0;
+  color: #00001b;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: var(--font-weight-regular);
+}
+
+.radiografia-success-icon {
+  width: 46px;
+  height: 46px;
+  margin: 0 0 16px;
+  border-radius: 50%;
+  background: #6f60aa;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-primary);
+  font-size: 25px;
+  font-weight: var(--font-weight-bold);
+}
+
+.radiografia-error {
+  margin: 0 0 12px;
+  color: #b42318;
+  font-family: var(--font-primary);
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: var(--font-weight-medium);
+}
+
+@media (max-width: 480px) {
+  .radiografia-summary-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .radiografia-edit-btn {
+    align-self: flex-start;
+  }
+}
+
+.radiografia-guide-link,
+.radiografia-privacy-link {
+  margin-left: 4px;
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  font-weight: var(--font-weight-demi);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.radiografia-guide-link:hover,
+.radiografia-privacy-link:hover {
+  color: #120742;
+}
+
+.radiografia-summary-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.radiografia-summary-row-content {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.radiografia-edit-btn {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 1px solid rgba(111, 96, 170, 0.4);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  font-size: 13px;
+  font-weight: var(--font-weight-demi);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.radiografia-edit-btn:hover {
+  background: #6f60aa;
+  color: #ffffff;
+}

@@ -180,8 +180,29 @@ function Home() {
             </button>
 
             <div className="contacto-modal-header">
-              <h2>Agenda una Cita</h2>
-              <p>Completa el formulario y nos pondremos en contacto contigo</p>
+              <h2>
+                Agenda una Cita{" "}
+                <a
+                  href="/guia/precios-servicios-revera"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="contacto-modal-title-link"
+                >
+                  Ver precios
+                </a>
+              </h2>
+
+              <p>
+                Completa el formulario y nos pondremos en contacto contigo. {" "}
+                <a
+                  href="/guia/como-funcionan-servicios-revera"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="contacto-modal-subtitle-link"
+                >
+                  Cómo funcionan los servicios de Revera
+                </a>
+              </p>
             </div>
 
             <AgendaForm onSuccess={cerrarContacto} />
