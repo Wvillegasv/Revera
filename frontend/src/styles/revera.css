@@ -69,7 +69,7 @@ select {
 
 /*
   Capa suave encima del fondo base.
-  No debe competir con la imagen principal.
+  Se mantiene muy ligera para no tapar home-main-bg.png.
 */
 .revera-page-shell::before {
   content: "";
@@ -81,12 +81,12 @@ select {
   background:
     radial-gradient(
       circle at 18% 18%,
-      rgba(255, 255, 255, 0.24) 0%,
+      rgba(255, 255, 255, 0.08) 0%,
       rgba(255, 255, 255, 0) 30%
     ),
     radial-gradient(
       circle at 86% 28%,
-      rgba(111, 96, 170, 0.04) 0%,
+      rgba(111, 96, 170, 0.018) 0%,
       rgba(111, 96, 170, 0) 36%
     );
 }
@@ -99,18 +99,12 @@ select {
 
 /* =========================================================
    FONDO HOME - IMAGEN PRINCIPAL
-   Se usa con:
-   <div
-     className="home-main-background-image"
-     style={{ backgroundImage: `url(${homeMainBg})` }}
-     aria-hidden="true"
-   />
 ========================================================= */
 
 .home-main-background-image {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
 
   pointer-events: none;
   user-select: none;
@@ -120,6 +114,13 @@ select {
   background-size: 100% auto;
 
   opacity: 1;
+
+  filter: saturate(1.55) contrast(1.28) brightness(0.99);
+  mix-blend-mode: multiply;
+
+  transform: translateZ(0);
+  will-change: filter;
+
   border: none;
   box-shadow: none;
 }
@@ -134,12 +135,12 @@ select {
   left: 0;
   right: 0;
   bottom: -1px;
-  height: 34px;
+  height: 30px;
 
   background: linear-gradient(
     180deg,
     rgba(230, 231, 232, 0) 0%,
-    rgba(230, 231, 232, 0.78) 52%,
+    rgba(230, 231, 232, 0.38) 54%,
     var(--color-bg-base) 100%
   );
 
@@ -154,7 +155,7 @@ select {
 .home-background-image {
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
 
   pointer-events: none;
   user-select: none;
@@ -164,6 +165,13 @@ select {
   background-size: 78% auto;
 
   opacity: 1;
+
+  filter: saturate(1.55) contrast(1.28) brightness(0.99);
+  mix-blend-mode: multiply;
+
+  transform: translateZ(0);
+  will-change: filter;
+
   border: none;
   box-shadow: none;
 }
@@ -174,12 +182,12 @@ select {
   left: 0;
   right: 0;
   bottom: -1px;
-  height: 34px;
+  height: 30px;
 
   background: linear-gradient(
     180deg,
     rgba(230, 231, 232, 0) 0%,
-    rgba(230, 231, 232, 0.78) 52%,
+    rgba(230, 231, 232, 0.38) 54%,
     var(--color-bg-base) 100%
   );
 
@@ -211,10 +219,10 @@ select {
   position: absolute;
   pointer-events: none;
   user-select: none;
-  z-index: 1;
+  z-index: 0;
   border-radius: 999px;
   filter: blur(42px);
-  opacity: 0.22;
+  opacity: 0.06;
 }
 
 .home-background-glow-left {
@@ -225,8 +233,8 @@ select {
   background:
     radial-gradient(
       circle,
-      rgba(255, 255, 255, 0.42) 0%,
-      rgba(255, 255, 255, 0.14) 34%,
+      rgba(255, 255, 255, 0.16) 0%,
+      rgba(255, 255, 255, 0.035) 34%,
       rgba(255, 255, 255, 0) 72%
     );
 }
@@ -239,8 +247,8 @@ select {
   background:
     radial-gradient(
       circle,
-      rgba(111, 96, 170, 0.16) 0%,
-      rgba(111, 96, 170, 0.08) 32%,
+      rgba(111, 96, 170, 0.08) 0%,
+      rgba(111, 96, 170, 0.025) 32%,
       rgba(111, 96, 170, 0) 72%
     );
 }
@@ -298,7 +306,6 @@ select {
    AJUSTES TIPOGRÁFICOS HOME / NAVBAR
 ========================================================= */
 
-/* Menú principal: Chat, Contacto, Guía */
 .navbar a,
 .navbar button,
 .navbar-menu a,
@@ -309,19 +316,16 @@ select {
   font-weight: var(--font-weight-demi);
 }
 
-/* Título principal */
 .hero-content h1 {
   font-family: var(--font-primary);
   font-weight: var(--font-weight-bold);
 }
 
-/* Subtítulo */
 .hero-content h2 {
   font-family: var(--font-primary);
   font-weight: var(--font-weight-demi);
 }
 
-/* Frase inferior */
 .hero-content p {
   font-family: var(--font-primary);
   font-weight: var(--font-weight-medium);
@@ -346,9 +350,11 @@ select {
 
   .home-main-background-image,
   .home-background-image {
-    opacity: 0.94;
+    opacity: 1;
     background-position: center 80px;
     background-size: 96% auto;
+    filter: saturate(1.48) contrast(1.24) brightness(0.99);
+    mix-blend-mode: multiply;
   }
 
   .home-background-glow-left {
@@ -380,9 +386,11 @@ select {
 
   .home-main-background-image,
   .home-background-image {
-    opacity: 0.88;
+    opacity: 1;
     background-position: center 70px;
     background-size: 118% auto;
+    filter: saturate(1.40) contrast(1.18) brightness(1);
+    mix-blend-mode: multiply;
   }
 
   .home-background-glow-left {
@@ -419,9 +427,11 @@ select {
 
   .home-main-background-image,
   .home-background-image {
-    opacity: 0.82;
+    opacity: 1;
     background-position: center 65px;
     background-size: 145% auto;
+    filter: saturate(1.32) contrast(1.14) brightness(1);
+    mix-blend-mode: multiply;
   }
 
   .home-background-glow-left {
@@ -442,3 +452,4 @@ select {
     padding: 8px;
   }
 }
+
