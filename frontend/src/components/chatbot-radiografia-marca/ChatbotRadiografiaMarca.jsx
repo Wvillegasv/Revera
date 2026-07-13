@@ -7,8 +7,11 @@ import {
 import {
   formatearNombreArchivo,
   formatearTelefono,
+  obtenerLimitesPaso,
+  obtenerMaxLengthPaso,
   obtenerPasoPorId,
   obtenerSiguientePaso,
+  validarFlujoCompletoAntesDeEnviar,
   validarRespuesta,
 } from "./radiografiaHelpers";
 import { enviarRadiografiaMarca } from "../../services/radiografiaMarcaApi";
@@ -16,10 +19,6 @@ import "../../styles/chatbotRadiografiaMarca.css";
 import { Link } from "react-router-dom";
 
 const DURACION_MENSAJE_EXITO_MS = 30000;
-
-const TEXTO_LINK_GUIA =
-  "En este análisis revisamos si ya existe algo parecido, si hay riesgo de conflicto y en qué categoría deberías registrarla para protegerla bien.";
-
 
 function crearMensajesIniciales(primerPaso) {
   return [
@@ -47,7 +46,6 @@ function crearMensajesIniciales(primerPaso) {
     },
   ];
 }
-
 
 function construirPayloadRadiografia(respuestas) {
   const telefono = respuestas.telefonoContacto || {};
@@ -100,8 +98,12 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
   const [enviadoCorrectamente, setEnviadoCorrectamente] = useState(false);
   const [enviandoInformacion, setEnviandoInformacion] = useState(false);
 
-  // Indica que se está editando desde el resumen final.
-  const [editandoDesdeResumen, setEditandoDesdeResumen] = useState(false);
+  /*
+    Cuando hay un id, la persona está editando desde el resumen.
+    Usar el identificador del paso, en lugar de un booleano, evita que
+    el flujo vuelva accidentalmente a la siguiente pregunta normal.
+  */
+  const [pasoEditadoId, setPasoEditadoId] = useState(null);
 
   const chatRef = useRef(null);
   const timeoutCierreRef = useRef(null);
@@ -148,7 +150,7 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
     setFinalizado(false);
     setEnviadoCorrectamente(false);
     setEnviandoInformacion(false);
-    setEditandoDesdeResumen(false);
+    setPasoEditadoId(null);
   };
 
   const cerrar = () => {
@@ -159,43 +161,9 @@ function ChatbotRadiografiaMarca({ abierto, onClose }) {
     }
   };
 
-  const agregarMensajeUsuario = (texto) => {
-    setMensajes((prev) => [
-      ...prev.map((mensaje) => ({
-        ...mensaje,
-        current: false,
-      })),
-      {
-        tipo: "user",
-        texto,
-      },
-    ]);
-  };
-
-const agregarPreguntaBot = (siguientePasoId) => {
-  const siguientePaso = obtenerPasoPorId(RADIOGRAFIA_FLOW, siguientePasoId);
-
-  if (!siguientePaso) {
-    return;
-  }
-
-  setMensajes((prev) => [
-    ...prev,
-    {
-      tipo: "bot",
-      texto: siguientePaso.label,
-      sectionTitle: siguientePaso.sectionTitle || "",
-      preguntaId: siguientePaso.id,
-      required: siguientePaso.required,
-      current: true,
-    },
-  ]);
-};
-
-
   const obtenerTextoRespuesta = (paso, valor) => {
     if (paso.type === "file") {
-      return formatearNombreArchivo(archivoActual);
+      return formatearNombreArchivo(valor);
     }
 
     if (paso.type === "phone") {
@@ -203,18 +171,116 @@ const agregarPreguntaBot = (siguientePasoId) => {
     }
 
     if (valor && String(valor).trim() !== "") {
-      return valor;
+      return String(valor).trim();
     }
 
     return "No indicado";
   };
 
+
+  const volverAlResumenDespuesDeEditar = ({
+    textoRespuesta,
+    nuevasRespuestas,
+  }) => {
+    setRespuestas(nuevasRespuestas);
+    setPasoEditadoId(null);
+    setFinalizado(true);
+    setEnviadoCorrectamente(false);
+    setValorActual("");
+    setArchivoActual(null);
+    setError("");
+
+    setMensajes((prev) => [
+      ...prev.map((mensaje) => ({
+        ...mensaje,
+        current: false,
+      })),
+      {
+        tipo: "user",
+        texto: textoRespuesta,
+      },
+      {
+        tipo: "bot",
+        texto:
+          "Respuesta actualizada. Revisa nuevamente tu información antes de enviarla.",
+      },
+    ]);
+  };
+
+  const agregarMensajeUsuarioYPregunta = ({
+    textoRespuesta,
+    siguientePasoId,
+    esEdicion,
+  }) => {
+    setMensajes((prev) => {
+      const mensajesActualizados = [
+        ...prev.map((mensaje) => ({
+          ...mensaje,
+          current: false,
+        })),
+        {
+          tipo: "user",
+          texto: textoRespuesta,
+        },
+      ];
+
+      /*
+        Después de editar, no se calcula la ruta normal ni se vuelve a
+        formular la siguiente pregunta. El chat vuelve directamente al resumen.
+      */
+      if (esEdicion) {
+        return [
+          ...mensajesActualizados,
+          {
+            tipo: "bot",
+            texto:
+              "Respuesta actualizada. Revisa nuevamente tu información antes de enviarla.",
+          },
+        ];
+      }
+
+      if (siguientePasoId === "resumen") {
+        return [
+          ...mensajesActualizados,
+          {
+            tipo: "bot",
+            texto: "Hemos preparado el resumen de tu Radiografía de Marca.",
+          },
+        ];
+      }
+
+      const siguientePaso = obtenerPasoPorId(
+        RADIOGRAFIA_FLOW,
+        siguientePasoId
+      );
+
+      if (!siguientePaso) {
+        return mensajesActualizados;
+      }
+
+      return [
+        ...mensajesActualizados,
+        {
+          tipo: "bot",
+          texto: siguientePaso.label,
+          sectionTitle: siguientePaso.sectionTitle || "",
+          preguntaId: siguientePaso.id,
+          required: siguientePaso.required,
+          current: true,
+        },
+      ];
+    });
+  };
+
   const guardarRespuesta = (valor) => {
     if (!pasoActual) {
+      setError("No fue posible identificar la pregunta actual.");
       return;
     }
 
-    const respuestaFinal = pasoActual.type === "file" ? archivoActual : valor;
+    const respuestaFinal =
+      pasoActual.type === "file" ? archivoActual : valor;
+
     const mensajeError = validarRespuesta(pasoActual, respuestaFinal);
 
     if (mensajeError) {
@@ -222,68 +288,72 @@ const agregarPreguntaBot = (siguientePasoId) => {
       return;
     }
 
-    setError("");
-
-    const textoRespuesta = obtenerTextoRespuesta(pasoActual, respuestaFinal);
+    const textoRespuesta = obtenerTextoRespuesta(
+      pasoActual,
+      respuestaFinal
+    );
 
     const nuevasRespuestas = {
       ...respuestas,
       [pasoActual.id]: {
         pregunta: pasoActual.label,
         valor: textoRespuesta,
-        archivo: pasoActual.type === "file" ? archivoActual : null,
+        archivo: pasoActual.type === "file" ? respuestaFinal : null,
         telefonoCodigoPais:
           pasoActual.type === "phone"
-            ? respuestaFinal.codigoPais || ""
+            ? respuestaFinal?.codigoPais || ""
             : "",
         telefonoNumero:
           pasoActual.type === "phone"
-            ? respuestaFinal.numero || ""
+            ? respuestaFinal?.numero || ""
             : "",
       },
     };
 
-    setRespuestas(nuevasRespuestas);
-    agregarMensajeUsuario(textoRespuesta);
+    const esEdicion =
+      Boolean(pasoEditadoId) && pasoEditadoId === pasoActual.id;
 
+    if (esEdicion) {
+      volverAlResumenDespuesDeEditar({
+        textoRespuesta,
+        nuevasRespuestas,
+      });
+
+      return;
+    }
+
+    setError("");
+    setRespuestas(nuevasRespuestas);
     setValorActual("");
     setArchivoActual(null);
 
-    // Si la persona venía desde Editar, regresa al resumen.
-    if (editandoDesdeResumen) {
-      setEditandoDesdeResumen(false);
+    const siguientePasoId = obtenerSiguientePaso(
+      pasoActual,
+      respuestaFinal
+    );
+
+    if (!siguientePasoId) {
+      setError("No fue posible determinar el siguiente paso.");
+      return;
+    }
+
+    if (siguientePasoId === "resumen") {
       setFinalizado(true);
 
-      setMensajes((prev) => [
-        ...prev,
-        {
-          tipo: "bot",
-          texto:
-            "Respuesta actualizada. Revisa nuevamente tu información antes de enviarla.",
-        },
-      ]);
+      agregarMensajeUsuarioYPregunta({
+        textoRespuesta,
+        siguientePasoId,
+      });
 
       return;
     }
 
-    const siguientePaso = obtenerSiguientePaso(pasoActual, respuestaFinal);
+    setPasoActualId(siguientePasoId);
 
-    if (siguientePaso === "resumen") {
-      setFinalizado(true);
-
-      setMensajes((prev) => [
-        ...prev,
-        {
-          tipo: "bot",
-          texto: "Hemos preparado el resumen de tu Radiografía de Marca.",
-        },
-      ]);
-
-      return;
-    }
-
-    setPasoActualId(siguientePaso);
-    agregarPreguntaBot(siguientePaso);
+    agregarMensajeUsuarioYPregunta({
+      textoRespuesta,
+      siguientePasoId,
+    });
   };
 
   const editarRespuesta = (preguntaId) => {
@@ -297,11 +367,13 @@ const agregarPreguntaBot = (siguientePasoId) => {
     setError("");
     setFinalizado(false);
     setEnviadoCorrectamente(false);
-    setEditandoDesdeResumen(true);
+    setPasoEditadoId(preguntaId);
     setPasoActualId(preguntaId);
 
-    // Se añade el paso al final del chat para que la persona vea
-    // que está editando, sin eliminar las respuestas posteriores.
+    /*
+      Se agrega la pregunta de edición al final sin borrar respuestas
+      posteriores. Todas las respuestas existentes se mantienen.
+    */
     setMensajes((prev) => [
       ...prev.map((mensaje) => ({
         ...mensaje,
@@ -353,11 +425,72 @@ const agregarPreguntaBot = (siguientePasoId) => {
       typeof valorActual === "object" && valorActual !== null
         ? valorActual
         : {
-            codigoPais: "",
+            codigoPais: "506",
             numero: "",
           };
 
     guardarRespuesta(telefonoValue);
+  };
+
+  const renderMensajeLimitesPaso = () => {
+    if (!pasoActual || finalizado) {
+      return null;
+    }
+
+    if (["text", "email", "textarea"].includes(pasoActual.type)) {
+      const { min: minimo, max: maximo } = obtenerLimitesPaso(
+        pasoActual.id
+      );
+
+      if (!minimo && !maximo) {
+        return null;
+      }
+
+      const longitudActual = String(valorActual ?? "").length;
+      const alcanzoMaximo = Boolean(maximo && longitudActual >= maximo);
+
+      return (
+        <small
+          className={`radiografia-limit-message ${
+            alcanzoMaximo ? "radiografia-limit-message--limit" : ""
+          }`}
+          role="status"
+          aria-live="polite"
+        >
+          {longitudActual}
+          {maximo ? ` / ${maximo}` : ""} caracteres.
+          {minimo ? ` Mínimo permitido: ${minimo} caracteres.` : ""}
+          {maximo ? ` Máximo permitido: ${maximo} caracteres.` : ""}
+        </small>
+      );
+    }
+
+    if (pasoActual.type === "phone") {
+      const telefonoValue =
+        typeof valorActual === "object" && valorActual !== null
+          ? valorActual
+          : { codigoPais: "506", numero: "" };
+
+      const codigoPais = String(telefonoValue.codigoPais || "");
+      const numero = String(telefonoValue.numero || "");
+      const esCostaRica = codigoPais === "506";
+
+      return (
+        <small
+          className="radiografia-limit-message"
+          role="status"
+          aria-live="polite"
+        >
+          Código país: {codigoPais.length} / 3 dígitos. Teléfono: {numero.length}
+          {esCostaRica ? " / 8" : " / 20"} dígitos.
+          {esCostaRica
+            ? " Para Costa Rica se requieren exactamente 8 dígitos."
+            : " Mínimo permitido: 6. Máximo permitido: 20 dígitos."}
+        </small>
+      );
+    }
+
+    return null;
   };
 
   const renderCampo = () => {
@@ -384,15 +517,29 @@ const agregarPreguntaBot = (siguientePasoId) => {
     if (pasoActual.type === "textarea") {
       return (
         <form className="radiografia-input-area" onSubmit={manejarSubmit}>
-          <textarea
-            value={valorActual}
-            onChange={(event) => setValorActual(event.target.value)}
-            placeholder={pasoActual.placeholder || "Escribe tu respuesta..."}
-            rows={4}
-          />
+          <div
+            className="radiografia-field-with-counter"
+            style={{
+              flex: 1,
+              minWidth: 0,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <textarea
+              value={valorActual}
+              onChange={(event) => setValorActual(event.target.value)}
+              placeholder={pasoActual.placeholder || "Escribe tu respuesta..."}
+              maxLength={obtenerMaxLengthPaso(pasoActual.id)}
+              rows={4}
+              style={{ width: "100%" }}
+            />
 
-          <button type="submit">
-            <Send size={17} strokeWidth={2.1} />
+            {renderMensajeLimitesPaso()}
+          </div>
+
+          <button type="submit" className="radiografia-next-button">
+            <Send size={16} strokeWidth={2.1} />
             Siguiente
           </button>
         </form>
@@ -413,38 +560,61 @@ const agregarPreguntaBot = (siguientePasoId) => {
           className="radiografia-input-area radiografia-phone-area"
           onSubmit={manejarSubmitTelefono}
         >
-          <input
-            type="text"
-            inputMode="numeric"
-            className="radiografia-phone-code"
-            value={telefonoValue.codigoPais}
-            onChange={(event) =>
-              setValorActual({
-                ...telefonoValue,
-                codigoPais: event.target.value.replace(/\D/g, ""),
-              })
-            }
-            placeholder={pasoActual.placeholderCodigoPais || "506"}
-            aria-label="Código de país"
-          />
+          <div
+            className="radiografia-phone-fields-with-counter"
+            style={{
+              flex: 1,
+              minWidth: 0,
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div
+              className="radiografia-phone-fields-row"
+              style={{
+                display: "flex",
+                gap: "10px",
+                width: "100%",
+              }}
+            >
+              <input
+                type="text"
+                inputMode="numeric"
+                className="radiografia-phone-code"
+                value={telefonoValue.codigoPais}
+                onChange={(event) =>
+                  setValorActual({
+                    ...telefonoValue,
+                    codigoPais: event.target.value.replace(/\D/g, ""),
+                  })
+                }
+                placeholder={pasoActual.placeholderCodigoPais || "506"}
+                maxLength={3}
+                aria-label="Código de país"
+              />
 
-          <input
-            type="text"
-            inputMode="numeric"
-            className="radiografia-phone-number"
-            value={telefonoValue.numero}
-            onChange={(event) =>
-              setValorActual({
-                ...telefonoValue,
-                numero: event.target.value.replace(/\D/g, ""),
-              })
-            }
-            placeholder={pasoActual.placeholderNumero || "88887777"}
-            aria-label="Número de teléfono"
-          />
+              <input
+                type="text"
+                inputMode="numeric"
+                className="radiografia-phone-number"
+                value={telefonoValue.numero}
+                onChange={(event) =>
+                  setValorActual({
+                    ...telefonoValue,
+                    numero: event.target.value.replace(/\D/g, ""),
+                  })
+                }
+                placeholder={pasoActual.placeholderNumero || "88887777"}
+                maxLength={20}
+                aria-label="Número de teléfono"
+              />
+            </div>
 
-          <button type="submit">
-            <Send size={17} strokeWidth={2.1} />
+            {renderMensajeLimitesPaso()}
+          </div>
+
+          <button type="submit" className="radiografia-next-button">
+            <Send size={16} strokeWidth={2.1} />
             Siguiente
           </button>
         </form>
@@ -487,15 +657,29 @@ const agregarPreguntaBot = (siguientePasoId) => {
 
     return (
       <form className="radiografia-input-area" onSubmit={manejarSubmit}>
-        <input
-          type={pasoActual.type === "email" ? "email" : "text"}
-          value={valorActual}
-          onChange={(event) => setValorActual(event.target.value)}
-          placeholder={pasoActual.placeholder || "Escribe tu respuesta..."}
-        />
+        <div
+          className="radiografia-field-with-counter"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <input
+            type={pasoActual.type === "email" ? "email" : "text"}
+            value={valorActual}
+            onChange={(event) => setValorActual(event.target.value)}
+            placeholder={pasoActual.placeholder || "Escribe tu respuesta..."}
+            maxLength={obtenerMaxLengthPaso(pasoActual.id)}
+            style={{ width: "100%" }}
+          />
 
-        <button type="submit">
-          <Send size={17} strokeWidth={2.1} />
+          {renderMensajeLimitesPaso()}
+        </div>
+
+        <button type="submit" className="radiografia-next-button">
+          <Send size={16} strokeWidth={2.1} />
           Siguiente
         </button>
       </form>
@@ -534,11 +718,26 @@ const agregarPreguntaBot = (siguientePasoId) => {
       return;
     }
 
+    const validacionFinal = validarFlujoCompletoAntesDeEnviar(
+      RADIOGRAFIA_FLOW,
+      respuestas
+    );
+
+    if (validacionFinal) {
+      setError(
+        `${validacionFinal.pregunta} ${validacionFinal.mensaje}`
+      );
+      return;
+    }
+
     setError("");
     setEnviandoInformacion(true);
 
-    // Muestra el agradecimiento inmediatamente.
-    // Si el backend falla, se retorna al resumen y aparece el error.
+    /*
+      Muestra el agradecimiento inmediatamente.
+      Si el backend falla, se retorna al resumen y aparece el error.
+    */
+    setFinalizado(true);
     setEnviadoCorrectamente(true);
 
     try {
@@ -581,34 +780,44 @@ const agregarPreguntaBot = (siguientePasoId) => {
   };
 
   return (
-    <div className="radiografia-overlay" onClick={cerrar}>
+    <div className="radiografia-overlay">
       <section
-        className="radiografia-modal"
-        onClick={(event) => event.stopPropagation()}
+        className={`radiografia-modal ${
+          enviadoCorrectamente ? "radiografia-modal--final-message" : ""
+        }`}
+        style={
+          enviadoCorrectamente
+            ? { transform: "translateY(-50px)" }
+            : undefined
+        }
       >
-        <button
-          type="button"
-          className="radiografia-close"
-          onClick={cerrar}
-          aria-label="Cerrar Radiografía de Marca"
-        >
-          <X size={19} strokeWidth={2.1} />
-        </button>
+        {!enviadoCorrectamente && (
+          <button
+            type="button"
+            className="radiografia-close"
+            onClick={cerrar}
+            aria-label="Cerrar Radiografía de Marca"
+          >
+            <X size={19} strokeWidth={2.1} />
+          </button>
+        )}
 
-        <header className="radiografia-header">
-          <span>Radiografía de Marca</span>
+        {!enviadoCorrectamente && (
+          <header className="radiografia-header">
+            <span>Radiografía de Marca</span>
 
-          <p>
-            Responde unas preguntas rápidas para evaluar la viabilidad inicial
-            de tu marca.{" "}
-            <Link
-              to="/guia/precios-servicios-revera"
-              className="radiografia-prices-link"
-            >
-              Conoce los precios de nuestros servicios.
-            </Link>
-          </p>
-        </header>
+            <p>
+              Responde unas preguntas rápidas para evaluar la viabilidad inicial
+              de tu marca.{" "}
+              <Link
+                to="/guia/precios-servicios-revera"
+                className="radiografia-prices-link"
+              >
+                Conoce los precios de nuestros servicios.
+              </Link>
+            </p>
+          </header>
+        )}
 
         <div className="radiografia-chat" ref={chatRef}>
           {mensajes.map((mensaje, index) => (
@@ -624,34 +833,37 @@ const agregarPreguntaBot = (siguientePasoId) => {
                 </div>
               )}
 
-            <div>
-              {mensaje.texto}
+              <div>
+                {mensaje.texto}
 
-              {mensaje.linkTexto && mensaje.linkUrl && (
-                <>
-                  {" "}
-                  <a
-                    href={mensaje.linkUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="radiografia-guide-link"
-                  >
-                    {mensaje.linkTexto}
-                  </a>
-                </>
-              )}
+                {mensaje.linkTexto && mensaje.linkUrl && (
+                  <>
+                    {" "}
+                    <a
+                      href={mensaje.linkUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="radiografia-guide-link"
+                    >
+                      {mensaje.linkTexto}
+                    </a>
+                  </>
+                )}
 
-              {mensaje.required && (
-                <span className="required">*</span>
-              )}
-            </div>
+                {mensaje.required && (
+                  <span className="required">*</span>
+                )}
+              </div>
             </div>
           ))}
 
           {finalizado && (
             <div className="radiografia-summary">
               {enviadoCorrectamente ? (
-                <div className="radiografia-success-layout">
+                <div
+                  className="radiografia-success-layout"
+                  style={{ transform: "translateY(-03px)" }}
+                >
                   <div className="radiografia-success-header">
                     <h2>Radiografía de Marca</h2>
                     <p>Solicitud enviada correctamente.</p>
@@ -662,11 +874,14 @@ const agregarPreguntaBot = (siguientePasoId) => {
                       <span>✓</span>
                     </div>
 
-                    <h3>¡Gracias por compartir su información con nosotros!</h3>
+                    <h3>
+                      ¡Gracias por compartir su información con nosotros!
+                    </h3>
 
                     <p>Nos pondremos en contacto.</p>
 
-                    <p>La confidencialidad y protección de la información de
+                    <p>
+                      La confidencialidad y protección de la información de
                       nuestros clientes es una prioridad para nosotros.
                       Tratamos sus datos personales de manera segura,
                       responsable y conforme a nuestra Política de Privacidad.

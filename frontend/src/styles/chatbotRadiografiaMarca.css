@@ -981,3 +981,267 @@
   background: #6f60aa;
   color: #ffffff;
 }
+
+/* =========================================================
+   AJUSTE FINAL — CONTADOR DE CARACTERES VISIBLE
+   Mantener este bloque al final del archivo.
+========================================================= */
+
+.radiografia-chat {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.radiografia-footer {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 auto;
+  overflow: visible;
+  padding: 14px 28px 18px;
+}
+
+.radiografia-input-area {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.radiografia-field-with-counter,
+.radiografia-phone-fields-with-counter {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100%;
+  min-width: 0;
+  overflow: visible !important;
+}
+
+.radiografia-limit-message {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  position: static !important;
+
+  width: 100%;
+  min-height: 18px;
+  margin: 6px 0 0;
+  padding: 0 5px 0 0;
+
+  color: #6b7280 !important;
+  background: transparent !important;
+
+  font-family: var(--font-primary);
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: var(--font-weight-regular);
+
+  text-align: right;
+  white-space: normal;
+  overflow: visible !important;
+  overflow-wrap: anywhere;
+}
+
+.radiografia-limit-message--limit {
+  color: #b42318 !important;
+  font-weight: var(--font-weight-medium);
+}
+
+.radiografia-input-area input,
+.radiografia-phone-code,
+.radiografia-phone-number {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 10px 14px;
+}
+
+.radiografia-input-area textarea {
+  box-sizing: border-box;
+  min-height: 76px;
+  max-height: 140px;
+  padding: 11px 14px;
+  resize: vertical;
+}
+
+.radiografia-input-area > .radiografia-next-button,
+.radiografia-phone-area > .radiografia-next-button {
+  flex: 0 0 auto;
+  width: auto !important;
+  min-width: 106px !important;
+  max-width: max-content;
+  height: 40px !important;
+  padding: 0 15px !important;
+  border-radius: 999px;
+
+  align-self: center;
+  justify-self: end;
+
+  gap: 7px;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.radiografia-next-button svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+.radiografia-phone-area {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.radiografia-phone-fields-row {
+  display: flex !important;
+  width: 100%;
+  min-width: 0;
+  gap: 10px !important;
+}
+
+.radiografia-phone-code {
+  flex: 0 0 92px !important;
+  width: 92px !important;
+  min-width: 92px !important;
+  text-align: center;
+}
+
+.radiografia-phone-number {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .radiografia-footer {
+    padding: 13px 18px 16px;
+  }
+
+  .radiografia-input-area,
+  .radiografia-phone-area {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 9px;
+  }
+
+  .radiografia-input-area > .radiografia-next-button,
+  .radiografia-phone-area > .radiografia-next-button {
+    grid-column: 1;
+    width: auto !important;
+    min-width: 102px !important;
+    height: 39px !important;
+    justify-self: start;
+    align-self: start;
+  }
+}
+
+@media (max-width: 480px) {
+  .radiografia-footer {
+    padding: 12px 14px 14px;
+  }
+
+  .radiografia-limit-message {
+    min-height: 17px;
+    margin-top: 5px;
+    padding-right: 2px;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .radiografia-input-area textarea {
+    min-height: 68px;
+  }
+
+  .radiografia-phone-code {
+    flex-basis: 78px !important;
+    width: 78px !important;
+    min-width: 78px !important;
+  }
+}
+
+/* =========================================================
+   CENTRADO DEFINITIVO DEL MODAL - REVERA
+   Mantener este bloque al final del archivo.
+========================================================= */
+
+.radiografia-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 10000 !important;
+
+  box-sizing: border-box !important;
+  width: 100vw !important;
+  min-width: 100vw !important;
+  height: 100vh !important;
+  min-height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+
+  margin: 0 !important;
+  padding: 24px !important;
+
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) !important;
+  place-items: center !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior: contain;
+
+  background: rgba(15, 23, 42, 0.42) !important;
+}
+
+.radiografia-overlay > .radiografia-modal {
+  position: relative !important;
+  inset: auto !important;
+
+  box-sizing: border-box !important;
+  width: min(980px, calc(100vw - 48px)) !important;
+  max-width: 980px !important;
+  max-height: calc(100dvh - 48px) !important;
+
+  margin: auto !important;
+  align-self: center !important;
+  justify-self: center !important;
+
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+
+  transform: none !important;
+}
+
+.radiografia-modal--final-message {
+  transform: none !important;
+}
+
+.radiografia-success-layout {
+  transform: none !important;
+}
+
+@media (max-width: 768px) {
+  .radiografia-overlay {
+    padding: 14px !important;
+  }
+
+  .radiografia-overlay > .radiografia-modal {
+    width: calc(100vw - 28px) !important;
+    max-height: calc(100dvh - 28px) !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .radiografia-overlay {
+    padding: 8px !important;
+  }
+
+  .radiografia-overlay > .radiografia-modal {
+    width: calc(100vw - 16px) !important;
+    max-height: calc(100dvh - 16px) !important;
+  }
+}

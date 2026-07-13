@@ -115,7 +115,7 @@ select {
 
   opacity: 1;
 
-  filter: saturate(1.55) contrast(1.28) brightness(0.99);
+  filter: saturate(4.55) contrast(1.00) brightness(0.99);
   mix-blend-mode: multiply;
 
   transform: translateZ(0);

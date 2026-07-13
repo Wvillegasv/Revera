@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Search, FileText, CalendarDays, X } from "lucide-react";
+import { CalendarDays, FileText, Search, X } from "lucide-react";
 
 import Navbar from "../components/Navbar";
 import ServiceCard from "../components/ServiceCard";
@@ -16,48 +16,64 @@ import homeMainBg from "../assets/home-main-bg.png";
 import "../styles/revera.css";
 import "../styles/hero.css";
 import "../styles/agenda.css";
+import "../styles/chatbotRadiografiaMarca.css";
+
+const MODALES = {
+  CONTACTO: "contacto",
+  REGISTRO_MARCA: "registroMarca",
+  RADIOGRAFIA_MARCA: "radiografiaMarca",
+};
+
+function obtenerModalDesdeQuery(search) {
+  const params = new URLSearchParams(search);
+
+  if (params.get("abrirAgenda") === "true") {
+    return MODALES.CONTACTO;
+  }
+
+  if (params.get("abrirRadiografia") === "true") {
+    return MODALES.RADIOGRAFIA_MARCA;
+  }
+
+  if (params.get("abrirRegistroMarca") === "true") {
+    return MODALES.REGISTRO_MARCA;
+  }
+
+  return null;
+}
 
 function Home() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const [mostrarContacto, setMostrarContacto] = useState(false);
-  const [mostrarRegistroMarca, setMostrarRegistroMarca] = useState(false);
-  const [mostrarRadiografiaMarca, setMostrarRadiografiaMarca] = useState(false);
+  const [modalActivo, setModalActivo] = useState(() =>
+    obtenerModalDesdeQuery(window.location.search)
+  );
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
+    const modalDesdeQuery = obtenerModalDesdeQuery(location.search);
 
-    const abrirAgenda = params.get("abrirAgenda");
-    const abrirRadiografia = params.get("abrirRadiografia");
-    const abrirRegistroMarca = params.get("abrirRegistroMarca");
-
-    if (abrirAgenda === "true") {
-      setMostrarRegistroMarca(false);
-      setMostrarRadiografiaMarca(false);
-      setMostrarContacto(true);
-
-      navigate("/", { replace: true });
-      return;
+    if (!modalDesdeQuery) {
+      return undefined;
     }
 
-    if (abrirRadiografia === "true") {
-      setMostrarContacto(false);
-      setMostrarRegistroMarca(false);
-      setMostrarRadiografiaMarca(true);
-
+    const temporizador = window.setTimeout(() => {
+      setModalActivo(modalDesdeQuery);
       navigate("/", { replace: true });
-      return;
-    }
+    }, 0);
 
-    if (abrirRegistroMarca === "true") {
-      setMostrarContacto(false);
-      setMostrarRadiografiaMarca(false);
-      setMostrarRegistroMarca(true);
-
-      navigate("/", { replace: true });
-    }
+    return () => {
+      window.clearTimeout(temporizador);
+    };
   }, [location.search, navigate]);
+
+  const abrirModal = (modal) => {
+    setModalActivo(modal);
+  };
+
+  const cerrarModal = () => {
+    setModalActivo(null);
+  };
 
   const servicios = [
     {
@@ -67,7 +83,7 @@ function Home() {
       subtitle: "Cómo validar tu marca antes de registrarla",
       description:
         "Revera te da una visión clara y estructurada de la viabilidad de tu marca antes de invertir tiempo, dinero o identidad en ella.",
-      action: () => setMostrarRadiografiaMarca(true),
+      action: () => abrirModal(MODALES.RADIOGRAFIA_MARCA),
     },
     {
       id: 2,
@@ -76,7 +92,7 @@ function Home() {
       subtitle: "Registra tu marca con seguridad desde el inicio",
       description:
         "Gestionamos el proceso aplicando criterios jurídicos para reducir riesgos y evitar errores que puedan costarte.",
-      action: () => setMostrarRegistroMarca(true),
+      action: () => abrirModal(MODALES.REGISTRO_MARCA),
     },
     {
       id: 3,
@@ -86,27 +102,9 @@ function Home() {
         "Si prefieres hablarlo antes de avanzar, este es tu punto de partida",
       description:
         "Agenda una sesión personalizada y obtén claridad sobre tu marca o cualquier cuestión de propiedad intelectual.",
-      action: () => setMostrarContacto(true),
+      action: () => abrirModal(MODALES.CONTACTO),
     },
   ];
-
-  const abrirContacto = () => {
-    setMostrarRegistroMarca(false);
-    setMostrarRadiografiaMarca(false);
-    setMostrarContacto(true);
-  };
-
-  const cerrarContacto = () => {
-    setMostrarContacto(false);
-  };
-
-  const cerrarRegistroMarca = () => {
-    setMostrarRegistroMarca(false);
-  };
-
-  const cerrarRadiografiaMarca = () => {
-    setMostrarRadiografiaMarca(false);
-  };
 
   return (
     <div id="home-top" className="home-page revera-page-shell">
@@ -127,7 +125,7 @@ function Home() {
       />
 
       <div className="revera-content-layer">
-        <Navbar onContactoClick={abrirContacto} />
+        <Navbar onContactoClick={() => abrirModal(MODALES.CONTACTO)} />
 
         <main className="hero-section">
           <section className="hero-content">
@@ -147,6 +145,14 @@ function Home() {
                 key={service.id}
                 onClick={service.action}
                 style={{ cursor: service.action ? "pointer" : "default" }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    service.action();
+                  }
+                }}
               >
                 <ServiceCard
                   icon={service.icon}
@@ -164,8 +170,8 @@ function Home() {
         <FloatingHelpButton />
       </div>
 
-      {mostrarContacto && (
-        <div className="contacto-modal-overlay" onClick={cerrarContacto}>
+      {modalActivo === MODALES.CONTACTO && (
+        <div className="contacto-modal-overlay" onClick={cerrarModal}>
           <div
             className="contacto-modal-container"
             onClick={(event) => event.stopPropagation()}
@@ -173,7 +179,7 @@ function Home() {
             <button
               type="button"
               className="contacto-modal-close"
-              onClick={cerrarContacto}
+              onClick={cerrarModal}
               aria-label="Cerrar formulario"
             >
               <X size={18} strokeWidth={2.1} />
@@ -193,7 +199,7 @@ function Home() {
               </h2>
 
               <p>
-                Completa el formulario y nos pondremos en contacto contigo. {" "}
+                Completa el formulario y nos pondremos en contacto contigo.{" "}
                 <a
                   href="/guia/como-funcionan-servicios-revera"
                   target="_blank"
@@ -205,19 +211,19 @@ function Home() {
               </p>
             </div>
 
-            <AgendaForm onSuccess={cerrarContacto} />
+            <AgendaForm onSuccess={cerrarModal} />
           </div>
         </div>
       )}
 
       <ChatbotRegistroMarca
-        abierto={mostrarRegistroMarca}
-        onClose={cerrarRegistroMarca}
+        abierto={modalActivo === MODALES.REGISTRO_MARCA}
+        onClose={cerrarModal}
       />
 
       <ChatbotRadiografiaMarca
-        abierto={mostrarRadiografiaMarca}
-        onClose={cerrarRadiografiaMarca}
+        abierto={modalActivo === MODALES.RADIOGRAFIA_MARCA}
+        onClose={cerrarModal}
       />
     </div>
   );
