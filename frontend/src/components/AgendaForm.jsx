@@ -30,7 +30,7 @@ const HORARIOS_LUNES_VIERNES = [
   "18:00",
 ];
 
-const HORARIOS_SABADO = ["10:00", "11:00", "12:00", "14:00"];
+const HORARIOS_SABADO = ["10:00", "11:00", "12:00", "13:00", "14:00"];
 
 const OPCIONES_CONSULTA = [
   "Registro de marca",

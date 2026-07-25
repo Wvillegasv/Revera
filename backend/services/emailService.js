@@ -1,23 +1,54 @@
 const nodemailer = require("nodemailer");
 
+const smtpPort = Number(process.env.SMTP_PORT || 587);
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: false,
+  port: smtpPort,
+  secure: smtpPort === 465,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
 });
 
-async function enviarCorreo({ to, subject, html, attachments = [] }) {
-  return transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
+async function enviarCorreo({
+  to,
+  subject,
+  html,
+  attachments = [],
+  replyTo,
+}) {
+  const destinatario = Array.isArray(to) ? to.join(",") : to;
+
+  if (!destinatario || String(destinatario).trim() === "") {
+    throw new Error("No se indicó un destinatario para el correo.");
+  }
+
+  const info = await transporter.sendMail({
+    from:
+      process.env.SMTP_FROM ||
+      `REVERA <${process.env.SMTP_USER}>`,
+    to: destinatario,
+    replyTo:
+      replyTo ||
+      process.env.SMTP_REPLY_TO ||
+      undefined,
     subject,
     html,
     attachments,
   });
+
+  console.log("Resultado SMTP:", {
+    to: destinatario,
+    subject,
+    messageId: info.messageId,
+    accepted: info.accepted,
+    rejected: info.rejected,
+    response: info.response,
+  });
+
+  return info;
 }
 
 /* =======================================================
@@ -320,6 +351,7 @@ async function enviarEstudioRegistrabilidad({
     subject: "CALLESE LOS OJOS! UNA NUEVA SOLICITUD RADIOGRAFÍA DE MARCA",
     html,
     attachments,
+    replyTo: correo,
   });
 }
 

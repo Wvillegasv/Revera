@@ -17,7 +17,10 @@ import {
   buildRequestFormData,
   buildResumenItems,
   formatearTelefonoVisual,
+  obtenerLimitesCampo,
+  obtenerMaxLengthCampo,
   validateCorreo,
+  validateLongitudCampo,
   validateRequiredOption,
   validateTelefono,
   validateTexto,
@@ -244,14 +247,68 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
   }
 
   function validateCurrentValue(value) {
-    if (!currentStep || typeof currentStep.validate !== "function") {
+    if (!currentStep) {
       return "";
     }
 
-    return currentStep.validate(value);
+    if (typeof currentStep.validate === "function") {
+      const validationMessage = currentStep.validate(value);
+
+      if (validationMessage) {
+        return validationMessage;
+      }
+    }
+
+    return validateLongitudCampo(currentStep.key, value);
+  }
+
+  function construirFormDataActualizado(step, value) {
+    const nextFormData = {
+      ...formData,
+    };
+
+    if (step.type === "phone") {
+      const codigoPais = String(value?.codigoPais || "").trim();
+      const numero = String(value?.numero || "").trim();
+      const phoneKeys = step.phoneKeys || {};
+
+      nextFormData[phoneKeys.codigoPais || `${step.key}CodigoPais`] = codigoPais;
+      nextFormData[phoneKeys.numero || `${step.key}Numero`] = numero;
+      nextFormData[phoneKeys.completo || step.key] = `${codigoPais}${numero}`;
+
+      return nextFormData;
+    }
+
+    nextFormData[step.key] = value;
+    return nextFormData;
+  }
+
+  function volverAlResumenDespuesDeEditar(nextFormData) {
+    setFormData(nextFormData);
+    setInputValue("");
+    setErrorActual("");
+    setEditandoPasoKey("");
+    setEnResumen(true);
+
+    /*
+      No se recalcula la ruta normal después de editar.
+      El usuario vuelve directamente al resumen final y conserva
+      las respuestas posteriores.
+
+      Importante:
+      No usamos steps.length aquí, porque steps se recalcula cuando
+      se editan campos condicionales como tipoTramite, tipoTitular
+      o países con "Otro". Si se usa un índice viejo, el componente
+      puede quedar en un estado inconsistente.
+    */
+    setStepIndex(0);
   }
 
   function handleAdvance(value) {
+    if (!currentStep) {
+      return;
+    }
+
     const validationMessage = validateCurrentValue(value);
 
     if (validationMessage) {
@@ -259,22 +316,16 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
       return;
     }
 
-    setErrorActual("");
+    const nextFormData = construirFormDataActualizado(currentStep, value);
 
-    if (currentStep.type === "phone") {
-      setPhoneFieldValue(currentStep, value);
-    } else {
-      setFieldValue(currentStep.key, value);
-    }
-
-    setInputValue("");
-
-    if (editandoPasoKey) {
-      setEditandoPasoKey("");
-      setStepIndex(steps.length);
-      setEnResumen(true);
+    if (editandoPasoKey && editandoPasoKey === currentStep.key) {
+      volverAlResumenDespuesDeEditar(nextFormData);
       return;
     }
+
+    setErrorActual("");
+    setFormData(nextFormData);
+    setInputValue("");
 
     const nextIndex = stepIndex + 1;
 
@@ -302,6 +353,72 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
       handleAdvance(getCurrentPhoneValue());
     }
   }
+
+  function renderContadorTexto() {
+    if (!currentStep || !["text", "textarea"].includes(currentStep.type)) {
+      return null;
+    }
+
+    const { min: minimo, max: maximo } = obtenerLimitesCampo(
+      currentStep.key
+    );
+
+    if (!minimo && !maximo) {
+      return null;
+    }
+
+    const longitud = String(inputValue ?? "").length;
+    const alcanzoMaximo = Boolean(maximo && longitud >= maximo);
+
+    return (
+      <small
+        className={`crm-character-counter ${
+          alcanzoMaximo ? "crm-character-counter--limit" : ""
+        }`}
+        role="status"
+        aria-live="polite"
+      >
+        {longitud}
+        {maximo ? ` / ${maximo}` : ""} caracteres.
+        {minimo ? ` Mínimo permitido: ${minimo} caracteres.` : ""}
+        {maximo ? ` Máximo permitido: ${maximo} caracteres.` : ""}
+        {alcanzoMaximo
+          ? " Has alcanzado el máximo permitido."
+          : ""}
+      </small>
+    );
+  }
+
+  function renderContadorTelefono(phoneValue) {
+    const codigoPais = String(phoneValue?.codigoPais || "");
+    const numero = String(phoneValue?.numero || "");
+    const maxCodigoPais = 10;
+    const maxNumero = 20;
+    const esCostaRica = codigoPais === "506";
+    const alcanzoMaximo =
+      codigoPais.length >= maxCodigoPais || numero.length >= maxNumero;
+
+    return (
+      <small
+        className={`crm-character-counter ${
+          alcanzoMaximo ? "crm-character-counter--limit" : ""
+        }`}
+        role="status"
+        aria-live="polite"
+      >
+        Código país: {codigoPais.length} / {maxCodigoPais} dígitos.
+        Teléfono: {numero.length}
+        {esCostaRica ? " / 8" : ` / ${maxNumero}`} dígitos.
+        {esCostaRica
+          ? " Para Costa Rica se requieren exactamente 8 dígitos."
+          : " Mínimo permitido: 6. Máximo permitido: 20 dígitos."}
+        {alcanzoMaximo
+          ? " Has alcanzado el máximo permitido."
+          : ""}
+      </small>
+    );
+  }
+
 
   function handleOptionClick(option) {
     if (!isSubmitting) {
@@ -331,6 +448,11 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
     const file = event.target.files?.[0] || null;
 
     if (file) {
+      if (String(file.name || "").length > 255) {
+        setErrorActual("El nombre del archivo permite un máximo de 255 caracteres.");
+        return;
+      }
+
       const allowedMimeTypes = [
         "image/jpeg",
         "image/png",
@@ -460,41 +582,58 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
       const phoneValue = getCurrentPhoneValue();
 
       return (
-        <form onSubmit={handlePhoneSubmit} className="crm-form-inline crm-phone-inline">
-          <input
-            type="text"
-            inputMode="numeric"
-            className="crm-input crm-phone-code"
-            value={phoneValue.codigoPais}
-            onChange={(event) => {
-              setInputValue({
-                ...phoneValue,
-                codigoPais: event.target.value.replace(/\D/g, ""),
-              });
-              setErrorActual("");
-            }}
-            placeholder={currentStep.placeholderCodigoPais || "506"}
+        <form
+          onSubmit={handlePhoneSubmit}
+          className="crm-form-inline crm-phone-inline"
+        >
+          <div className="crm-phone-fields-with-counter">
+            <div className="crm-phone-fields-row">
+              <input
+                type="text"
+                inputMode="numeric"
+                className="crm-input crm-phone-code"
+                value={phoneValue.codigoPais}
+                onChange={(event) => {
+                  setInputValue({
+                    ...phoneValue,
+                    codigoPais: event.target.value.replace(/\D/g, ""),
+                  });
+                  setErrorActual("");
+                }}
+                placeholder={currentStep.placeholderCodigoPais || "506"}
+                maxLength={10}
+                disabled={isSubmitting}
+                aria-label="Código de país"
+              />
+
+              <input
+                type="text"
+                inputMode="numeric"
+                className="crm-input crm-phone-number"
+                value={phoneValue.numero}
+                onChange={(event) => {
+                  setInputValue({
+                    ...phoneValue,
+                    numero: event.target.value.replace(/\D/g, ""),
+                  });
+                  setErrorActual("");
+                }}
+                placeholder={currentStep.placeholderNumero || "88887777"}
+                maxLength={20}
+                disabled={isSubmitting}
+                aria-label="Número de teléfono"
+              />
+            </div>
+
+            {renderContadorTelefono(phoneValue)}
+          </div>
+
+          <button
+            type="submit"
+            className="crm-send-btn crm-next-btn"
             disabled={isSubmitting}
-            aria-label="Código de país"
-          />
-          <input
-            type="text"
-            inputMode="numeric"
-            className="crm-input crm-phone-number"
-            value={phoneValue.numero}
-            onChange={(event) => {
-              setInputValue({
-                ...phoneValue,
-                numero: event.target.value.replace(/\D/g, ""),
-              });
-              setErrorActual("");
-            }}
-            placeholder={currentStep.placeholderNumero || "88887777"}
-            disabled={isSubmitting}
-            aria-label="Número de teléfono"
-          />
-          <button type="submit" className="crm-send-btn" disabled={isSubmitting}>
-            <Send size={18} strokeWidth={2.2} />
+          >
+            <Send size={16} strokeWidth={2.2} />
             <span>Siguiente</span>
           </button>
         </form>
@@ -504,19 +643,29 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
     if (currentStep.type === "text") {
       return (
         <form onSubmit={handleTextSubmit} className="crm-form-inline">
-          <input
-            type={currentStep.key === "correo" ? "email" : "text"}
-            className="crm-input"
-            value={inputValue}
-            onChange={(event) => {
-              setInputValue(event.target.value);
-              setErrorActual("");
-            }}
-            placeholder={currentStep.placeholder || "Escribe tu respuesta"}
+          <div className="crm-field-with-counter">
+            <input
+              type={currentStep.key === "correo" ? "email" : "text"}
+              className="crm-input"
+              value={inputValue}
+              onChange={(event) => {
+                setInputValue(event.target.value);
+                setErrorActual("");
+              }}
+              placeholder={currentStep.placeholder || "Escribe tu respuesta"}
+              maxLength={obtenerMaxLengthCampo(currentStep.key)}
+              disabled={isSubmitting}
+            />
+
+            {renderContadorTexto()}
+          </div>
+
+          <button
+            type="submit"
+            className="crm-send-btn crm-next-btn"
             disabled={isSubmitting}
-          />
-          <button type="submit" className="crm-send-btn" disabled={isSubmitting}>
-            <Send size={18} strokeWidth={2.2} />
+          >
+            <Send size={16} strokeWidth={2.2} />
             <span>Siguiente</span>
           </button>
         </form>
@@ -526,19 +675,29 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
     if (currentStep.type === "textarea") {
       return (
         <form onSubmit={handleTextSubmit} className="crm-form-block">
-          <textarea
-            className="crm-textarea"
-            value={inputValue}
-            onChange={(event) => {
-              setInputValue(event.target.value);
-              setErrorActual("");
-            }}
-            placeholder={currentStep.placeholder || "Escribe tu respuesta"}
-            rows={5}
+          <div className="crm-field-with-counter">
+            <textarea
+              className="crm-textarea"
+              value={inputValue}
+              onChange={(event) => {
+                setInputValue(event.target.value);
+                setErrorActual("");
+              }}
+              placeholder={currentStep.placeholder || "Escribe tu respuesta"}
+              maxLength={obtenerMaxLengthCampo(currentStep.key)}
+              rows={4}
+              disabled={isSubmitting}
+            />
+
+            {renderContadorTexto()}
+          </div>
+
+          <button
+            type="submit"
+            className="crm-primary-btn crm-next-btn"
             disabled={isSubmitting}
-          />
-          <button type="submit" className="crm-primary-btn" disabled={isSubmitting}>
-            <Send size={18} strokeWidth={2.2} />
+          >
+            <Send size={16} strokeWidth={2.2} />
             Siguiente
           </button>
         </form>
@@ -571,6 +730,7 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
           <p className="crm-options-help">
             Puedes seleccionar una o varias clases. Luego pulsa Siguiente.
           </p>
+
           <div className="crm-options-grid">
             {currentStep.options.map((option) => {
               const selected = seleccionadas.includes(option);
@@ -579,7 +739,9 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
                 <button
                   type="button"
                   key={option}
-                  className={`crm-option-btn ${selected ? "crm-option-btn--selected" : ""}`}
+                  className={`crm-option-btn ${
+                    selected ? "crm-option-btn--selected" : ""
+                  }`}
                   onClick={() => toggleNizaOption(option)}
                   disabled={isSubmitting}
                   aria-pressed={selected}
@@ -589,13 +751,14 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
               );
             })}
           </div>
+
           <button
             type="button"
-            className="crm-primary-btn"
+            className="crm-primary-btn crm-next-btn"
             onClick={() => handleAdvance(seleccionadas)}
             disabled={isSubmitting}
           >
-            <Send size={18} strokeWidth={2.2} />
+            <Send size={16} strokeWidth={2.2} />
             Siguiente
           </button>
         </div>
@@ -610,6 +773,7 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
           <label className="crm-file-label">
             <Upload size={18} />
             <span>Seleccionar archivo</span>
+
             <input
               type="file"
               accept={currentStep.accept}
@@ -618,7 +782,13 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
               disabled={isSubmitting}
             />
           </label>
-          {archivoActual?.name && <span className="crm-file-name">{archivoActual.name}</span>}
+
+          {archivoActual?.name && (
+            <span className="crm-file-name">
+              {archivoActual.name}
+            </span>
+          )}
+
           <button
             type="button"
             className="crm-secondary-btn"
@@ -635,7 +805,7 @@ export default function ChatbotRegistroMarca({ abierto, onClose }) {
   }
 
   return (
-    <div className="crm-overlay" onClick={cerrarChat}>
+    <div className="crm-overlay">
       <section className="crm-modal" onClick={(event) => event.stopPropagation()}>
         <header className="crm-header">
           <div>

@@ -10,6 +10,167 @@ function tieneValor(valor) {
   return limpiarTexto(valor) !== "";
 }
 
+export const LIMITES_REGISTRO_MARCA = {
+  correo: {
+    max: 200,
+    mensajeMax: "El correo electrónico permite un máximo de 200 caracteres.",
+  },
+  nombreMarca: {
+    min: 2,
+    max: 255,
+    mensajeMax: "La marca o nombre comercial permite un máximo de 255 caracteres.",
+  },
+  paisOrigenOtro: {
+    min: 2,
+    max: 100,
+    mensajeMax: "El país de origen permite un máximo de 100 caracteres.",
+  },
+  giroActividad: {
+    min: 3,
+    max: 200,
+    mensajeMax: "El giro o actividad permite un máximo de 200 caracteres.",
+  },
+  detalleProductosServicios: {
+    min: 10,
+    max: 2000,
+    mensajeMax: "El detalle de productos o servicios permite un máximo de 2,000 caracteres.",
+  },
+  direccionEstablecimiento: {
+    min: 10,
+    max: 200,
+    mensajeMax: "La dirección del establecimiento permite un máximo de 200 caracteres.",
+  },
+  informacionAdicional: {
+    max: 1000,
+    mensajeMax: "La información adicional permite un máximo de 1,000 caracteres.",
+  },
+  personaNombre: {
+    min: 8,
+    max: 160,
+    mensajeMax: "El nombre completo del titular permite un máximo de 160 caracteres.",
+  },
+  personaProfesion: {
+    min: 3,
+    max: 100,
+    mensajeMax: "La profesión u ocupación permite un máximo de 100 caracteres.",
+  },
+  personaNumeroIdentificacion: {
+    min: 5,
+    max: 30,
+    mensajeMax: "El número de identificación permite un máximo de 30 caracteres.",
+  },
+  personaDireccion: {
+    min: 10,
+    max: 200,
+    mensajeMax: "La dirección exacta del titular permite un máximo de 200 caracteres.",
+  },
+  personaPaisNacionalidadOtro: {
+    min: 2,
+    max: 100,
+    mensajeMax: "El país de nacionalidad permite un máximo de 100 caracteres.",
+  },
+  personaPaisResidenciaOtro: {
+    min: 2,
+    max: 100,
+    mensajeMax: "El país de residencia permite un máximo de 100 caracteres.",
+  },
+  empresaNombre: {
+    min: 3,
+    max: 100,
+    mensajeMax: "El nombre de la empresa permite un máximo de 100 caracteres.",
+  },
+  empresaIdentificacion: {
+    min: 5,
+    max: 30,
+    mensajeMax: "La identificación de la empresa permite un máximo de 30 caracteres.",
+  },
+  empresaPaisConstitucionOtro: {
+    min: 2,
+    max: 100,
+    mensajeMax: "El país de constitución permite un máximo de 100 caracteres.",
+  },
+  empresaDomicilioSocial: {
+    min: 10,
+    max: 200,
+    mensajeMax: "El domicilio social permite un máximo de 200 caracteres.",
+  },
+  representanteNombre: {
+    min: 8,
+    max: 160,
+    mensajeMax: "El nombre completo del representante permite un máximo de 160 caracteres.",
+  },
+  representanteProfesion: {
+    min: 3,
+    max: 100,
+    mensajeMax: "La profesión u ocupación del representante permite un máximo de 100 caracteres.",
+  },
+  representanteNumeroIdentificacion: {
+    min: 5,
+    max: 30,
+    mensajeMax: "El número de identificación del representante permite un máximo de 30 caracteres.",
+  },
+  representantePaisNacionalidadOtro: {
+    min: 2,
+    max: 100,
+    mensajeMax: "El país de nacionalidad del representante permite un máximo de 100 caracteres.",
+  },
+  representantePaisResidenciaOtro: {
+    min: 2,
+    max: 100,
+    mensajeMax: "El país de residencia del representante permite un máximo de 100 caracteres.",
+  },
+  representanteDireccion: {
+    min: 10,
+    max: 200,
+    mensajeMax: "La dirección exacta del representante permite un máximo de 200 caracteres.",
+  },
+  empresaInformacionAdicional: {
+    max: 1000,
+    mensajeMax: "La información adicional de la empresa permite un máximo de 1,000 caracteres.",
+  },
+  nombreCompleto: {
+    min: 8,
+    max: 160,
+    mensajeMax: "El nombre de contacto permite un máximo de 160 caracteres.",
+  },
+};
+
+export function obtenerMaxLengthCampo(key) {
+  return LIMITES_REGISTRO_MARCA[key]?.max;
+}
+
+export function obtenerLimitesCampo(key) {
+  const limites = LIMITES_REGISTRO_MARCA[key] || {};
+
+  return {
+    min: limites.min ?? null,
+    max: limites.max ?? null,
+  };
+}
+
+export function validateLongitudCampo(key, value) {
+  const limite = LIMITES_REGISTRO_MARCA[key];
+
+  if (!limite?.max) {
+    return "";
+  }
+
+  const texto = limpiarTexto(value);
+
+  if (!texto) {
+    return "";
+  }
+
+  if (texto.length > limite.max) {
+    return (
+      limite.mensajeMax ||
+      `Este campo permite un máximo de ${limite.max} caracteres.`
+    );
+  }
+
+  return "";
+}
+
 export function validateRequiredOption(value) {
   return tieneValor(value) ? "" : "Selecciona una opción para continuar.";
 }
@@ -20,6 +181,10 @@ export function validateCorreo(value) {
 
   if (!correo) {
     return "Ingresa tu correo electrónico.";
+  }
+
+  if (correo.length > 200) {
+    return "El correo electrónico permite un máximo de 200 caracteres.";
   }
 
   if (!patron.test(correo)) {
@@ -37,6 +202,14 @@ export function validateTelefono(value) {
     return "Ingresa el código de país y el número de teléfono.";
   }
 
+  if (codigoPais.length > 10) {
+    return "El código de país permite un máximo de 10 dígitos.";
+  }
+
+  if (numero.length > 20) {
+    return "El número de teléfono permite un máximo de 20 dígitos.";
+  }
+
   if (codigoPais === "506" && numero.length !== 8) {
     return "Para Costa Rica, el número de teléfono debe tener 8 dígitos.";
   }
@@ -48,11 +221,24 @@ export function validateTelefono(value) {
   return "";
 }
 
-export function validateTexto(value, minLength = 1, mensaje = "Completa este campo.") {
+export function validateTexto(
+  value,
+  minLength = 1,
+  mensaje = "Completa este campo.",
+  maxLength,
+  mensajeMax
+) {
   const texto = limpiarTexto(value);
 
   if (texto.length < minLength) {
     return mensaje;
+  }
+
+  if (maxLength && texto.length > maxLength) {
+    return (
+      mensajeMax ||
+      `Este campo permite un máximo de ${maxLength} caracteres.`
+    );
   }
 
   return "";

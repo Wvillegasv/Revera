@@ -1,147 +1,18 @@
 /* =========================================================
-   REVERA - AVISO DE PRIVACIDAD
+   REVERA - CONTENIDO AVISO DE PRIVACIDAD
 ========================================================= */
 
-.aviso-page {
-  min-height: 100vh;
-  background: var(--color-bg-base);
-  color: #00001b;
-  padding: 12px 16px 24px;
-}
-
-.aviso-container {
+.aviso-contenido {
   width: 100%;
-  max-width: 980px;
-  margin: 72px auto 0;
-  padding: 46px 48px;
-
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(18, 7, 66, 0.06);
-  border-radius: 28px;
-  box-shadow: 0 18px 42px rgba(18, 7, 66, 0.08);
-
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
 }
 
-/* Título principal: Aviso de Privacidad */
-.aviso-container h1 {
-  margin: 0 0 42px;
-  text-align: center;
-
-  color: #00001b;
-  font-family: var(--font-primary);
-  font-size: clamp(22px, 2.4vw, 32px);
-  line-height: 1.15;
-  font-weight: var(--font-weight-heavy);
+.aviso-contenido section {
+  margin: 0;
 }
 
-/* Secciones */
-.aviso-container section {
-  margin-top: 32px;
-}
-
-/* Títulos secundarios */
-.aviso-container h2 {
-  margin: 0 0 12px;
-
-  color: #6f60aa;
-  font-family: var(--font-primary);
-  font-size: clamp(16px, 1.5vw, 20px);
-  line-height: 1.25;
-  font-weight: var(--font-weight-bold);
-}
-
-/* Párrafos y listas */
-.aviso-container p,
-.aviso-container li {
-  color: #00001b;
-  font-family: var(--font-primary);
-  font-size: 15.5px;
-  line-height: 1.75;
-  font-weight: var(--font-weight-regular);
-}
-
-.aviso-container p {
-  margin: 0 0 14px;
-}
-
-.aviso-container ul {
-  margin: 12px 0 18px;
-  padding-left: 24px;
-}
-
-.aviso-container li {
-  margin-bottom: 8px;
-}
-
-/* Última actualización */
-.aviso-last-update {
-  margin: 44px 0 0 !important;
-  text-align: center;
-
-  color: #939598 !important;
-  font-family: var(--font-primary);
-  font-size: 15px;
-  line-height: 1.5;
-  font-weight: var(--font-weight-medium) !important;
-}
-
-/* =========================================================
-   RESPONSIVE - TABLET
-========================================================= */
-
-@media (max-width: 768px) {
-  .aviso-page {
-    padding: 10px 10px 22px;
-  }
-
-  .aviso-container {
-    margin-top: 48px;
-    padding: 34px 28px;
-    border-radius: 24px;
-  }
-
-  .aviso-container h1 {
-    margin-bottom: 32px;
-  }
-
-  .aviso-container section {
-    margin-top: 26px;
-  }
-
-  .aviso-container p,
-  .aviso-container li {
-    font-size: 14.5px;
-    line-height: 1.7;
-  }
-}
-
-/* =========================================================
-   RESPONSIVE - MOBILE
-========================================================= */
-
-@media (max-width: 480px) {
-  .aviso-container {
-    margin-top: 34px;
-    padding: 28px 20px;
-    border-radius: 22px;
-  }
-
-  .aviso-container h1 {
-    font-size: 24px;
-  }
-
-  .aviso-container h2 {
-    font-size: 17px;
-  }
-
-  .aviso-container p,
-  .aviso-container li {
-    font-size: 14px;
-  }
-
-  .aviso-last-update {
-    font-size: 14px;
-  }
+.aviso-contenido h2,
+.aviso-contenido h3,
+.aviso-contenido p,
+.aviso-contenido ul {
+  box-sizing: border-box;
 }

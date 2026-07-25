@@ -6,7 +6,6 @@ import Guia from "./pages/Guia";
 import ArticuloDetalle from "./pages/ArticuloDetalle";
 import ChatbotRegistrabilidad from "./pages/ChatbotRegistrabilidad";
 import ChatbotRegistroMarca from "./pages/ChatbotRegistroMarca";
-import AvisoPrivacidad from "./pages/AvisoPrivacidad";
 import AdminArticulos from "./pages/admin/AdminArticulos";
 
 import "./App.css";
@@ -32,9 +31,10 @@ function App() {
           element={<ChatbotRegistroMarca />}
         />
 
-        <Route path="/aviso-privacidad" element={<AvisoPrivacidad />} />
-
-        <Route path="/admin/articulos" element={<AdminArticulos />} />
+        <Route
+          path="/admin/articulos"
+          element={<AdminArticulos />}
+        />
       </Routes>
     </BrowserRouter>
   );

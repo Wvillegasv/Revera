@@ -824,7 +824,32 @@ async function obtenerCorreosDestinatariosRegistroMarca(connection) {
 
   const [rows] = await connection.execute(sql);
 
-  return rows.map((row) => row.co_correo);
+  const destinatariosBaseDatos = rows
+    .map((row) => sanitizarTexto(row.co_correo).toLowerCase())
+    .filter(Boolean);
+
+  if (destinatariosBaseDatos.length > 0) {
+    return [...new Set(destinatariosBaseDatos)];
+  }
+
+  /*
+    Respaldo cuando no existen usuarios activos configurados
+    para atención de clientes en la base de datos.
+  */
+  const configurados =
+    process.env.SMTP_NOTIFICATION_TO ||
+    process.env.SMTP_REPLY_TO ||
+    process.env.SMTP_USER ||
+    "";
+
+  return [
+    ...new Set(
+      configurados
+        .split(",")
+        .map((correo) => sanitizarTexto(correo).toLowerCase())
+        .filter(Boolean)
+    ),
+  ];
 }
 
 async function registrarSolicitudRegistroMarca({ body, files = [] }) {
