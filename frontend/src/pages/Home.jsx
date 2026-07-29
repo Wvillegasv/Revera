@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import ServiceCard from "../components/ServiceCard";
 import AgendaForm from "../components/AgendaForm";
 import Footer from "../components/Footer";
-import FloatingHelpButton from "../components/FloatingHelpButton";
+/*import FloatingHelpButton from "../components/FloatingHelpButton"; De momento no lo vamos a usar*/ 
 
 import ChatbotRegistroMarca from "../components/chatbot-registro-marca/ChatbotRegistroMarca";
 import ChatbotRadiografiaMarca from "../components/chatbot-radiografia-marca/ChatbotRadiografiaMarca";
@@ -176,7 +176,7 @@ function Home() {
 
         <Footer />
 
-        <FloatingHelpButton />
+         
       </div>
 
       {modalActivo === MODALES.CONTACTO && (
