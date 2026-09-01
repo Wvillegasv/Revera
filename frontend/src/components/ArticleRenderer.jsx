@@ -1,3 +1,5 @@
+import { Fragment } from "react";
+import { Link } from "react-router-dom";
 import "../styles/guiarevera.css";
 
 function obtenerUrlImagen(imagenUrl) {
@@ -22,53 +24,141 @@ function obtenerUrlImagen(imagenUrl) {
   return `/${imagenUrl}`;
 }
 
+/*
+  Admite los dos formatos de enlaces:
+
+  1. Markdown:
+     [nombre](/guia/como-elegir-nombre-marca-fuerte)
+
+  2. HTML guardado en la base de datos:
+     <a class="guia-revera-inline-link"
+        href="/guia/como-elegir-nombre-marca-fuerte">nombre</a>
+
+  No utiliza dangerouslySetInnerHTML.
+*/
+const REGEX_ENLACES =
+  /<a\b[^>]*href=(["'])(.*?)\1[^>]*>([\s\S]*?)<\/a>|\[([^\]]+)\]\(([^)]+)\)/gi;
+
+function limpiarTextoEnlace(texto = "") {
+  return String(texto)
+    .replace(/<[^>]+>/g, "")
+    .trim();
+}
+
+function normalizarUrlEnlace(url = "") {
+  const valor = String(url).trim();
+
+  if (
+    valor.startsWith("/") ||
+    valor.startsWith("http://") ||
+    valor.startsWith("https://") ||
+    valor.startsWith("mailto:") ||
+    valor.startsWith("tel:")
+  ) {
+    return valor;
+  }
+
+  return "";
+}
+
 function parsearContenidoConLinks(texto = "") {
+  const contenido = String(texto ?? "");
   const partes = [];
-  const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
 
   let ultimoIndice = 0;
   let match;
 
-  while ((match = regex.exec(texto)) !== null) {
+  REGEX_ENLACES.lastIndex = 0;
+
+  while ((match = REGEX_ENLACES.exec(contenido)) !== null) {
     if (match.index > ultimoIndice) {
-      partes.push(texto.slice(ultimoIndice, match.index));
+      partes.push({
+        tipo: "texto",
+        contenido: contenido.slice(ultimoIndice, match.index),
+      });
     }
 
-    partes.push({
-      tipo: "link",
-      texto: match[1],
-      url: match[2],
-    });
+    /*
+      Formato HTML:
+        match[2] = URL
+        match[3] = texto visible
 
-    ultimoIndice = regex.lastIndex;
+      Formato Markdown:
+        match[4] = texto visible
+        match[5] = URL
+    */
+    const url = normalizarUrlEnlace(match[2] || match[5] || "");
+    const textoVisible = limpiarTextoEnlace(match[3] || match[4] || "");
+
+    if (url && textoVisible) {
+      partes.push({
+        tipo: "link",
+        texto: textoVisible,
+        url,
+      });
+    } else {
+      /*
+        Si el enlace no es válido, se conserva el texto visible
+        sin crear una etiqueta navegable.
+      */
+      partes.push({
+        tipo: "texto",
+        contenido: textoVisible || match[0],
+      });
+    }
+
+    ultimoIndice = REGEX_ENLACES.lastIndex;
   }
 
-  if (ultimoIndice < texto.length) {
-    partes.push(texto.slice(ultimoIndice));
+  if (ultimoIndice < contenido.length) {
+    partes.push({
+      tipo: "texto",
+      contenido: contenido.slice(ultimoIndice),
+    });
   }
 
   return partes;
 }
 
-function ContenidoConLinks({ texto }) {
+function ContenidoConLinks({ texto = "" }) {
   const partes = parsearContenidoConLinks(texto);
 
   return (
     <>
       {partes.map((parte, index) => {
-        if (typeof parte === "string") {
-          return <span key={`text-${index}`}>{parte}</span>;
+        if (parte.tipo === "texto") {
+          return (
+            <Fragment key={`texto-${index}`}>
+              {parte.contenido}
+            </Fragment>
+          );
         }
 
-        const esExterno = parte.url.startsWith("http");
+        const esExterno =
+          parte.url.startsWith("http://") ||
+          parte.url.startsWith("https://");
+
+        const esRutaInterna = parte.url.startsWith("/");
+
+        if (esRutaInterna) {
+          return (
+            <Link
+              key={`link-interno-${index}`}
+              to={parte.url}
+              className="guia-revera-inline-link"
+            >
+              {parte.texto}
+            </Link>
+          );
+        }
 
         return (
           <a
-            key={`link-${index}`}
+            key={`link-externo-${index}`}
             href={parte.url}
             className="guia-revera-inline-link"
             target={esExterno ? "_blank" : undefined}
-            rel={esExterno ? "noreferrer" : undefined}
+            rel={esExterno ? "noreferrer noopener" : undefined}
           >
             {parte.texto}
           </a>
@@ -136,11 +226,21 @@ function ArticleRenderer({ bloques = [] }) {
         }
 
         if (bloque.tipo === "lista") {
-          return <ListaBloque key={bloque.id} contenido={bloque.contenido} />;
+          return (
+            <ListaBloque
+              key={bloque.id}
+              contenido={bloque.contenido}
+            />
+          );
         }
 
         if (bloque.tipo === "cta") {
-          return <CtaBloque key={bloque.id} contenido={bloque.contenido} />;
+          return (
+            <CtaBloque
+              key={bloque.id}
+              contenido={bloque.contenido}
+            />
+          );
         }
 
         if (bloque.tipo === "imagen") {

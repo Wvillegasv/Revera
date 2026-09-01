@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const path = require("path");
 
 const citasRoutes = require("./routes/citasRoutes");
@@ -9,12 +10,20 @@ const estudioRegistrabilidadRoutes = require("./routes/estudioRegistrabilidadRou
 const registroMarcaRoutes = require("./routes/registroMarcaRoutes");
 const articulosRoutes = require("./routes/articulosRoutes");
 const articulosAdminRoutes = require("./routes/articulosAdminRoutes");
-
 const radiografiaMarcaRoutes = require("./routes/radiografiaMarcaRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 const app = express();
-
 const PORT = process.env.PORT || 3000;
+
+const appEnv = String(process.env.APP_ENV || "").toLowerCase();
+const nodeEnv = String(process.env.NODE_ENV || "").toLowerCase();
+const usaProxySeguro =
+  nodeEnv === "production" || appEnv === "production" || appEnv === "staging";
+
+if (usaProxySeguro) {
+  app.set("trust proxy", 1);
+}
 
 /* =========================================
    ORÍGENES PERMITIDOS
@@ -25,6 +34,8 @@ const allowedOrigins = [
   "http://127.0.0.1:1573",
   "http://localhost:5173",
   "http://127.0.0.1:5173",
+  "http://localhost:5174",
+  "http://127.0.0.1:5174",
   "https://revera-omega.vercel.app",
   "https://test.revera.com",
   "https://decency-womb-pulsate.ngrok-free.dev",
@@ -37,13 +48,6 @@ const allowedOrigins = [
 
 const corsOptions = {
   origin(origin, callback) {
-    /*
-      Permitir requests sin origin:
-      - Postman
-      - navegador directo
-      - proxy interno de Vite
-      - health checks
-    */
     if (!origin) {
       return callback(null, true);
     }
@@ -56,45 +60,36 @@ const corsOptions = {
 
     return callback(new Error(`Origen no permitido por CORS: ${origin}`));
   },
-
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-
   allowedHeaders: [
     "Content-Type",
     "Authorization",
     "ngrok-skip-browser-warning",
   ],
-
   credentials: true,
-
   optionsSuccessStatus: 204,
 };
 
 app.use(cors(corsOptions));
 
-/*
-  Manejo seguro de preflight OPTIONS.
-  Evitamos app.options("*") porque puede fallar en algunas versiones.
-*/
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
     return res.sendStatus(204);
   }
 
-  next();
+  return next();
 });
 
 /* =========================================
-   BODY PARSERS
+   BODY PARSERS Y COOKIES
 ========================================= */
 
 app.use(express.json({ limit: "20mb" }));
 app.use(express.urlencoded({ extended: true, limit: "20mb" }));
+app.use(cookieParser());
 
 /* =========================================
    STATIC FILES
-   Permite servir imágenes desde:
-   /uploads/...
 ========================================= */
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
@@ -116,7 +111,13 @@ app.get("/api/test", (req, res) => {
 });
 
 /* =========================================
-   ROUTES PÚBLICAS / FUNCIONALES
+   AUTENTICACIÓN CMS
+========================================= */
+
+app.use("/api/auth", authRoutes);
+
+/* =========================================
+   RUTAS PÚBLICAS / FUNCIONALES
 ========================================= */
 
 app.use("/api", citasRoutes);
@@ -125,9 +126,6 @@ app.use("/api", registroMarcaRoutes);
 app.use("/api", articulosRoutes);
 app.use("/api", radiografiaMarcaRoutes);
 app.use("/api", articulosAdminRoutes);
-
-
-// app.use("/api", articulosAdminRoutes);
 
 /* =========================================
    404 API
@@ -174,5 +172,5 @@ app.listen(PORT, () => {
     `Entorno: ${process.env.APP_ENV || process.env.NODE_ENV || "local"}`
   );
   console.log("Origins permitidos:", allowedOrigins);
-  console.log("Rutas admin de artículos: DESACTIVADAS TEMPORALMENTE");
+  console.log("Rutas de autenticación CMS: ACTIVAS");
 });

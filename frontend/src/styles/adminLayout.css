@@ -1,0 +1,55 @@
+.admin-layout {
+  min-height: 100vh;
+  background: #f2f2f3;
+  color: #00001b;
+  font-family: var(--font-primary, "Termina", Arial, sans-serif);
+}
+
+.admin-main {
+  min-height: 100vh;
+  margin-left: 270px;
+  padding: 34px;
+}
+
+.admin-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.admin-page-header h1 {
+  margin: 5px 0 8px;
+  color: #00001b;
+  font-size: clamp(25px, 3vw, 36px);
+  line-height: 1.2;
+}
+
+.admin-page-header p {
+  margin: 0;
+  color: #67676e;
+  line-height: 1.6;
+}
+
+.admin-page-eyebrow {
+  display: inline-block;
+  color: #6f60aa;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+}
+
+@media (max-width: 960px) {
+  .admin-main {
+    margin-left: 0;
+    padding: 82px 22px 28px;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-main {
+    padding: 78px 15px 24px;
+  }
+}

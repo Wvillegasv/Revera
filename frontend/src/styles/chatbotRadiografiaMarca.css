@@ -1038,7 +1038,7 @@
   line-height: 1.4;
   font-weight: var(--font-weight-regular);
 
-  text-align: right;
+  text-align: left !important;
   white-space: normal;
   overflow: visible !important;
   overflow-wrap: anywhere;

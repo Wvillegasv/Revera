@@ -1,0 +1,82 @@
+.admin-home {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.admin-module-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.admin-module-card {
+  min-height: 205px;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  border: 1px solid rgba(18, 7, 66, 0.1);
+  border-radius: 20px;
+  background: #ffffff;
+  color: #00001b;
+  text-decoration: none;
+  box-shadow: 0 14px 34px rgba(18, 7, 66, 0.06);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.admin-module-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(111, 96, 170, 0.45);
+  box-shadow: 0 20px 45px rgba(18, 7, 66, 0.11);
+}
+
+.admin-module-card__icon {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  background: #00001b;
+  color: #ffffff;
+}
+
+.admin-module-card:hover .admin-module-card__icon {
+  background: #6f60aa;
+}
+
+.admin-module-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 21px;
+}
+
+.admin-module-card__content strong {
+  font-size: 18px;
+}
+
+.admin-module-card__content span {
+  color: #68686f;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.admin-module-card__action {
+  margin-top: auto;
+  padding-top: 18px;
+  color: #6f60aa;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .admin-module-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-module-card {
+    min-height: 190px;
+  }
+}

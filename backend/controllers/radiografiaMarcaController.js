@@ -2,14 +2,36 @@ const {
   registrarRadiografiaMarca,
 } = require("../services/radiografiaMarcaService");
 
+/**
+ * Convierte el body recibido.
+ *
+ * Cuando la solicitud usa multipart/form-data, el frontend envía
+ * la información dentro del campo "data" como texto JSON.
+ */
 function parseBody(req) {
+  if (!req.body) {
+    return {};
+  }
+
   if (req.body.data) {
-    return JSON.parse(req.body.data);
+    try {
+      return JSON.parse(req.body.data);
+    } catch (error) {
+      const parseError = new Error(
+        "El campo data no contiene un JSON válido."
+      );
+
+      parseError.statusCode = 400;
+      throw parseError;
+    }
   }
 
   return req.body;
 }
 
+/**
+ * Valida los campos indispensables de la Radiografía de Marca.
+ */
 function validarPayload(data) {
   const camposObligatorios = [
     "nombreMarca",
@@ -27,9 +49,19 @@ function validarPayload(data) {
   ];
 
   for (const campo of camposObligatorios) {
-    if (!data[campo] || String(data[campo]).trim() === "") {
+    const valor = data?.[campo];
+
+    if (valor === undefined || valor === null || String(valor).trim() === "") {
       return `El campo ${campo} es obligatorio.`;
     }
+  }
+
+  const correo = String(data.correoContacto).trim();
+
+  const correoValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!correoValido.test(correo)) {
+    return "El correo electrónico no tiene un formato válido.";
   }
 
   return null;
@@ -39,19 +71,43 @@ async function crearRadiografiaMarca(req, res) {
   try {
     console.log("Entró a crearRadiografiaMarca");
     console.log("Body recibido:", req.body);
-    console.log("Archivo recibido:", req.file);
+
+    /*
+      undefined es válido cuando el archivo o logotipo es opcional.
+    */
+    console.log(
+      "Archivo recibido:",
+      req.file
+        ? {
+            originalname: req.file.originalname,
+            mimetype: req.file.mimetype,
+            size: req.file.size,
+          }
+        : "Sin archivo adjunto"
+    );
 
     const data = parseBody(req);
-    const error = validarPayload(data);
+    const errorValidacion = validarPayload(data);
 
-    if (error) {
+    if (errorValidacion) {
       return res.status(400).json({
         ok: false,
-        mensaje: error,
+        mensaje: errorValidacion,
       });
     }
 
-    const result = await registrarRadiografiaMarca(data, req.file || null);
+    console.log("Iniciando registro de Radiografía de Marca:", {
+      nombreMarca: data.nombreMarca,
+      correoContacto: data.correoContacto,
+      tieneArchivo: Boolean(req.file),
+    });
+
+    const result = await registrarRadiografiaMarca(
+      data,
+      req.file || null
+    );
+
+    console.log("Resultado de registrarRadiografiaMarca:", result);
 
     return res.status(201).json({
       ok: true,
@@ -59,12 +115,26 @@ async function crearRadiografiaMarca(req, res) {
       data: result,
     });
   } catch (error) {
-    console.error("Error registrando Radiografía de Marca:", error);
+    console.error("Error registrando Radiografía de Marca:", {
+      message: error.message,
+      code: error.code,
+      command: error.command,
+      response: error.response,
+      stack: error.stack,
+    });
 
-    return res.status(500).json({
+    const statusCode = error.statusCode || 500;
+
+    return res.status(statusCode).json({
       ok: false,
-      mensaje: "Error registrando Radiografía de Marca.",
-      error: error.message,
+      mensaje:
+        statusCode === 400
+          ? error.message
+          : "Error registrando Radiografía de Marca.",
+      error:
+        process.env.NODE_ENV === "development"
+          ? error.message
+          : undefined,
     });
   }
 }

@@ -82,6 +82,62 @@
   font-weight: var(--font-weight-demi);
 }
 
+.contacto-modal-title-group,
+.contacto-modal-subtitle-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.contacto-modal-title-group {
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.contacto-modal-subtitle-group {
+  gap: 6px;
+}
+
+.contacto-modal-title-group h2,
+.contacto-modal-subtitle-group p {
+  margin: 0;
+}
+
+.contacto-modal-title-link,
+.contacto-modal-subtitle-link {
+  display: block;
+
+  color: #6f60aa;
+  font-family: var(--font-primary);
+  line-height: 1.4;
+  font-weight: var(--font-weight-demi);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+
+  transition: color 0.2s ease;
+}
+
+.contacto-modal-title-link {
+  font-size: 16px;
+}
+
+.contacto-modal-subtitle-link {
+  font-size: 14px;
+}
+
+.contacto-modal-title-link:hover,
+.contacto-modal-subtitle-link:hover {
+  color: #120742;
+}
+
+.contacto-modal-title-link:focus-visible,
+.contacto-modal-subtitle-link:focus-visible {
+  outline: 2px solid rgba(111, 96, 170, 0.35);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
 /* =========================================================
    TARJETA PRINCIPAL
 ========================================================= */
@@ -599,6 +655,23 @@
     font-size: 13.5px;
   }
 
+  .contacto-modal-title-group {
+    gap: 5px;
+    margin-bottom: 12px;
+  }
+
+  .contacto-modal-subtitle-group {
+    gap: 5px;
+  }
+
+  .contacto-modal-title-link {
+    font-size: 15px;
+  }
+
+  .contacto-modal-subtitle-link {
+    font-size: 13.5px;
+  }
+
   .agenda-form-card {
     padding: 22px 18px;
   }
@@ -670,6 +743,14 @@
   }
 
   .contacto-modal-header p {
+    font-size: 13px;
+  }
+
+  .contacto-modal-title-link {
+    font-size: 14px;
+  }
+
+  .contacto-modal-subtitle-link {
     font-size: 13px;
   }
 

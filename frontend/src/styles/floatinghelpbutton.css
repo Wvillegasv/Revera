@@ -5,17 +5,14 @@
   z-index: 9999;
 }
 
-/* BOTÓN ? */
-
 .floating-help-button {
   width: 56px;
   height: 56px;
 
   border-radius: 50%;
-  border: 1px solid rgba(18, 7, 66, 0.06);
+  border: 1px solid rgba(18, 7, 66, 0.055);
 
-  background: rgba(255, 255, 255, 0.96);
-
+  background: rgba(255, 255, 255, 0.92);
   color: #00001b;
 
   display: flex;
@@ -24,7 +21,12 @@
 
   cursor: pointer;
 
-  box-shadow: 0 12px 24px rgba(18, 7, 66, 0.12);
+  box-shadow:
+    0 13px 28px rgba(18, 7, 66, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 
   transition:
     transform 0.22s ease,
@@ -35,15 +37,17 @@
 
 .floating-help-button:hover {
   transform: translateY(-3px);
-
-  background: #8d82c2;
-
+  background: #6f60aa;
   color: #ffffff;
-
-  box-shadow: 0 16px 28px rgba(141, 130, 194, 0.26);
+  box-shadow: 0 16px 30px rgba(111, 96, 170, 0.25);
 }
 
-/* MENU */
+.floating-help-button:focus-visible {
+  outline: 3px solid rgba(111, 96, 170, 0.3);
+  outline-offset: 4px;
+}
+
+/* MENÚ */
 
 .floating-help-menu {
   position: absolute;
@@ -51,9 +55,11 @@
   bottom: 72px;
 
   width: 315px;
+  max-height: min(72vh, 640px);
+  overflow-y: auto;
 
-  background: #151515;
-
+  background: #15151b;
+  border: 1px solid rgba(255, 255, 255, 0.055);
   border-radius: 18px;
 
   padding: 10px;
@@ -81,23 +87,19 @@
 
 .floating-help-menu button {
   width: 100%;
-
   min-height: 42px;
 
   border: 0;
   border-radius: 10px;
 
   background: transparent;
-
   color: #f2f2f2;
 
   font-size: 15px;
   font-weight: 500;
-
   text-align: left;
 
   padding: 0 14px;
-
   cursor: pointer;
 
   transition:
@@ -105,63 +107,20 @@
     color 0.18s ease;
 }
 
-.floating-help-menu button:hover {
-  background: #8d82c2;
-  color: #ffffff;
-}
-
+.floating-help-menu button:hover,
 .floating-help-menu button.active {
-  background: #8d82c2;
+  background: #6f60aa;
   color: #ffffff;
 }
 
 .floating-help-divider {
   width: 100%;
   height: 1px;
-
   margin: 8px 0;
-
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* MOBILE */
-
-@media (max-width: 768px) {
-  .floating-help-wrapper {
-    right: 18px;
-    bottom: 18px;
-  }
-
-  .floating-help-button {
-    width: 52px;
-    height: 52px;
-  }
-
-  .floating-help-menu {
-    width: 285px;
-  }
-}
-
-@media (max-width: 480px) {
-  .floating-help-wrapper {
-    right: 14px;
-    bottom: 14px;
-  }
-
-  .floating-help-button {
-    width: 48px;
-    height: 48px;
-  }
-
-  .floating-help-menu {
-    width: 260px;
-    bottom: 62px;
-  }
-
-  .floating-help-menu button {
-    font-size: 14px;
-  }
-}
+/* MODAL DE IDIOMA */
 
 .language-modal-overlay {
   position: fixed;
@@ -308,17 +267,54 @@
 }
 
 .language-save-button {
-  background: #8d82c2;
-  border: 1px solid #8d82c2;
+  background: #6f60aa;
+  border: 1px solid #6f60aa;
   color: #ffffff;
 }
 
 .language-save-button:hover {
-  background: #7b70b3;
-  border-color: #7b70b3;
+  background: #5f5098;
+  border-color: #5f5098;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 768px) {
+  .floating-help-wrapper {
+    right: 18px;
+    bottom: 18px;
+  }
+
+  .floating-help-button {
+    width: 52px;
+    height: 52px;
+  }
+
+  .floating-help-menu {
+    width: 285px;
+  }
 }
 
 @media (max-width: 480px) {
+  .floating-help-wrapper {
+    right: 14px;
+    bottom: 14px;
+  }
+
+  .floating-help-button {
+    width: 48px;
+    height: 48px;
+  }
+
+  .floating-help-menu {
+    width: min(260px, calc(100vw - 28px));
+    bottom: 62px;
+  }
+
+  .floating-help-menu button {
+    font-size: 14px;
+  }
+
   .language-modal {
     border-radius: 14px;
   }

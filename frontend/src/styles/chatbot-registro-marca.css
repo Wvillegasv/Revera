@@ -914,3 +914,217 @@
     text-align: center;
   }
 }
+
+/* =========================================================
+   AJUSTE FINAL - CAMPOS, BOTÓN SIGUIENTE Y CONTADORES
+   Este bloque modifica únicamente la presentación visual.
+   No altera validaciones, flujo, respuestas ni envío.
+========================================================= */
+
+/* El campo ocupa todo el espacio disponible y el botón queda a la derecha. */
+.crm-form-inline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+/* El campo y su mensaje se comportan como una sola columna. */
+.crm-field-with-counter,
+.crm-phone-fields-with-counter {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  width: 100%;
+  min-width: 0;
+
+  text-align: left;
+}
+
+/* Mensaje de mínimo y máximo debajo del campo y alineado a la izquierda. */
+.crm-character-counter {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  position: static;
+
+  width: 100%;
+  min-height: 18px;
+  margin: 6px 0 0;
+  padding: 0;
+
+  color: #6b7280;
+  background: transparent;
+
+  font-family: var(--font-primary);
+  font-size: 12px;
+  line-height: 1.4;
+  font-weight: var(--font-weight-regular);
+
+  text-align: left !important;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.crm-character-counter--limit {
+  color: #b42318;
+  font-weight: var(--font-weight-medium);
+}
+
+/* Evita que el ancho del campo se desborde por el padding. */
+.crm-input,
+.crm-textarea {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.crm-input {
+  min-height: 44px;
+  padding: 10px 14px;
+}
+
+.crm-textarea {
+  min-height: 76px;
+  max-height: 140px;
+  padding: 11px 14px;
+  resize: vertical;
+}
+
+/* Botón compacto, conservado al lado derecho del campo en escritorio. */
+.crm-form-inline > .crm-next-btn {
+  flex: 0 0 auto;
+
+  width: auto !important;
+  min-width: 106px !important;
+  max-width: max-content;
+  height: 40px !important;
+  padding: 0 15px !important;
+
+  align-self: start;
+  justify-self: end;
+
+  gap: 7px;
+  border-radius: 999px;
+
+  font-size: 13px;
+  line-height: 1;
+}
+
+.crm-next-btn svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+/* Textarea y selección múltiple: botón debajo y alineado a la izquierda. */
+.crm-form-block > .crm-next-btn,
+.crm-multi-options-panel > .crm-next-btn {
+  width: auto !important;
+  min-width: 106px !important;
+  max-width: max-content;
+  min-height: 40px !important;
+  height: 40px !important;
+  padding: 0 15px !important;
+
+  align-self: flex-start;
+  justify-content: center;
+
+  gap: 7px;
+  border-radius: 999px;
+
+  font-size: 13px;
+  line-height: 1;
+}
+
+/* Teléfono: ambos campos llenan el área disponible como un solo bloque. */
+.crm-phone-inline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+
+  width: 100%;
+  min-width: 0;
+}
+
+.crm-phone-fields-row {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  min-width: 0;
+  gap: 10px;
+}
+
+.crm-phone-code {
+  flex: 0 0 92px;
+  width: 92px;
+  min-width: 92px;
+
+  text-align: center;
+}
+
+.crm-phone-number {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
+/* En pantallas pequeñas, el botón pasa debajo y queda alineado a la izquierda. */
+@media (max-width: 768px) {
+  .crm-form-inline,
+  .crm-phone-inline {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 9px;
+  }
+
+  .crm-form-inline > .crm-next-btn,
+  .crm-phone-inline > .crm-next-btn {
+    grid-column: 1;
+
+    width: auto !important;
+    min-width: 102px !important;
+    height: 39px !important;
+
+    justify-self: start;
+    align-self: start;
+  }
+
+  .crm-phone-fields-row {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .crm-character-counter {
+    min-height: 17px;
+    margin-top: 5px;
+
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .crm-textarea {
+    min-height: 68px;
+  }
+
+  .crm-phone-code {
+    flex-basis: 78px;
+    width: 78px;
+    min-width: 78px;
+  }
+
+  /* Anula la regla móvil previa que hacía el botón de ancho completo. */
+  .crm-form-inline > .crm-next-btn,
+  .crm-phone-inline > .crm-next-btn,
+  .crm-form-block > .crm-next-btn,
+  .crm-multi-options-panel > .crm-next-btn {
+    width: auto !important;
+    justify-content: center;
+  }
+}
+

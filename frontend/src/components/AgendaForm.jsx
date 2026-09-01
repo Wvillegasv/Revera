@@ -333,7 +333,7 @@ function AgendaForm({ onSuccess }) {
               </div>
               <div>
                 <h4>Correo electrónico</h4>
-                <p>contacto@revera.cr</p>
+                <p>info@revera-legal.com</p>
               </div>
             </div>
 

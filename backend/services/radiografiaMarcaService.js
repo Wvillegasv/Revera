@@ -1,7 +1,24 @@
 const path = require("path");
 const pool = require("../config/db").promise();
+const {
+  enviarEstudioRegistrabilidad,
+  enviarConfirmacionRadiografiaMarcaUsuario,
+} = require("./emailService");
 
 const DB_USER = process.env.DB_USER || "WEBUSER";
+
+function obtenerDestinatariosNotificacion() {
+  const configurados =
+    process.env.SMTP_NOTIFICATION_TO ||
+    process.env.SMTP_REPLY_TO ||
+    process.env.SMTP_USER ||
+    "";
+
+  return configurados
+    .split(",")
+    .map((correo) => correo.trim())
+    .filter(Boolean);
+}
 
 function crearError(message, statusCode = 400) {
   const error = new Error(message);
@@ -341,12 +358,26 @@ async function registrarRadiografiaMarca(data = {}, file = null) {
     throw crearError("El número de teléfono no es válido.");
   }
 
-  const { nombre, apellido1, apellido2 } = dividirNombreCompleto(nombreCompleto);
+  const { nombre, apellido1, apellido2 } =
+    dividirNombreCompleto(nombreCompleto);
+
   let connection;
+  let resultadoRegistro;
+  let transaccionConfirmada = false;
 
   try {
     connection = await pool.getConnection();
+    const [dbInfo] = await connection.query(`
+      SELECT
+        DATABASE() AS base_datos,
+        @@port AS puerto_mysql,
+        CURRENT_USER() AS usuario_mysql
+    `);
+
+    console.log("=== RADIOGRAFIA DB ===", dbInfo[0]);
+
     await connection.beginTransaction();
+
 
     let personaId = await buscarPersonaPorCorreo(connection, correo);
 
@@ -358,9 +389,17 @@ async function registrarRadiografiaMarca(data = {}, file = null) {
       });
     }
 
-    const correoExiste = await existeCorreoActivo(connection, personaId, correo);
+    const correoExiste = await existeCorreoActivo(
+      connection,
+      personaId,
+      correo
+    );
+
     if (!correoExiste) {
-      await insertarCorreo(connection, { personaId, correo });
+      await insertarCorreo(connection, {
+        personaId,
+        correo,
+      });
     }
 
     if (telefono) {
@@ -387,6 +426,12 @@ async function registrarRadiografiaMarca(data = {}, file = null) {
       tieneImagenes,
     });
 
+    console.log("=== RADIOGRAFIA INSERT ===", {
+      estudioId,
+      personaId,
+      nombreMarca,
+    });
+
     if (archivo) {
       await insertarImagen(connection, {
         estudioId,
@@ -395,8 +440,36 @@ async function registrarRadiografiaMarca(data = {}, file = null) {
     }
 
     await connection.commit();
+    transaccionConfirmada = true;
 
-    return {
+    const [verificacion] = await connection.execute(
+      `
+        SELECT
+          er_estudio_id,
+          er_persona_id,
+          er_nombre_marca,
+          er_estado,
+          er_usuario_crea
+        FROM re_estudio_registrabilidad
+        WHERE er_estudio_id = ?
+      `,
+      [estudioId]
+    );
+
+    console.log(
+      "=== RADIOGRAFIA DESPUES COMMIT ===",
+      verificacion
+    );
+
+    if (verificacion.length === 0) {
+      const errorPersistencia = new Error(
+        `El estudio ${estudioId} no fue encontrado después del COMMIT.`
+      );
+      errorPersistencia.statusCode = 500;
+      throw errorPersistencia;
+    }
+
+    resultadoRegistro = {
       estudioId,
       personaId,
       nombreCompleto,
@@ -409,10 +482,25 @@ async function registrarRadiografiaMarca(data = {}, file = null) {
       tieneImagenes,
       totalImagenes: archivo ? 1 : 0,
       files: archivo ? [archivo] : [],
+      baseDatos: dbInfo[0]?.base_datos || null,
     };
   } catch (error) {
-    if (connection) {
-      await connection.rollback();
+    console.error("Error registrando Radiografía de Marca:", {
+      message: error.message,
+      code: error.code,
+      sqlMessage: error.sqlMessage,
+      statusCode: error.statusCode,
+    });
+
+    if (connection && !transaccionConfirmada) {
+      try {
+        await connection.rollback();
+      } catch (rollbackError) {
+        console.error(
+          "Error ejecutando rollback de Radiografía de Marca:",
+          rollbackError
+        );
+      }
     }
 
     throw error;
@@ -421,6 +509,96 @@ async function registrarRadiografiaMarca(data = {}, file = null) {
       connection.release();
     }
   }
+
+  const destinatarios = obtenerDestinatariosNotificacion();
+
+  console.log("Iniciando correos de Radiografía de Marca:", {
+    estudioId: resultadoRegistro.estudioId,
+    baseDatos: resultadoRegistro.baseDatos,
+    destinatariosInternos: destinatarios,
+    correoCliente: resultadoRegistro.correo,
+    tieneArchivo: Boolean(archivo),
+  });
+
+  const [resultadoInterno, resultadoCliente] =
+    await Promise.allSettled([
+      enviarEstudioRegistrabilidad({
+        destinatarios,
+        nombreCompleto: resultadoRegistro.nombreCompleto,
+        correo: resultadoRegistro.correo,
+        telefono: resultadoRegistro.telefono,
+        nombreMarca: resultadoRegistro.nombreMarca,
+        descripcionProductoServicio:
+          resultadoRegistro.descripcionProductoServicio,
+        sectorClase: resultadoRegistro.sectorClase,
+        files: resultadoRegistro.files,
+      }),
+      enviarConfirmacionRadiografiaMarcaUsuario({
+        correoUsuario: resultadoRegistro.correo,
+      }),
+    ]);
+
+  const notificacionInternaEnviada =
+    resultadoInterno.status === "fulfilled";
+  const confirmacionClienteEnviada =
+    resultadoCliente.status === "fulfilled";
+
+  if (!notificacionInternaEnviada) {
+    console.error(
+      "Error enviando notificación interna de Radiografía:",
+      resultadoInterno.reason
+    );
+  }
+
+  if (!confirmacionClienteEnviada) {
+    console.error(
+      "Error enviando confirmación al cliente de Radiografía:",
+      resultadoCliente.reason
+    );
+  }
+
+  const notificaciones = {
+    interna: {
+      enviada: notificacionInternaEnviada,
+      accepted:
+        resultadoInterno.status === "fulfilled"
+          ? resultadoInterno.value.accepted
+          : [],
+      rejected:
+        resultadoInterno.status === "fulfilled"
+          ? resultadoInterno.value.rejected
+          : [],
+      error:
+        resultadoInterno.status === "rejected"
+          ? resultadoInterno.reason.message
+          : null,
+    },
+    cliente: {
+      enviada: confirmacionClienteEnviada,
+      accepted:
+        resultadoCliente.status === "fulfilled"
+          ? resultadoCliente.value.accepted
+          : [],
+      rejected:
+        resultadoCliente.status === "fulfilled"
+          ? resultadoCliente.value.rejected
+          : [],
+      error:
+        resultadoCliente.status === "rejected"
+          ? resultadoCliente.reason.message
+          : null,
+    },
+  };
+
+  console.log(
+    "Resultado final de correos de Radiografía:",
+    notificaciones
+  );
+
+  return {
+    ...resultadoRegistro,
+    notificaciones,
+  };
 }
 
 module.exports = {

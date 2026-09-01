@@ -1,48 +1,62 @@
-import { Link } from "react-router-dom";
-/*import { Instagram, Facebook, Linkedin, Twitter } from "lucide-react"; */
+import { useState } from "react";
 import { Instagram, Facebook } from "lucide-react";
+import AvisoPrivacidadModal from "./AvisoPrivacidadModal";
 import "../styles/footer.css";
 
 function Footer() {
+  const [mostrarAvisoPrivacidad, setMostrarAvisoPrivacidad] =
+    useState(false);
+
   return (
-    <footer className="footer">
-      <div className="footer-left">
-        <Link to="/aviso-privacidad" className="footer-privacy-link">
-          Aviso de Privacidad
-        </Link>
+    <>
+      <footer className="footer">
+        <div className="footer-left">
+          <button
+            type="button"
+            className="footer-privacy-link"
+            onClick={() => setMostrarAvisoPrivacidad(true)}
+          >
+            Aviso de Privacidad
+          </button>
 
-        <span className="footer-separator">|</span>
+          <span className="footer-separator">|</span>
 
-        <span className="footer-copy">
-          © 2026 REVERA. Todos los derechos reservados.
-        </span>
-      </div>
+          <span className="footer-copy">
+            © 2026 REVERA. Todos los derechos reservados.
+          </span>
+        </div>
 
-      <div className="footer-social">
-        <span className="footer-social-label">Síguenos:</span>
+        <div className="footer-social">
+          <span className="footer-social-label">Síguenos:</span>
 
-        <a
-          href="https://www.instagram.com/"
-          className="footer-social-link"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Instagram"
-        >
-          <Instagram size={16} strokeWidth={2} />
-        </a>
+            <a
+              href="https://www.instagram.com/revera.legal"
+              className="footer-social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Instagram"
+            >
+              <Instagram size={16} strokeWidth={2} />
+            </a>
 
-        <a
-          href="https://www.facebook.com/"
-          className="footer-social-link"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Facebook"
-        >
-          <Facebook size={16} strokeWidth={2} />
-        </a>
-          
-      </div>
-    </footer>
+            <a
+              href="https://www.facebook.com/people/Revera/61591048964557/"
+              className="footer-social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Facebook"
+            >
+              <Facebook size={16} strokeWidth={2} />
+            </a>
+
+        </div>
+      </footer>
+
+      <AvisoPrivacidadModal
+        abierto={mostrarAvisoPrivacidad}
+        onCerrar={() => setMostrarAvisoPrivacidad(false)}
+      />
+    </>
   );
 }
 

@@ -1,163 +1,66 @@
 /* =========================================================
-   REVERA HOME HERO
-   Usa variables globales desde theme.css
+   REVERA HOME HERO - LANDING CLARO
 ========================================================= */
 
 .hero-section {
   position: relative;
   width: 100%;
-  max-width: var(--layout-max-width);
+  max-width: var(--layout-max-width, 1220px);
   margin: 0 auto;
-  min-height: calc(100vh - 118px);
+  min-height: calc(100vh - 126px);
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
 
-  padding: 54px 0 34px;
+  padding: 70px 0 34px;
   overflow: visible;
 }
 
-/* Luz suave interna del hero */
 .hero-section::before {
   content: "";
   position: absolute;
-  inset: -40px -20px 0;
-  pointer-events: none;
+  inset: 0 -10vw auto;
+  height: 650px;
   z-index: 0;
-
+  pointer-events: none;
   background:
     radial-gradient(
-      circle at 50% 18%,
-      rgba(255, 255, 255, 0.44) 0%,
-      rgba(255, 255, 255, 0) 28%
-    ),
-    radial-gradient(
-      circle at 72% 30%,
-      rgba(111, 96, 170, 0.07) 0%,
-      rgba(111, 96, 170, 0) 36%
-    ),
-    radial-gradient(
-      circle at 22% 82%,
-      rgba(18, 7, 66, 0.035) 0%,
-      rgba(18, 7, 66, 0) 30%
+      ellipse at 50% 42%,
+      rgba(255, 255, 255, 0.93) 0%,
+      rgba(255, 255, 255, 0.58) 32%,
+      rgba(255, 255, 255, 0) 70%
     );
 }
 
-/* Se conserva por compatibilidad con Home.jsx */
 .hero-background-shape {
   display: none;
 }
 
 /* =========================================================
-   MARCA CENTRAL / ÍCONO R + PUNTOS
-   Actualmente no se usa si Home.jsx ya eliminó hero-brand-mark.
-   Se deja por compatibilidad.
+   MARCA CENTRAL
 ========================================================= */
 
 .hero-brand-mark {
   position: relative;
-  width: 118px;
-  height: 176px;
-  margin: 0 auto 24px;
   z-index: 3;
+  width: 116px;
+  margin: 0 auto 18px;
+  pointer-events: none;
 }
 
-.hero-logo-circle {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  transform: translateX(-50%);
-
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background:
-    radial-gradient(
-      circle at 34% 28%,
-      rgba(255, 255, 255, 0.62) 0%,
-      rgba(255, 255, 255, 0.08) 34%,
-      rgba(111, 96, 170, 0.08) 100%
-    );
-
-  filter: drop-shadow(0 14px 20px rgba(18, 7, 66, 0.14));
-  z-index: 2;
-}
-
-.hero-logo-svg {
+.hero-brand-mark-image {
   width: 100%;
-  height: 100%;
+  height: auto;
   display: block;
+  filter: drop-shadow(0 12px 22px rgba(18, 7, 66, 0.11));
 }
 
-.hero-logo-ring {
-  stroke: var(--revera-indigo);
-  stroke-width: 5;
-  fill: none;
-}
-
-.hero-logo-stroke {
-  stroke: var(--revera-indigo);
-  stroke-width: 7;
-  stroke-linecap: butt;
-  stroke-linejoin: round;
-  fill: none;
-}
-
-.hero-logo-fill {
-  fill: var(--revera-indigo);
-  stroke: none;
-}
-
-/* Puntos decorativos */
-.hero-dots {
-  position: absolute;
-  left: 50%;
-  top: 118px;
-  transform: translateX(-50%);
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-
-  z-index: 2;
-}
-
-.hero-dots span {
-  border-radius: 50%;
-  background: var(--revera-morado);
-  box-shadow: 0 3px 8px rgba(111, 96, 170, 0.18);
-}
-
-.hero-dots span:nth-child(1) {
-  width: 13px;
-  height: 13px;
-  opacity: 1;
-}
-
-.hero-dots span:nth-child(2) {
-  width: 10px;
-  height: 10px;
-  opacity: 0.78;
-}
-
-.hero-dots span:nth-child(3) {
-  width: 7px;
-  height: 7px;
-  opacity: 0.56;
-}
-
-.hero-dots span:nth-child(4) {
-  width: 5px;
-  height: 5px;
-  opacity: 0.36;
+.hero-logo-circle,
+.hero-dots,
+.hero-logo-svg {
+  display: none;
 }
 
 /* =========================================================
@@ -167,22 +70,23 @@
 .hero-content {
   position: relative;
   z-index: 3;
+  width: 100%;
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 0 20px;
   text-align: center;
-  max-width: 1120px;
-  padding: 0 16px;
-  margin-top: 235px;
 }
 
 .hero-content h1 {
-  max-width: 1040px;
+  max-width: 1000px;
   margin: 0 auto;
 
-  color: var(--color-text-primary);
+  color: var(--color-text-primary, #00001b);
   font-family: var(--font-primary);
-  font-size: clamp(19px, 3.0vw, 32px);
-  line-height: 1.04;
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.015em;
+  font-size: clamp(19px, 3vw, 32px);
+  line-height: 1.12;
+  font-weight: var(--font-weight-bold, 700);
+  letter-spacing: 0.035em;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -190,15 +94,15 @@
 }
 
 .hero-content h2 {
-  max-width: 960px;
-  margin: 20px auto 0;
+  max-width: 890px;
+  margin: 18px auto 0;
 
-  color: var(--color-primary);
+  color: var(--color-primary, #6f60aa);
   font-family: var(--font-primary);
-  font-size: clamp(18px, 2.25vw, 28px);
-  line-height: 1.24;
-  font-weight: var(--font-weight-demi);
-  letter-spacing: 0.005em;
+  font-size: clamp(17px, 2.05vw, 26px);
+  line-height: 1.32;
+  font-weight: var(--font-weight-demi, 600);
+  letter-spacing: 0.004em;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -206,13 +110,13 @@
 }
 
 .hero-content p {
-  margin: 10px 0 0;
-  color: var(--color-text-secondary);
+  margin: 12px 0 0;
+  color: var(--color-text-secondary, #939598);
   font-family: var(--font-primary);
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.5;
-  font-weight: var(--font-weight-medium);
-  letter-spacing: 0.035em;
+  font-weight: var(--font-weight-medium, 500);
+  letter-spacing: 0.055em;
 }
 
 /* =========================================================
@@ -224,73 +128,66 @@
   z-index: 4;
 
   width: 100%;
-  margin-top: 48px;
-  padding: 0 12px 10px;
+  margin-top: 54px;
+  padding: 0 12px 12px;
 
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-items: stretch;
-  gap: 22px;
-  flex-wrap: wrap;
+  gap: 24px;
 }
 
 .services-section > div {
   display: flex;
   min-width: 0;
+  outline: none;
+}
+
+.services-section > div:focus-visible {
+  border-radius: 28px;
+  outline: 3px solid rgba(111, 96, 170, 0.28);
+  outline-offset: 5px;
 }
 
 /* =========================================================
    TABLET
 ========================================================= */
 
-@media (max-width: 992px) {
+@media (max-width: 1080px) {
   .hero-section {
     min-height: auto;
-    padding: 44px 0 30px;
+    padding: 58px 0 30px;
   }
 
   .hero-brand-mark {
-    width: 106px;
-    height: 162px;
-    margin-bottom: 20px;
-  }
-
-  .hero-logo-circle {
-    width: 86px;
-    height: 86px;
-  }
-
-  .hero-dots {
-    top: 102px;
-    gap: 5px;
+    width: 104px;
+    margin-bottom: 16px;
   }
 
   .hero-content {
-    max-width: 860px;
-    margin-top: 175px;
-    padding: 0 16px;
+    max-width: 900px;
   }
 
   .hero-content h1 {
     font-size: clamp(19px, 3.2vw, 30px);
-    line-height: 1.08;
   }
 
   .hero-content h2 {
     max-width: 760px;
     margin-top: 16px;
-    font-size: clamp(17px, 2.8vw, 23px);
-    line-height: 1.25;
-  }
-
-  .hero-content p {
-    margin-top: 5px;
-    font-size: 15px;
+    font-size: clamp(17px, 2.7vw, 23px);
   }
 
   .services-section {
-    margin-top: 40px;
-    gap: 18px;
+    margin-top: 44px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .services-section > div:last-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(100%, 380px);
   }
 }
 
@@ -300,132 +197,74 @@
 
 @media (max-width: 768px) {
   .hero-section {
-    padding: 34px 0 26px;
+    padding: 44px 0 26px;
   }
 
   .hero-brand-mark {
-    width: 92px;
-    height: 140px;
-    margin-bottom: 16px;
-  }
-
-  .hero-logo-circle {
-    width: 74px;
-    height: 74px;
-  }
-
-  .hero-logo-ring {
-    stroke-width: 6;
-  }
-
-  .hero-logo-stroke {
-    stroke-width: 7;
-  }
-
-  .hero-dots {
-    top: 86px;
-    gap: 4px;
-  }
-
-  .hero-dots span:nth-child(1) {
-    width: 8px;
-    height: 8px;
-  }
-
-  .hero-dots span:nth-child(2) {
-    width: 7px;
-    height: 7px;
-  }
-
-  .hero-dots span:nth-child(3) {
-    width: 5px;
-    height: 5px;
-  }
-
-  .hero-dots span:nth-child(4) {
-    width: 4px;
-    height: 4px;
+    width: 88px;
+    margin-bottom: 14px;
   }
 
   .hero-content {
     max-width: 620px;
-    margin-top: 145px;
     padding: 0 14px;
   }
 
   .hero-content h1 {
     font-size: clamp(18px, 5.2vw, 25px);
-    line-height: 1.12;
-    letter-spacing: 0;
+    line-height: 1.16;
+    letter-spacing: 0.018em;
   }
 
   .hero-content h2 {
     max-width: 560px;
     margin-top: 13px;
     font-size: clamp(16px, 4.5vw, 20px);
-    line-height: 1.28;
+    line-height: 1.33;
   }
 
   .hero-content p {
-    margin-top: 5px;
+    margin-top: 9px;
     font-size: 14px;
+    letter-spacing: 0.035em;
   }
 
   .services-section {
-    margin-top: 32px;
-    padding: 0 8px 8px;
-
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
+    margin-top: 34px;
+    padding: 0 6px 8px;
+    grid-template-columns: 1fr;
+    gap: 17px;
   }
 
-  .services-section > div {
+  .services-section > div,
+  .services-section > div:last-child {
     width: 100%;
-    max-width: 420px;
+    max-width: 430px;
+    grid-column: auto;
+    justify-self: center;
   }
 }
 
-/* =========================================================
-   MOBILE PEQUEÑO
-========================================================= */
-
 @media (max-width: 480px) {
   .hero-section {
-    padding-top: 28px;
+    padding-top: 34px;
   }
 
   .hero-brand-mark {
-    width: 84px;
-    height: 128px;
-  }
-
-  .hero-logo-circle {
-    width: 68px;
-    height: 68px;
-  }
-
-  .hero-dots {
-    top: 79px;
-  }
-
-  .hero-content {
-    margin-top: 118px;
+    width: 78px;
+    margin-bottom: 12px;
   }
 
   .hero-content h1 {
     font-size: clamp(17px, 5.7vw, 22px);
-    line-height: 1.14;
   }
 
   .hero-content h2 {
-    margin-top: 12px;
+    margin-top: 11px;
     font-size: clamp(15px, 4.8vw, 18px);
-    line-height: 1.32;
   }
 
   .hero-content p {
-    margin-top: 5px;
     font-size: 13.5px;
   }
 }

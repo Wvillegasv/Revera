@@ -6,12 +6,13 @@ import Navbar from "../components/Navbar";
 import ServiceCard from "../components/ServiceCard";
 import AgendaForm from "../components/AgendaForm";
 import Footer from "../components/Footer";
-import FloatingHelpButton from "../components/FloatingHelpButton";
+/*import FloatingHelpButton from "../components/FloatingHelpButton"; De momento no lo vamos a usar*/ 
 
 import ChatbotRegistroMarca from "../components/chatbot-registro-marca/ChatbotRegistroMarca";
 import ChatbotRadiografiaMarca from "../components/chatbot-radiografia-marca/ChatbotRadiografiaMarca";
 
-import homeMainBg from "../assets/home-main-bg.png";
+import reveraRMask from "../assets/revera-r-mask-solid.png";
+import reveraOrbitMark from "../assets/revera-orbit-mark.png";
 
 import "../styles/revera.css";
 import "../styles/hero.css";
@@ -110,7 +111,7 @@ function Home() {
     <div id="home-top" className="home-page revera-page-shell">
       <div
         className="home-main-background-image"
-        style={{ backgroundImage: `url(${homeMainBg})` }}
+        style={{ "--revera-r-mask": `url(${reveraRMask})` }}
         aria-hidden="true"
       />
 
@@ -128,6 +129,14 @@ function Home() {
         <Navbar onContactoClick={() => abrirModal(MODALES.CONTACTO)} />
 
         <main className="hero-section">
+          <div className="hero-brand-mark" aria-hidden="true">
+            <img
+              src={reveraOrbitMark}
+              className="hero-brand-mark-image"
+              alt=""
+            />
+          </div>
+
           <section className="hero-content">
             <h1>Un sistema claro para tomar decisiones sobre tu marca</h1>
 
@@ -167,7 +176,7 @@ function Home() {
 
         <Footer />
 
-        <FloatingHelpButton />
+         
       </div>
 
       {modalActivo === MODALES.CONTACTO && (
@@ -186,8 +195,9 @@ function Home() {
             </button>
 
             <div className="contacto-modal-header">
-              <h2>
-                Agenda una Cita{" "}
+              <div className="contacto-modal-title-group">
+                <h2>Agenda una Cita</h2>
+
                 <a
                   href="/guia/precios-servicios-revera"
                   target="_blank"
@@ -196,10 +206,13 @@ function Home() {
                 >
                   Ver precios
                 </a>
-              </h2>
+              </div>
 
-              <p>
-                Completa el formulario y nos pondremos en contacto contigo.{" "}
+              <div className="contacto-modal-subtitle-group">
+                <p>
+                  Completa el formulario y nos pondremos en contacto contigo.
+                </p>
+
                 <a
                   href="/guia/como-funcionan-servicios-revera"
                   target="_blank"
@@ -208,7 +221,7 @@ function Home() {
                 >
                   Cómo funcionan los servicios de Revera
                 </a>
-              </p>
+              </div>
             </div>
 
             <AgendaForm onSuccess={cerrarModal} />
