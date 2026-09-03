@@ -1,0 +1,16 @@
+# Dependencias Node
+**/node_modules/
+
+# Variables de entorno
+**/.env
+**/.env.*
+!**/.env.example
+
+# Archivos temporales generados por formularios
+backend/uploads/registro-marca/*
+backend/uploads/radiografia-marca/*
+backend/uploads/estudios/*
+
+# Paquete temporal para despliegue Hostinger
+hostinger-backend/
+*.zip
