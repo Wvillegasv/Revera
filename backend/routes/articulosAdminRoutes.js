@@ -1,6 +1,9 @@
 const express = require("express");
 
 const uploadGuia = require("../middlewares/uploadGuia");
+const {
+  verificarAutenticacion,
+} = require("../middlewares/authMiddleware");
 const { validarAdmin } = require("../middlewares/validarAdmin");
 
 const {
@@ -21,10 +24,14 @@ const {
 const router = express.Router();
 
 /* =========================================
-   SEGURIDAD TEMPORAL ETAPA A
+   SEGURIDAD CMS
 ========================================= */
 
-router.use("/admin", validarAdmin);
+router.use(
+  "/admin",
+  verificarAutenticacion,
+  validarAdmin
+);
 
 /* =========================================
    ARTÍCULOS

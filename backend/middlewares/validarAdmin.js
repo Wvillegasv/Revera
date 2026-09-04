@@ -1,18 +1,5 @@
 function validarAdmin(req, res, next) {
-  /*
-    Seguridad temporal para Etapa A del CMS.
-
-    Se valida el rol ADMIN mediante header:
-    x-user-rol: ADMIN
-
-    En Etapa B esto será reemplazado por:
-    - login admin
-    - validación contra re_usuario
-    - us_rol = 'ADMIN'
-    - JWT
-  */
-
-  const usuarioRol = String(req.headers["x-user-rol"] || "")
+  const usuarioRol = String(req.auth?.rol || "")
     .trim()
     .toUpperCase();
 
@@ -23,7 +10,7 @@ function validarAdmin(req, res, next) {
     });
   }
 
-  next();
+  return next();
 }
 
 module.exports = {
