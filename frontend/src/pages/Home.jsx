@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar";
 import ServiceCard from "../components/ServiceCard";
 import AgendaForm from "../components/AgendaForm";
 import Footer from "../components/Footer";
-/*import FloatingHelpButton from "../components/FloatingHelpButton"; De momento no lo vamos a usar*/ 
+/*import FloatingHelpButton from "../components/FloatingHelpButton"; De momento no lo vamos a usar*/
 
 import ChatbotRegistroMarca from "../components/chatbot-registro-marca/ChatbotRegistroMarca";
 import ChatbotRadiografiaMarca from "../components/chatbot-radiografia-marca/ChatbotRadiografiaMarca";
@@ -152,22 +152,15 @@ function Home() {
             {servicios.map((service) => (
               <div
                 key={service.id}
+                className="service-card-action-wrapper"
                 onClick={service.action}
-                style={{ cursor: service.action ? "pointer" : "default" }}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    service.action();
-                  }
-                }}
               >
                 <ServiceCard
                   icon={service.icon}
                   title={service.title}
                   subtitle={service.subtitle}
                   description={service.description}
+                  onAction={service.action}
                 />
               </div>
             ))}
@@ -175,8 +168,6 @@ function Home() {
         </main>
 
         <Footer />
-
-         
       </div>
 
       {modalActivo === MODALES.CONTACTO && (

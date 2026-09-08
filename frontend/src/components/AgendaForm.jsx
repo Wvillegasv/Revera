@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useEffect, useMemo, useState, forwardRef } from "react";
+import { useEffect, useMemo, useRef, useState, forwardRef } from "react";
 import {
   User,
   Mail,
@@ -8,6 +8,7 @@ import {
   Clock,
   MessageSquare,
   MapPin,
+  CheckCircle2,
 } from "lucide-react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import { es } from "date-fns/locale";
@@ -118,6 +119,8 @@ function AgendaForm({ onSuccess }) {
   const [mensajeError, setMensajeError] = useState("");
   const [horariosOcupados, setHorariosOcupados] = useState([]);
   const [cargandoHorarios, setCargandoHorarios] = useState(false);
+  const [confirmacionCita, setConfirmacionCita] = useState(null);
+  const temporizadorConfirmacionRef = useRef(null);
 
   const fechaSeleccionada = watch("ac_fecha_cita");
   const fechaSeleccionadaDate = convertirTextoAFecha(fechaSeleccionada);
@@ -131,6 +134,14 @@ function AgendaForm({ onSuccess }) {
       ? HORARIOS_SABADO
       : HORARIOS_LUNES_VIERNES;
   }, [fechaSeleccionada]);
+
+  useEffect(() => {
+    return () => {
+      if (temporizadorConfirmacionRef.current) {
+        clearTimeout(temporizadorConfirmacionRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const cargarHorarios = async () => {
@@ -275,23 +286,21 @@ function AgendaForm({ onSuccess }) {
 
       if (response.data.ok) {
         limpiarFormulario();
+        setMensajeExito("");
+        setMensajeError("");
 
-        if (response.data.correoEnviado === false) {
-          setMensajeExito(
-            "Cita registrada correctamente. Sin embargo, hubo un problema al enviar la notificación por correo."
-          );
+        setConfirmacionCita(
+          response.data.correoEnviado === false ? "sin-correo" : "correo-enviado"
+        );
 
-          setTimeout(() => {
-            setMensajeExito("");
-            if (onSuccess) onSuccess();
-          }, 5000);
-        } else {
-          setMensajeExito("Gracias por contactarnos, nos pondremos en contacto pronto.");
-
-          setTimeout(() => {
-            if (onSuccess) onSuccess();
-          }, 3000);
+        if (temporizadorConfirmacionRef.current) {
+          clearTimeout(temporizadorConfirmacionRef.current);
         }
+
+        temporizadorConfirmacionRef.current = setTimeout(() => {
+          setConfirmacionCita(null);
+          if (onSuccess) onSuccess();
+        }, 20000);
       } else {
         setMensajeError("No fue posible registrar la cita. Inténtalo nuevamente.");
 
@@ -317,6 +326,64 @@ function AgendaForm({ onSuccess }) {
       }, 5000);
     }
   };
+
+  if (confirmacionCita) {
+    const correoEnviado = confirmacionCita === "correo-enviado";
+
+    return (
+      <section className="agenda-section agenda-confirmacion-section">
+        <div className="agenda-confirmacion-shell" role="status" aria-live="polite">
+          <div
+            className={`agenda-confirmacion-card ${
+              correoEnviado ? "" : "agenda-confirmacion-card--correo-error"
+            }`}
+          >
+            <div className="agenda-confirmacion-icon" aria-hidden="true">
+              <CheckCircle2 size={44} strokeWidth={2.1} />
+            </div>
+
+            <h3>¡Tu cita quedó agendada!</h3>
+
+            {correoEnviado ? (
+              <>
+                <p>
+                  Gracias por confiar en REVERA. Hemos recibido correctamente tu
+                  solicitud.
+                </p>
+                <p>
+                  Nuestro equipo revisará la información de tu consulta para
+                  brindarte una atención adecuada.
+                </p>
+                <p>
+                  Recibirás una confirmación en el correo electrónico que nos
+                  proporcionaste.
+                </p>
+              </>
+            ) : (
+              <>
+                <p>
+                  Hemos recibido correctamente tu solicitud. Sin embargo, no fue
+                  posible enviar la confirmación por correo en este momento.
+                </p>
+                <p>
+                  Nuestro equipo sí recibió la información de tu cita y podrá darle
+                  seguimiento.
+                </p>
+                <p>Gracias por confiar en REVERA.</p>
+              </>
+            )}
+
+            <div className="agenda-confirmacion-divider" aria-hidden="true" />
+
+            <p className="agenda-confirmacion-despedida">Nos vemos pronto.</p>
+            <p className="agenda-confirmacion-redireccion">
+              Serás redirigido automáticamente al inicio en unos segundos.
+            </p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="agenda-section">
@@ -586,7 +653,7 @@ function AgendaForm({ onSuccess }) {
 
                 {fechaSeleccionada && esSabadoTexto(fechaSeleccionada) && (
                   <p className="help-message">
-                    Horario de sábado disponible: 10:00, 11:00, 12:00 y 14:00
+                    Horario de sábado disponible: 10:00, 11:00, 12:00, 13:00 y 14:00
                   </p>
                 )}
 

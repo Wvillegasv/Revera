@@ -2,9 +2,15 @@
    REVERA - SERVICE CARD / LANDING CLARO
 ========================================================= */
 
+.service-card-action-wrapper {
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
 .service-card {
   width: 100%;
-  min-height: 378px;
+  min-height: 438px;
   height: 100%;
 
   background:
@@ -22,6 +28,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.88);
 
   padding: 32px 28px 31px;
+
   text-align: center;
   cursor: pointer;
 
@@ -43,7 +50,9 @@
 .service-card:hover {
   background: rgba(255, 255, 255, 0.98);
   border-color: rgba(111, 96, 170, 0.12);
+
   transform: translateY(-6px);
+
   box-shadow:
     0 26px 48px rgba(18, 7, 66, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.96);
@@ -61,9 +70,11 @@
 .service-card-icon {
   width: 70px;
   height: 70px;
+
   margin: 0 auto 25px;
 
   border-radius: 50%;
+
   background: #00001b;
   color: #ffffff;
 
@@ -89,18 +100,21 @@
 
 .service-card:hover .service-card-icon {
   transform: scale(1.055);
+
   background: #6f60aa;
   color: #ffffff;
+
   box-shadow: 0 11px 24px rgba(111, 96, 170, 0.28);
 }
 
 /* =========================================================
-   TEXTOS
+   TÍTULO
 ========================================================= */
 
 .service-card-title,
 .service-card h3 {
   margin: 0;
+
   max-width: 300px;
   min-height: 58px;
 
@@ -114,6 +128,7 @@
   font-weight: var(--font-weight-demi, 600);
 
   color: #6f60aa;
+
   letter-spacing: -0.012em;
 
   -webkit-font-smoothing: antialiased;
@@ -121,9 +136,14 @@
   text-rendering: optimizeLegibility;
 }
 
+/* =========================================================
+   SUBTÍTULO
+========================================================= */
+
 .service-card-subtitle,
 .service-card h4 {
   margin: 17px 0 0;
+
   max-width: 300px;
   min-height: 82px;
 
@@ -137,12 +157,79 @@
   font-weight: var(--font-weight-bold, 700);
 
   color: #00001b;
+
   letter-spacing: -0.01em;
 }
 
+/* =========================================================
+   BOTÓN SOLICITAR
+========================================================= */
+
+.service-card-request {
+  width: min(220px, 78%);
+  height: 42px;
+
+  /*
+    Separación equilibrada entre subtítulo,
+    botón y descripción.
+  */
+  margin: 18px auto 0;
+  padding: 0 22px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #6f60aa;
+  color: #ffffff;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-family: var(--font-primary);
+  font-size: 14px;
+  line-height: 1;
+  font-weight: var(--font-weight-demi, 600);
+
+  cursor: pointer;
+
+  box-shadow: 0 8px 18px rgba(111, 96, 170, 0.2);
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.service-card-request:hover {
+  background: #120742;
+
+  transform: translateY(-1px);
+
+  box-shadow: 0 10px 22px rgba(18, 7, 66, 0.24);
+}
+
+.service-card-request:active {
+  transform: translateY(0);
+}
+
+.service-card-request:focus-visible {
+  outline: 3px solid rgba(111, 96, 170, 0.28);
+  outline-offset: 3px;
+}
+
+/* =========================================================
+   DESCRIPCIÓN
+========================================================= */
+
 .service-card-description,
 .service-card p {
-  margin: 12px 0 0;
+  /*
+    Más espacio debajo del botón para que
+    el texto no se vea pegado.
+  */
+  margin: 22px 0 0;
+
   max-width: 290px;
   min-height: 80px;
 
@@ -156,66 +243,200 @@
 }
 
 /* =========================================================
-   RESPONSIVE
+   RESPONSIVE - TABLET / LAPTOP PEQUEÑO
 ========================================================= */
 
 @media (max-width: 1080px) {
   .service-card {
-    min-height: 388px;
+    min-height: 448px;
+    padding: 30px 24px 30px;
+  }
+
+  .service-card-title,
+  .service-card h3 {
+    font-size: 23px;
+  }
+
+  .service-card-subtitle,
+  .service-card h4 {
+    font-size: 17.5px;
+  }
+
+  .service-card-request {
+    width: min(210px, 80%);
+    margin-top: 18px;
+  }
+
+  .service-card-description,
+  .service-card p {
+    margin-top: 21px;
   }
 }
 
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
 @media (max-width: 768px) {
+  .service-card-action-wrapper {
+    width: 100%;
+
+    display: flex;
+    justify-content: center;
+  }
+
   .service-card {
     width: 100%;
     max-width: 430px;
+
     min-height: auto;
+
     padding: 31px 24px 33px;
+
     border-radius: 25px;
+  }
+
+  .service-card-icon {
+    width: 68px;
+    height: 68px;
+
+    margin-bottom: 23px;
   }
 
   .service-card-title,
   .service-card h3 {
     min-height: auto;
+
     font-size: 22px;
+    line-height: 1.2;
   }
 
   .service-card-subtitle,
   .service-card h4 {
     min-height: auto;
+
+    margin-top: 15px;
+
     font-size: 18px;
+    line-height: 1.4;
+  }
+
+  .service-card-request {
+    width: min(210px, 80%);
+    height: 42px;
+
+    margin-top: 18px;
+
+    font-size: 14px;
   }
 
   .service-card-description,
   .service-card p {
     min-height: auto;
+
+    margin-top: 20px;
+
     font-size: 14px;
+    line-height: 1.5;
   }
 }
 
+/* =========================================================
+   RESPONSIVE - MÓVIL
+========================================================= */
+
 @media (max-width: 480px) {
   .service-card {
+    width: 100%;
+
     padding: 28px 20px 30px;
+
+    border-radius: 23px;
   }
 
   .service-card-icon {
     width: 64px;
     height: 64px;
+
     margin-bottom: 22px;
   }
 
   .service-card-title,
   .service-card h3 {
+    max-width: 280px;
+
     font-size: 20px;
+    line-height: 1.22;
   }
 
   .service-card-subtitle,
   .service-card h4 {
+    max-width: 280px;
+
+    margin-top: 14px;
+
     font-size: 16.5px;
+    line-height: 1.4;
+  }
+
+  .service-card-request {
+    width: min(200px, 82%);
+    height: 41px;
+
+    margin-top: 16px;
+    padding: 0 18px;
+
+    font-size: 13.5px;
   }
 
   .service-card-description,
   .service-card p {
+    max-width: 280px;
+
+    margin-top: 18px;
+
     font-size: 13.5px;
+    line-height: 1.5;
+  }
+}
+
+/* =========================================================
+   RESPONSIVE - MÓVIL PEQUEÑO
+========================================================= */
+
+@media (max-width: 360px) {
+  .service-card {
+    padding: 26px 16px 28px;
+  }
+
+  .service-card-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .service-card-title,
+  .service-card h3 {
+    font-size: 19px;
+  }
+
+  .service-card-subtitle,
+  .service-card h4 {
+    font-size: 16px;
+  }
+
+  .service-card-request {
+    width: min(190px, 84%);
+    height: 40px;
+
+    margin-top: 15px;
+
+    font-size: 13px;
+  }
+
+  .service-card-description,
+  .service-card p {
+    margin-top: 17px;
+
+    font-size: 13px;
   }
 }
