@@ -36,7 +36,7 @@ function Navbar({ onContactoClick }) {
               location.pathname === "/" ? "active" : ""
             }`}
           >
-            Chat
+            Inicio
           </Link>
 
           <button
